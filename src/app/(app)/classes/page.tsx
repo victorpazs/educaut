@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function ClassesPage() {
   return (
-    <div className="space-y-4">
+    <div className="mx-auto w-full max-w-3xl space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Turmas</h1>
         <Button>Nova turma</Button>
