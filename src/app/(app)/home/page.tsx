@@ -3,15 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function DashboardPage() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Alunos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">128</div>
-          <p className="text-sm text-muted-foreground">+12 este mês</p>
-        </CardContent>
-      </Card>
+      {Array.from({ length: 50 }).map(() => (
+        <Card>
+          <CardHeader>
+            <CardTitle>Alunos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">128</div>
+            <p className="text-sm text-muted-foreground">+12 este mês</p>
+          </CardContent>
+        </Card>
+      ))}
       <Card>
         <CardHeader>
           <CardTitle>Turmas</CardTitle>

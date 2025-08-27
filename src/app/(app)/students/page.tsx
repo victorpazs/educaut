@@ -6,7 +6,7 @@ export default function StudentsPage() {
     <div className="mx-auto w-full max-w-3xl space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Alunos</h1>
-        <Button>Novo aluno</Button>
+        <Button className="text-white">Novo aluno</Button>
       </div>
       <Card>
         <CardHeader>

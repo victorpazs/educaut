@@ -1,15 +1,15 @@
 import * as React from "react";
-import { Topbar } from "@/components/topbar";
-import { Sidebar } from "./sidebar";
+import { Topbar } from "@/components/nav/topbar";
+import { Sidebar } from "./nav/sidebar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Sidebar />
+    <div className="flex flex-col flex-1 min-h-screen bg-background text-foreground">
       <Topbar />
-      <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6">
-        {children}
-      </main>
+      <div className="flex-1 flex">
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-6">{children}</main>
+      </div>
     </div>
   );
 }
