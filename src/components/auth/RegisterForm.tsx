@@ -54,23 +54,26 @@ export default function RegisterForm() {
   }
 
   return (
-    <Card className="mx-auto w-full max-w-md">
-      <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-foreground">
-          Criar conta
+    <Card className="mx-auto w-full shadow-lg border-0 bg-white/95 backdrop-blur-sm dark:bg-gray-800/95">
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="text-2xl font-semibold text-center text-gray-900 dark:text-white">
+          Crie sua conta
         </CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
+        <CardDescription className="text-center text-gray-600 dark:text-gray-400">
           Preencha seus dados para começar
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6 pb-6">
         <form
-          className="space-y-4"
+          className="space-y-5"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Nome
             </label>
             <Input
@@ -78,14 +81,20 @@ export default function RegisterForm() {
               type="text"
               autoComplete="name"
               placeholder="Seu nome"
+              className="h-11"
               {...register("name")}
             />
             {errors.name?.message ? (
-              <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                {errors.name.message}
+              </p>
             ) : null}
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               E-mail
             </label>
             <Input
@@ -93,18 +102,19 @@ export default function RegisterForm() {
               type="email"
               autoComplete="email"
               placeholder="voce@exemplo.com"
+              className="h-11"
               {...register("email")}
             />
             {errors.email?.message ? (
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                 {errors.email.message}
               </p>
             ) : null}
           </div>
-          <div>
+          <div className="space-y-2">
             <label
               htmlFor="password"
-              className="block text-sm font-medium mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               Senha
             </label>
@@ -113,16 +123,20 @@ export default function RegisterForm() {
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
+              className="h-11"
               {...register("password")}
             />
             {errors.password?.message ? (
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                 {errors.password.message}
               </p>
             ) : null}
           </div>
-          <div>
-            <label htmlFor="confirm" className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <label
+              htmlFor="confirm"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Confirmar senha
             </label>
             <Input
@@ -130,22 +144,32 @@ export default function RegisterForm() {
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
+              className="h-11"
               {...register("confirm")}
             />
             {errors.confirm?.message ? (
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                 {errors.confirm.message}
               </p>
             ) : null}
           </div>
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            Criar conta
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full h-11 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+          >
+            {isSubmitting ? "Criando conta..." : "Criar conta"}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="justify-center">
-        <span className="text-xs text-foreground/80">Já tem conta?</span>
-        <Link href="/login" className="ml-1 underline text-xs">
+      <CardFooter className="justify-center pt-6 border-t border-gray-100 dark:border-gray-700">
+        <span className="text-sm text-gray-600 dark:text-gray-400">
+          Já tem conta?
+        </span>
+        <Link
+          href="/auth/login"
+          className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+        >
           Entrar
         </Link>
       </CardFooter>
