@@ -1,46 +1,29 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Sample data for dashboard cards
+const dashboardData = [
+  {
+    title: "Alunos",
+    value: "128",
+    subtitle: "+12 este mês",
+  },
+  {
+    title: "Turmas",
+    value: "8",
+    subtitle: "2 ativas",
+  },
+  {
+    title: "Atividades",
+    value: "56",
+    subtitle: "7 pendentes",
+  },
+  {
+    title: "Entregas",
+    value: "91%",
+    subtitle: "Taxa média",
+  },
+];
+
 export default function DashboardPage() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: 50 }).map(() => (
-        <Card>
-          <CardHeader>
-            <CardTitle>Alunos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">128</div>
-            <p className="text-sm text-muted-foreground">+12 este mês</p>
-          </CardContent>
-        </Card>
-      ))}
-      <Card>
-        <CardHeader>
-          <CardTitle>Turmas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">8</div>
-          <p className="text-sm text-muted-foreground">2 ativas</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Atividades</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">56</div>
-          <p className="text-sm text-muted-foreground">7 pendentes</p>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Entregas</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">91%</div>
-          <p className="text-sm text-muted-foreground">Taxa média</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>;
 }

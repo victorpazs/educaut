@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function ActivitiesPage() {
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Atividades</h1>
         <Button>Nova atividade</Button>

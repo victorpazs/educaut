@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 
 export default function StudentsPage() {
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Alunos</h1>
+        <h1 className="text-xl font-semibold">Seus alunos</h1>
         <Button className="text-white">Novo aluno</Button>
       </div>
       <Card>

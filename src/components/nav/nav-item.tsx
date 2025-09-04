@@ -9,7 +9,7 @@ interface ISidebarItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
-export function SidebarItem({ path, label, icon: Icon }: ISidebarItem) {
+export function NavItem({ path, label, icon: Icon }: ISidebarItem) {
   const pathname = usePathname();
   const isActive = pathname === path;
 
@@ -17,10 +17,11 @@ export function SidebarItem({ path, label, icon: Icon }: ISidebarItem) {
     <li key={path}>
       <Link
         href={path}
+        prefetch={true}
         className={cn(
           "flex flex-col items-center gap-2 px-3 py-3 rounded-lg text-xs font-medium transition-colors relative",
           isActive
-            ? "bg-blue-50 text-blue-600"
+            ? "bg-blue-50 text-muted-foreground hover:bg-blue-50"
             : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
         )}
       >

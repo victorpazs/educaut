@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { SidebarItem } from "./sidebar-item";
+import { NavItem } from "./nav-item";
 
 export function Sidebar() {
   const navigation = [
@@ -25,13 +25,13 @@ export function Sidebar() {
   ];
 
   return (
-    <nav className="sticky top-0 left-0 bg-white z-10 h-screen flex flex-col">
+    <nav className="sticky top-0 left-0 bg-white z-10 h-screen flex-col hidden md:flex">
       <div className="flex flex-col h-full">
-        <div className="flex-1 pt-12 px-4">
+        <div className="flex-1 pt-8 px-4">
           <ul className="space-y-4">
             {navigation.map((item) => {
               return (
-                <SidebarItem
+                <NavItem
                   key={item.href}
                   label={item.label}
                   path={item.href}
