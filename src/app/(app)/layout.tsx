@@ -5,7 +5,7 @@ import { SearchProvider } from "@/providers/search";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SearchProvider>
-      <AppShell>{children}</AppShell>;
+      <AppShell>{children}</AppShell>
     </SearchProvider>
   );
 }

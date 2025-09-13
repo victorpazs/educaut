@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import moment from "moment";
+
+moment.locale("pt-br");
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +20,7 @@ export const metadata: Metadata = {
   title: "EducAut",
   description:
     "Painel administrativo para gestão de alunos, turmas e atividades.",
+  icons: "/app-logo.png",
 };
 
 export default function RootLayout({

@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useSearch } from "@/hooks/useSearch";
 import { AppLogo } from "../app-logo";
+import { UserMenu } from "./user-menu";
 
 export function Topbar() {
   const pathname = usePathname();
@@ -27,10 +28,7 @@ export function Topbar() {
         {/* Right side - User data */}
         <div className="flex items-center gap-8">
           {/* User Avatar and Dropdown */}
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8" fallback="VP" />
-            <ChevronDown className="h-4 w-4 text-gray-600" />
-          </div>
+          <UserMenu />
         </div>
       </div>
     </header>

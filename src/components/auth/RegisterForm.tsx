@@ -5,16 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Facebook, Twitter, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EmailInput } from "@/components/ui/email-input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { IconInput } from "../ui/icon-input";
 
 const registerSchema = z
   .object({
@@ -54,125 +50,64 @@ export default function RegisterForm() {
   }
 
   return (
-    <Card className="mx-auto w-full shadow-lg border-0 bg-white/95 backdrop-blur-sm dark:bg-gray-800/95">
-      <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="text-2xl font-semibold text-center text-gray-900 dark:text-white">
-          Crie sua conta
-        </CardTitle>
-        <CardDescription className="text-center text-gray-600 dark:text-gray-400">
-          Preencha seus dados para começar
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-6 pb-6">
-        <form
-          className="space-y-5"
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-        >
-          <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Nome
-            </label>
-            <Input
-              id="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Seu nome"
-              className="h-11"
-              {...register("name")}
-            />
-            {errors.name?.message ? (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                {errors.name.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              E-mail
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="voce@exemplo.com"
-              className="h-11"
-              {...register("email")}
-            />
-            {errors.email?.message ? (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                {errors.email.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Senha
-            </label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className="h-11"
-              {...register("password")}
-            />
-            {errors.password?.message ? (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                {errors.password.message}
-              </p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="confirm"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Confirmar senha
-            </label>
-            <Input
-              id="confirm"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              className="h-11"
-              {...register("confirm")}
-            />
-            {errors.confirm?.message ? (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                {errors.confirm.message}
-              </p>
-            ) : null}
-          </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full h-11 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+    <div className="w-full space-y-6">
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* Name Field */}
+        <div className="space-y-2">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-foreground"
           >
-            {isSubmitting ? "Criando conta..." : "Criar conta"}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center pt-6 border-t border-gray-100 dark:border-gray-700">
-        <span className="text-sm text-gray-600 dark:text-gray-400">
-          Já tem conta?
-        </span>
+            Nome
+          </label>
+          <IconInput
+            startIcon={User}
+            id="name"
+            type="text"
+            autoComplete="name"
+            placeholder="Seu nome completo"
+            className="h-12 bg-background border-border focus:border-primary focus:ring-primary"
+            {...register("name")}
+          />
+          {errors.name?.message ? (
+            <p className="text-xs text-red-600">{errors.name.message}</p>
+          ) : null}
+        </div>
+
+        {/* Email Field */}
+        <EmailInput
+          placeholder="seu.email@exemplo.com"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+
+        {/* Password Field */}
+        <PasswordInput
+          label="Senha"
+          error={errors.password?.message}
+          {...register("password")}
+        />
+
+        {/* Register Button */}
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+        >
+          {isSubmitting ? "Criando conta..." : "Criar conta"}
+        </Button>
+      </form>
+
+      {/* Already have account */}
+      <div className="text-center">
+        <span className="text-sm text-secondary">Já tem uma conta? </span>
         <Link
           href="/auth/login"
-          className="ml-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          className="text-sm font-bold text-primary hover:underline"
         >
-          Entrar
+          Faça login
         </Link>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
