@@ -105,7 +105,7 @@ export default function StudentsPage() {
             onChange={handleSearchChange}
             onClear={handleSearchClear}
           />
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+          <Button >
             Novo aluno
           </Button>
         </div>
