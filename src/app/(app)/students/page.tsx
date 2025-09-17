@@ -91,6 +91,11 @@ export default function StudentsPage() {
     setSearchTerm("");
   };
 
+  const filteredStudents = mockStudents.filter(student => 
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.turma.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
