@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/search-input";
 import { PageHeader } from "@/components/page-header";
-import { Mail, Phone, Calendar, Users, CakeIcon } from "lucide-react";
+import { Mail, Phone, Calendar, Users, CakeIcon, Edit } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
 
 // Mock data for students
@@ -144,6 +145,15 @@ export default function StudentsPage() {
                     />
                   </div>
                 </div>
+                <Link href={`/students/edit/${student.id}`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </CardHeader>
           </Card>
