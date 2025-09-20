@@ -28,19 +28,16 @@ const segmentOptions = [
   "Educação Infantil",
   "Ensino Fundamental 2º ao 5º ano",
   "Ensino Fundamental 6º ao 9º ano",
-  "Ensino Médio"
+  "Ensino Médio",
 ];
 
-const teaOptions = [
-  "TEA - nível de suporte 1",
-  "TEA - nível de suporte 2"
-];
+const teaOptions = ["TEA - nível de suporte 1", "TEA - nível de suporte 2"];
 
 const otherDisorderOptions = [
   "Ansiedade",
   "Coordenação Motora",
   "Deficiência Intelectual",
-  "Rigidez Cognitiva"
+  "Rigidez Cognitiva",
 ];
 
 const hyperfocusOptions = [
@@ -51,13 +48,10 @@ const hyperfocusOptions = [
   "análise lógica",
   "criatividade",
   "tecnologia",
-  "programações"
+  "programações",
 ];
 
-const communicationOptions = [
-  "sim",
-  "não"
-];
+const communicationOptions = ["sim", "não"];
 
 const preferenceOptions = [
   "jogos de encaixe",
@@ -67,7 +61,7 @@ const preferenceOptions = [
   "regras de jogos",
   "planejamento e resolução de problemas",
   "jogos educativos",
-  "percepção visual"
+  "percepção visual",
 ];
 
 const difficultyOptions = [
@@ -87,7 +81,7 @@ const difficultyOptions = [
   "fuga em tarefas complexas",
   "abstrair conceitos",
   "pensamento literal",
-  "questões comportamentais"
+  "questões comportamentais",
 ];
 
 export default function EditStudentPage() {
@@ -105,7 +99,7 @@ export default function EditStudentPage() {
     communication: "",
     preferences: [],
     difficulties: [],
-    observation: ""
+    observation: "",
   });
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -124,28 +118,33 @@ export default function EditStudentPage() {
         communication: "sim",
         preferences: ["jogos educativos", "quebra-cabeça"],
         difficulties: ["interação social", "manter diálogo"],
-        observation: "Aluna demonstra grande interesse por livros e atividades que envolvem raciocínio lógico."
+        observation:
+          "Aluna demonstra grande interesse por livros e atividades que envolvem raciocínio lógico.",
       });
     }
   }, [studentId]);
 
   const handleInputChange = (field: keyof StudentFormData, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
-  const handleCheckboxChange = (field: keyof StudentFormData, option: string, checked: boolean) => {
-    setFormData(prev => {
+  const handleCheckboxChange = (
+    field: keyof StudentFormData,
+    option: string,
+    checked: boolean
+  ) => {
+    setFormData((prev) => {
       const currentArray = prev[field] as string[];
-      const newArray = checked 
+      const newArray = checked
         ? [...currentArray, option]
-        : currentArray.filter(item => item !== option);
-      
+        : currentArray.filter((item) => item !== option);
+
       return {
         ...prev,
-        [field]: newArray
+        [field]: newArray,
       };
     });
   };
@@ -153,10 +152,10 @@ export default function EditStudentPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Saving student data:", formData);
       router.push("/students");
     } catch (error) {
@@ -173,15 +172,8 @@ export default function EditStudentPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleBack}
-          className="h-8 w-8 p-0"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
         <PageHeader
+          goBack={handleBack}
           title="Editar Aluno"
           subtitle="Atualize as informações do aluno."
         />
@@ -203,7 +195,7 @@ export default function EditStudentPage() {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Idade</label>
                 <Input
@@ -217,7 +209,7 @@ export default function EditStudentPage() {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Segmento Escolar</label>
               <Select
@@ -254,9 +246,11 @@ export default function EditStudentPage() {
                 ))}
               </Select>
             </div>
-            
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">Outro transtorno junto</label>
+              <label className="text-sm font-medium">
+                Outro transtorno junto
+              </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {otherDisorderOptions.map((option) => (
                   <Checkbox
@@ -264,17 +258,21 @@ export default function EditStudentPage() {
                     id={`disorder-${option}`}
                     label={option}
                     checked={formData.otherDisorders.includes(option)}
-                    onCheckedChange={(checked) => handleCheckboxChange("otherDisorders", option, checked)}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange("otherDisorders", option, checked)
+                    }
                   />
                 ))}
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Comunicação</label>
               <Select
                 value={formData.communication}
-                onValueChange={(value) => handleInputChange("communication", value)}
+                onValueChange={(value) =>
+                  handleInputChange("communication", value)
+                }
                 placeholder="Selecione"
               >
                 {communicationOptions.map((option) => (
@@ -301,12 +299,14 @@ export default function EditStudentPage() {
                     id={`hyperfocus-${option}`}
                     label={option}
                     checked={formData.hyperfocus.includes(option)}
-                    onCheckedChange={(checked) => handleCheckboxChange("hyperfocus", option, checked)}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange("hyperfocus", option, checked)
+                    }
                   />
                 ))}
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Preferências</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -316,7 +316,9 @@ export default function EditStudentPage() {
                     id={`preference-${option}`}
                     label={option}
                     checked={formData.preferences.includes(option)}
-                    onCheckedChange={(checked) => handleCheckboxChange("preferences", option, checked)}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange("preferences", option, checked)
+                    }
                   />
                 ))}
               </div>
@@ -330,7 +332,9 @@ export default function EditStudentPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Dificuldades identificadas</label>
+              <label className="text-sm font-medium">
+                Dificuldades identificadas
+              </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {difficultyOptions.map((option) => (
                   <Checkbox
@@ -338,7 +342,9 @@ export default function EditStudentPage() {
                     id={`difficulty-${option}`}
                     label={option}
                     checked={formData.difficulties.includes(option)}
-                    onCheckedChange={(checked) => handleCheckboxChange("difficulties", option, checked)}
+                    onCheckedChange={(checked) =>
+                      handleCheckboxChange("difficulties", option, checked)
+                    }
                   />
                 ))}
               </div>
@@ -355,7 +361,9 @@ export default function EditStudentPage() {
               <label className="text-sm font-medium">Observação</label>
               <Textarea
                 value={formData.observation}
-                onChange={(e) => handleInputChange("observation", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("observation", e.target.value)
+                }
                 placeholder="Digite observações adicionais sobre o aluno..."
                 rows={4}
               />

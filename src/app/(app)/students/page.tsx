@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { SearchInput } from "@/components/ui/search-input";
 import { PageHeader } from "@/components/page-header";
-import { Mail, Phone, Calendar, Users, CakeIcon, Edit } from "lucide-react";
-import { Chip } from "@/components/ui/chip";
+import { StudentCard } from "./_components/student-card";
+import { Plus } from "lucide-react";
 
 // Mock data for students
 const mockStudents = [
@@ -92,71 +89,39 @@ export default function StudentsPage() {
     setSearchTerm("");
   };
 
-  const filteredStudents = mockStudents.filter(student => 
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.turma.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStudents = mockStudents.filter(
+    (student) =>
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.turma.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <PageHeader
-          title="Alunos"
-          subtitle="Cadastre e administre os seus alunos."
-        />
-        <div className="flex items-center gap-3">
-          <SearchInput
-            placeholder="Buscar alunos..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            onClear={handleSearchClear}
-          />
-          <Button >
-            Novo aluno
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Alunos"
+        subtitle="Cadastre e administre os seus alunos."
+        actions={
+          <div className="flex items-center gap-3">
+            <SearchInput
+              placeholder="Buscar alunos..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onClear={handleSearchClear}
+            />
+            <Link href="/students/create">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Novo aluno
+              </Button>
+            </Link>
+          </div>
+        }
+      />
 
       {/* Students Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mockStudents.map((student) => (
-          <Card
-            key={student.id}
-            className="hover:-translate-y-1 cursor-pointer transition duration-200"
-          >
-            <CardHeader className="pb-4">
-              <div className="flex items-center space-x-4">
-                <Avatar
-                  src={student.avatar}
-                  alt={student.name}
-                  fallback={student.name.charAt(0).toUpperCase()}
-                  className="h-12 w-12"
-                />
-                <div className="flex-1">
-                  <CardTitle className="text-lg text-foreground">
-                    {student.name}
-                  </CardTitle>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <Chip
-                      label={`${student.age} anos`}
-                      color="default"
-                      size="sm"
-                      startIcon={CakeIcon}
-                    />
-                  </div>
-                </div>
-                <Link href={`/students/edit/${student.id}`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-          </Card>
+          <StudentCard {...student} />
         ))}
       </div>
     </div>
