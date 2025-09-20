@@ -366,8 +366,8 @@ export default function EditStudentPage() {
         {/* Sticky bottom buttons */}
         <div className="fixed bottom-[15px] right-2 z-50">
           <div className="max-w-7xl mx-auto px-4">
-            <Card className="w-full">
-              <CardContent className="p-4">
+            <Card className="backdrop-blur-sm bg-white/15">
+              <CardContent className="p-4 flex justify-center items-center">
                 <div className="flex justify-center items-center gap-4">
                   <Button
                     type="button"
@@ -397,7 +397,6 @@ export default function EditStudentPage() {
           </div>
         </div>
 
-        {/* Spacer to prevent content from being hidden behind sticky buttons */}
         <div className="h-20"></div>
       </form>
     </div>
