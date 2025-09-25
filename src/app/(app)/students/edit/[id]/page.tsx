@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { Accordion } from "@/components/ui/accordion";
 import { PageHeader } from "@/components/page-header";
 
 interface StudentFormData {
@@ -180,11 +181,8 @@ export default function EditStudentPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Básicas</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Accordion title="Informações Básicas" defaultExpanded={true}>
+          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Aluno</label>
@@ -224,14 +222,11 @@ export default function EditStudentPage() {
                 ))}
               </Select>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Accordion>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Clínicas</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Accordion title="Informações Clínicas">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">TEA</label>
               <Select
@@ -282,14 +277,11 @@ export default function EditStudentPage() {
                 ))}
               </Select>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Accordion>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Características e Habilidades</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Accordion title="Características e Habilidades">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Hiperfoco</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -323,14 +315,11 @@ export default function EditStudentPage() {
                 ))}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Accordion>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dificuldades</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <Accordion title="Dificuldades">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Dificuldades identificadas
@@ -349,27 +338,22 @@ export default function EditStudentPage() {
                 ))}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </Accordion>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Observações</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Observação</label>
-              <Textarea
-                value={formData.observation}
-                onChange={(e) =>
-                  handleInputChange("observation", e.target.value)
-                }
-                placeholder="Digite observações adicionais sobre o aluno..."
-                rows={4}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <Accordion title="Observações">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Observação</label>
+            <Textarea
+              value={formData.observation}
+              onChange={(e) =>
+                handleInputChange("observation", e.target.value)
+              }
+              placeholder="Digite observações adicionais sobre o aluno..."
+              rows={4}
+            />
+          </div>
+        </Accordion>
 
         {/* Sticky bottom buttons */}
         <div className="fixed bottom-[15px] right-2 z-50">
