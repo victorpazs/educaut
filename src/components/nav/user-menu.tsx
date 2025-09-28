@@ -27,19 +27,11 @@ export function UserMenu() {
       <MenuTrigger>
         <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
           <Avatar className="h-8 w-8" fallback="VP" />
-          <div className="flex flex-col text-left">
-            <span className="text-sm font-medium text-foreground">
-              Victor paz da silva
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Escola: <b>Educarse</b>
-            </span>
-          </div>
+
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </div>
       </MenuTrigger>
       <MenuContent align="start" className="w-64">
-        {/* User Info Header */}
         <div className="px-3 py-3 ">
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12" fallback="VP" />
@@ -53,8 +45,6 @@ export function UserMenu() {
             </div>
           </div>
         </div>
-
-        {/* Project Section */}
         <div className="py-1">
           <MenuItem>
             <div className="flex items-center justify-between w-full">
