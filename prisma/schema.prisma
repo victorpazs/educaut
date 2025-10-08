@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -9,4 +6,77 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model attribute_types {
+  id         BigInt       @id @default(autoincrement())
+  name       String       @unique @db.VarChar(100)
+  attributes attributes[]
+}
+
+model attributes {
+  id                 BigInt               @id @default(autoincrement())
+  type_id            BigInt
+  name               String               @db.VarChar(150)
+  attribute_types    attribute_types      @relation(fields: [type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  student_attributes student_attributes[]
+
+  @@unique([type_id, name])
+}
+
+model school_users {
+  id         BigInt    @id @default(autoincrement())
+  school_id  BigInt
+  user_id    BigInt
+  role       String    @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  schools    schools   @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([school_id, user_id])
+}
+
+model schools {
+  id           BigInt         @id @default(autoincrement())
+  created_by   BigInt
+  name         String         @db.VarChar(150)
+  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  school_users school_users[]
+  users        users          @relation(fields: [created_by], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  students     students[]
+}
+
+model student_attributes {
+  student_id   BigInt
+  attribute_id BigInt
+  attributes   attributes @relation(fields: [attribute_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  students     students   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([student_id, attribute_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model students {
+  id                 BigInt               @id @default(autoincrement())
+  school_id          BigInt
+  name               String               @db.VarChar(100)
+  birth_year         Int
+  school_year        String?              @db.VarChar(50)
+  school_segment     String?              @db.VarChar(50)
+  tea_support_level  String?              @db.VarChar(50)
+  communication      Boolean?
+  description        String?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  student_attributes student_attributes[]
+  schools            schools              @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id            BigInt         @id @default(autoincrement())
+  name          String         @db.VarChar(150)
+  email         String         @unique @db.VarChar(150)
+  password_hash String         @db.VarChar(255)
+  created_at    DateTime?      @default(now()) @db.Timestamp(6)
+  school_users  school_users[]
+  schools       schools[]
 }

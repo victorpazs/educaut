@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchData } from "@/lib/fetcher";
 
 export function useLiveQuery<T>(apiRoute: string) {
   const [searchText, setSearchText] = useState<string>("");
@@ -13,9 +12,7 @@ export function useLiveQuery<T>(apiRoute: string) {
       const getData = async (): Promise<void> => {
         if (!searchText) return setIsLoading(false);
         try {
-          const data = await fetchData(apiRoute, {
-            search: searchText,
-          });
+          const data = {} as T[];
           setOptions(data);
         } catch (err) {
           setIsLoading(false);

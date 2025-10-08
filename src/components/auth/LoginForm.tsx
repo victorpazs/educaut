@@ -5,40 +5,55 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Facebook, Twitter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { EmailInput } from "@/components/ui/email-input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { withValidation } from "@/lib/validation";
+import { loginAction } from "@/app/auth/login/actions";
+import { toast } from "@/lib/toast";
 
 const loginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
-  password: z.string().min(6, "A senha deve ter ao menos 6 caracteres"),
+  password: z.string(),
 });
 
-type LoginValues = z.infer<typeof loginSchema>;
+export type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
+  const [serverError, setServerError] = React.useState<string | null>(null);
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
+    setError,
   } = useForm<LoginValues>({
     defaultValues: { email: "", password: "" },
   });
 
-  async function onSubmit(values: LoginValues) {
-    const parsed = loginSchema.safeParse(values);
-    if (!parsed.success) {
-      parsed.error.issues.forEach((issue) => {
-        const path = issue.path[0] as keyof LoginValues;
-        setError(path, { type: "zod", message: issue.message });
-      });
-      return;
+  const validatedOnSubmit = withValidation(
+    loginSchema,
+    async (values: LoginValues) => {
+      try {
+        setServerError(null);
+        const result = await loginAction(values);
+        
+        if (result?.error) {
+          // Display error using toast
+          toast.error("Login failed", result.error);
+          // Optionally set server error to display in form
+          setServerError(result.error);
+        }
+      } catch (error) {
+        toast.error("Error", "An unexpected error occurred. Please try again.");
+        setServerError("An unexpected error occurred. Please try again.");
+      }
     }
-    router.push("/home");
+  );
+
+  async function onSubmit(values: LoginValues) {
+    await validatedOnSubmit(values);
   }
 
   return (
@@ -56,6 +71,13 @@ export default function LoginForm() {
           error={errors.password?.message}
           {...register("password")}
         />
+
+        {/* Server Error Display */}
+        {serverError && (
+          <div className="text-sm text-red-500 p-2 bg-red-50 rounded">
+            {serverError}
+          </div>
+        )}
 
         {/* Sign Up Button */}
         <Button
