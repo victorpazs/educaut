@@ -1,5 +1,6 @@
 import { ZodSchema, ZodError } from "zod";
 import { toast } from "@/lib/toast";
+import { createValidationError, ErrorDetail } from "@/lib/error";
 
 /**
  * Reusable Zod validation function that automatically shows toast errors
@@ -16,18 +17,19 @@ export async function validateForm<T>(
 
     if (!parsed.success) {
       // Handle Zod validation errors
-      const errorMessages: string[] = [];
+      const errorDetails: ErrorDetail[] = [];
 
       parsed.error.issues.forEach((issue) => {
-        const errorMessage = issue.message;
-
-        // Add to error messages array for toast
-        errorMessages.push(`${errorMessage}`);
+        errorDetails.push({
+          field: issue.path.join("."),
+          message: issue.message,
+        });
       });
 
       // Show error toast with all validation messages
-      if (errorMessages.length > 0) {
-        toast.error("Ocorreu um erro", errorMessages.join(", "));
+      if (errorDetails.length > 0) {
+        const errorMessage = errorDetails.map((e) => e.message).join(", ");
+        toast.error("Erro de validação", errorMessage);
       }
 
       return null;
@@ -36,7 +38,7 @@ export async function validateForm<T>(
     // Return validated data
     return parsed.data;
   } catch (error) {
-    toast.error("Error", "Um erro inesperado ocorreu!");
+    toast.error("Erro", "Um erro inesperado ocorreu!");
     return null;
   }
 }

@@ -12,49 +12,60 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { withValidation } from "@/lib/validation";
 import { loginAction } from "@/app/auth/login/actions";
 import { toast } from "@/lib/toast";
+import { ApiResponse } from "@/lib/error";
 
 const loginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
-  password: z.string(),
+  password: z.string().min(1, "Senha é obrigatória"),
 });
 
 export type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
-  const [serverError, setServerError] = React.useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
+    clearErrors,
   } = useForm<LoginValues>({
     defaultValues: { email: "", password: "" },
   });
 
-  const validatedOnSubmit = withValidation(
-    loginSchema,
-    async (values: LoginValues) => {
-      try {
-        setServerError(null);
-        const result = await loginAction(values);
-        
-        if (result?.error) {
-          // Display error using toast
-          toast.error("Login failed", result.error);
-          // Optionally set server error to display in form
-          setServerError(result.error);
-        }
-      } catch (error) {
-        toast.error("Error", "An unexpected error occurred. Please try again.");
-        setServerError("An unexpected error occurred. Please try again.");
-      }
-    }
-  );
+  const onSubmit = withValidation(loginSchema, async (values: LoginValues) => {
+    try {
+      clearErrors();
 
-  async function onSubmit(values: LoginValues) {
-    await validatedOnSubmit(values);
-  }
+      const result: ApiResponse<any> = await loginAction(values);
+
+      if (!result.success) {
+        // Handle error response - show only the main message in toast
+        toast.error("Login falhou", result.message);
+
+        // Set field-specific errors if available
+        if (result.error?.details) {
+          result.error.details.forEach((detail: any) => {
+            if (detail.field) {
+              setError(detail.field as keyof LoginValues, {
+                message: detail.message,
+              });
+            }
+          });
+        }
+
+        return;
+      }
+
+      // Handle success - redirect happens in server action
+      toast.success("Sucesso", result.message);
+    } catch (error) {
+      toast.error(
+        "Erro",
+        "Ocorreu um erro inesperado. Por favor, tente novamente."
+      );
+    }
+  });
 
   return (
     <div className="w-full space-y-6">
@@ -71,13 +82,6 @@ export default function LoginForm() {
           error={errors.password?.message}
           {...register("password")}
         />
-
-        {/* Server Error Display */}
-        {serverError && (
-          <div className="text-sm text-red-500 p-2 bg-red-50 rounded">
-            {serverError}
-          </div>
-        )}
 
         {/* Sign Up Button */}
         <Button
