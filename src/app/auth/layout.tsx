@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { BarChart3, TrendingUp, Users, Rocket } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
 import { usePathname } from "next/navigation";
 

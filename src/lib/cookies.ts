@@ -2,12 +2,14 @@
 
 import { cookies } from "next/headers";
 
+const SEVEN_DAYS = 60 * 60 * 24 * 7;
+
 export async function setAuthCookie(token: string) {
   const cookieStore = await cookies();
   cookieStore.set("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: SEVEN_DAYS,
     path: "/",
   });
 }
@@ -20,7 +22,7 @@ export async function getAuthToken(): Promise<string | undefined> {
 export async function setSchoolCookie(schoolId: number) {
   const cookieStore = await cookies();
   cookieStore.set("school_id", String(schoolId), {
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: SEVEN_DAYS,
     path: "/",
   });
 }

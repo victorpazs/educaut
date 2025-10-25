@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/auth";
+import { homeRoute, loginRoute } from "./lib/contraints";
 
-const publicPaths = ["/auth/login", "/auth/register", "/api/auth"];
+const publicPaths = [loginRoute, "/auth/register"];
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
@@ -11,21 +12,24 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(path)
   );
 
-  if (isPublic) return NextResponse.next();
-
+  if (isPublic) {
+    if (!!token) {
+      return NextResponse.redirect(new URL(homeRoute, req.url));
+    } else return NextResponse.next();
+  }
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return NextResponse.redirect(new URL(loginRoute, req.url));
   }
 
   const payload = await verifyJwt(token).catch(() => null);
-  if (!payload) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+
+  if (!payload || !payload.success || !payload.data) {
+    return NextResponse.redirect(new URL(loginRoute, req.url));
   }
 
   return NextResponse.next();
 }
 
-// Match all app routes except static assets
 export const config = {
   matcher: ["/((?!_next|favicon.ico|assets).*)"],
 };

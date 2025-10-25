@@ -1,17 +1,18 @@
 import { SignJWT, jwtVerify } from "jose";
-import { createErrorResponse, createSuccessResponse } from "@/lib/error";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/lib/server-responses";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export type JwtPayload = {
-  id: bigint;
-  email: string;
-  name: string;
+  id: string; // Changed from bigint to string for JSON serialization
 };
 
 /**
  * Signs a JWT for the user
- * @param payload - JWT payload
+ * @param payload - JWT payload (with string ID)
  * @returns Signed JWT token or error response
  */
 export async function signJwt(payload: JwtPayload) {
@@ -24,7 +25,7 @@ export async function signJwt(payload: JwtPayload) {
 
     return createSuccessResponse(token, "Token gerado com sucesso.");
   } catch (error) {
-    console.error("JWT signing error:", error);
+    console.error(error);
     return createErrorResponse(
       "Erro ao gerar token de autenticação.",
       "JWT_SIGN_ERROR",

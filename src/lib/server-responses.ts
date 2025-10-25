@@ -117,17 +117,13 @@ export function createServerError(
  * @returns Standardized error response
  */
 export function handleServerError(error: any): ApiResponse<null> {
-  // If it's already an ApiResponse, return it as is
-  if (error && typeof error === 'object' && 'success' in error) {
+  if (error && typeof error === "object" && "success" in error) {
     return error;
   }
 
-  // Log the actual error for debugging (in production, you might want to use a proper logger)
   console.error("Server Error:", error);
 
-  // Handle different types of errors
   if (error instanceof Error) {
-    // For validation errors or known error types, you can add specific handling here
     return createServerError(error.message);
   }
 

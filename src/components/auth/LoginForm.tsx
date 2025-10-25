@@ -12,14 +12,14 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { withValidation } from "@/lib/validation";
 import { loginAction } from "@/app/auth/login/actions";
 import { toast } from "@/lib/toast";
-import { ApiResponse } from "@/lib/error";
+import { homeRoute } from "@/lib/contraints";
 
-const loginSchema = z.object({
+const LoginSchema = z.object({
   email: z.string().email("Informe um e-mail válido"),
   password: z.string().min(1, "Senha é obrigatória"),
 });
 
-export type LoginValues = z.infer<typeof loginSchema>;
+export type LoginValues = z.infer<typeof LoginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
@@ -27,38 +27,27 @@ export default function LoginForm() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
+
     clearErrors,
   } = useForm<LoginValues>({
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = withValidation(loginSchema, async (values: LoginValues) => {
+  const onSubmit = withValidation(LoginSchema, async (values: LoginValues) => {
     try {
       clearErrors();
 
-      const result: ApiResponse<any> = await loginAction(values);
+      const loginResult = await loginAction(values);
 
-      if (!result.success) {
-        // Handle error response - show only the main message in toast
-        toast.error("Login falhou", result.message);
-
-        // Set field-specific errors if available
-        if (result.error?.details) {
-          result.error.details.forEach((detail: any) => {
-            if (detail.field) {
-              setError(detail.field as keyof LoginValues, {
-                message: detail.message,
-              });
-            }
-          });
-        }
-
-        return;
+      if (!loginResult.success) {
+        toast.error(
+          "Erro",
+          loginResult.message || "Não foi possível fazer login."
+        );
+      } else if (loginResult.success) {
+        router.push(homeRoute);
+        router.refresh();
       }
-
-      // Handle success - redirect happens in server action
-      toast.success("Sucesso", result.message);
     } catch (error) {
       toast.error(
         "Erro",
@@ -70,20 +59,13 @@ export default function LoginForm() {
   return (
     <div className="w-full space-y-6">
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
-        {/* Email Field */}
-        <EmailInput
-          placeholder="john.doe@email.com"
-          error={errors.email?.message}
-          {...register("email")}
-        />
+        <EmailInput error={errors.email?.message} {...register("email")} />
 
-        {/* Password Field */}
         <PasswordInput
           error={errors.password?.message}
           {...register("password")}
         />
 
-        {/* Sign Up Button */}
         <Button
           type="submit"
           disabled={isSubmitting}
@@ -93,16 +75,15 @@ export default function LoginForm() {
         </Button>
       </form>
 
-      {/* Already have account */}
       <div className="text-center">
         <span className="text-sm text-secondary">
-          Already have an account?{" "}
+          Ainda não criou a sua conta?{" "}
         </span>
         <Link
           href="/auth/register"
           className="text-sm font-bold text-primary hover:underline"
         >
-          Sign in instead
+          Registre-se
         </Link>
       </div>
     </div>
