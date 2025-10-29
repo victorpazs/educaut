@@ -1,7 +1,10 @@
+"use server";
+
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { verifyJwt } from "@/lib/auth";
+import { verifyJwt } from "@/lib/jwt";
 import { prisma } from "@/lib/prisma";
+import { getSchoolId } from "./cookies";
 
 export const getCurrentUser = cache(async () => {
   const cookieStore = await cookies();
@@ -25,21 +28,56 @@ export const getCurrentUser = cache(async () => {
   try {
     const user = await prisma.users.findUnique({
       where: { id: parseInt(session.data.id) },
-      include: {
-        schools: true,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        created_at: true,
+        avatar: true,
+        school_users: {
+          include: {
+            schools: true,
+          },
+        },
       },
     });
 
     if (!user) {
       return null;
     }
+    const user_schools = user.school_users.map(
+      (school_user) => school_user.schools
+    );
 
-    return user;
+    const { school_users, ...userWithoutSchoolUsers } = user;
+    return { ...userWithoutSchoolUsers, schools: user_schools };
   } catch (error) {
     console.error("Failed to fetch user:", error);
     return null;
   }
 });
+
+export const getSchoolFromCookie = cache(
+  async (schoolId: number, userId: number) => {
+    try {
+      const foundSchool = await prisma.schools.findFirst({
+        where: {
+          id: schoolId,
+          school_users: {
+            some: {
+              user_id: userId,
+            },
+          },
+        },
+      });
+
+      return foundSchool;
+    } catch (error) {
+      console.error("Failed to fetch school from cookie:", error);
+      return null;
+    }
+  }
+);
 
 export const getAuthContext = cache(async () => {
   const user = await getCurrentUser();
@@ -48,64 +86,18 @@ export const getAuthContext = cache(async () => {
     return { user: null, school: null };
   }
 
-  const cookieStore = await cookies();
-  const schoolIdCookie = cookieStore.get("selected-school")?.value;
-  let schoolId = schoolIdCookie ? parseInt(schoolIdCookie) : NaN;
+  const schoolIdCookie = await getSchoolId();
+  let schoolId = schoolIdCookie ? schoolIdCookie : NaN;
 
   let school = null;
 
-  // 1. If a valid schoolId is in the cookie, try to use it.
   if (!isNaN(schoolId)) {
-    try {
-      const foundSchool = await prisma.schools.findFirst({
-        where: {
-          id: schoolId,
-          school_users: {
-            some: {
-              user_id: user.id, // Verify user still belongs to this school
-            },
-          },
-        },
-      });
+    const foundSchool = await getSchoolFromCookie(schoolId, user.id);
 
-      if (foundSchool) {
-        school = foundSchool; // Success! Cookie was valid.
-      } else {
-        // Cookie was stale/invalid (user no longer in school or school deleted)
-        cookieStore.delete("selected-school");
-      }
-    } catch (error) {
-      console.error("Failed to fetch school from cookie:", error);
-      // Proceed as if there was no cookie
+    if (foundSchool) {
+      school = foundSchool;
     }
   }
 
-  // 2. If we don't have a school yet (no cookie, or bad cookie)...
-  if (!school) {
-    // Check the user's school list (fetched by getCurrentUser)
-    if (user.schools && user.schools.length > 0) {
-      // REQ 1 & 2: Get the first school from the list
-      school = user.schools[0];
-
-      // Set the cookie for the next request
-      cookieStore.set("selected-school", school.id.toString(), {
-        path: "/",
-        // Add other options as needed:
-        // httpOnly: true,
-        // secure: process.env.NODE_ENV === 'production',
-        // maxAge: 60 * 60 * 24 * 30, // 30 days
-      });
-    } else {
-      // REQ 3: User is logged in but has NO schools.
-      // This is an invalid state, so log them out.
-      cookieStore.delete("token"); // Delete the session cookie
-      cookieStore.delete("selected-school"); // Clean up just in case
-
-      // Throw an error to stop further execution
-      throw new Error("User is not associated with any school.");
-    }
-  }
-
-  // 3. Return the final context
   return { user: user, school: school };
 });

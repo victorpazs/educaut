@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyJwt } from "@/lib/auth";
+import { verifyJwt } from "@/lib/jwt";
 import { homeRoute, loginRoute } from "./lib/contraints";
 
 const publicPaths = [loginRoute, "/auth/register"];
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(loginRoute, req.url));
   }
 
-  const payload = await verifyJwt(token).catch(() => null);
+  const payload = await verifyJwt(token);
 
   if (!payload || !payload.success || !payload.data) {
     return NextResponse.redirect(new URL(loginRoute, req.url));

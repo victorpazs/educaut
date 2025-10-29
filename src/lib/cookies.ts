@@ -19,9 +19,9 @@ export async function getAuthToken(): Promise<string | undefined> {
   return cookieStore.get("token")?.value;
 }
 
-export async function setSchoolCookie(schoolId: number) {
+export async function setSchoolCookie(token: string) {
   const cookieStore = await cookies();
-  cookieStore.set("school_id", String(schoolId), {
+  cookieStore.set("selected_school", String(token), {
     maxAge: SEVEN_DAYS,
     path: "/",
   });
@@ -29,12 +29,17 @@ export async function setSchoolCookie(schoolId: number) {
 
 export async function getSchoolId(): Promise<number | undefined> {
   const cookieStore = await cookies();
-  const value = cookieStore.get("school_id")?.value;
+  const value = cookieStore.get("selected_school")?.value;
   return value ? Number(value) : undefined;
+}
+
+export async function clearSchoolCookie() {
+  const cookieStore = await cookies();
+  cookieStore.delete("selected_school");
 }
 
 export async function clearCookies() {
   const cookieStore = await cookies();
   cookieStore.delete("token");
-  cookieStore.delete("school_id");
+  cookieStore.delete("selected_school");
 }

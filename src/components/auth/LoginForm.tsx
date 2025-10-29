@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { EmailInput } from "@/components/ui/email-input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { withValidation } from "@/lib/validation";
-import { loginAction } from "@/app/auth/login/actions";
+import { loginAction } from "@/app/auth/actions";
 import { toast } from "@/lib/toast";
 import { homeRoute } from "@/lib/contraints";
 

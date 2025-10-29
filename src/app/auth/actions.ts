@@ -2,8 +2,8 @@
 
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
-import { signJwt } from "@/lib/auth";
-import { clearCookies, setAuthCookie } from "@/lib/cookies";
+import { signJwt } from "@/lib/jwt";
+import { clearCookies, setAuthCookie, setSchoolCookie } from "@/lib/cookies";
 import { redirect } from "next/navigation";
 import { LoginValues } from "@/components/auth/LoginForm";
 import {
@@ -31,7 +31,16 @@ export async function loginAction({ email, password }: LoginValues) {
       return createValidationError(errors);
     }
 
-    const user = await prisma.users.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({
+      where: { email },
+      include: {
+        school_users: {
+          include: {
+            schools: true,
+          },
+        },
+      },
+    });
     if (!user) {
       return createAuthError("Credenciais inválidas.");
     }
@@ -50,9 +59,21 @@ export async function loginAction({ email, password }: LoginValues) {
       return tokenResponse;
     }
 
-    const token = tokenResponse.data;
+    await setAuthCookie(tokenResponse.data);
 
-    await setAuthCookie(token);
+    const userSchools = user.school_users.map(
+      (school_user) => school_user.schools
+    );
+
+    if (userSchools && userSchools.length > 0) {
+      const schoolToken = await signJwt({
+        id: userSchools[0].id?.toString(),
+      });
+
+      if (schoolToken.success && schoolToken.data) {
+        await setSchoolCookie(schoolToken.data);
+      }
+    }
 
     return tokenResponse;
   } catch (error) {

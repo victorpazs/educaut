@@ -7,7 +7,7 @@ import {
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export type JwtPayload = {
-  id: string; // Changed from bigint to string for JSON serialization
+  id: string;
 };
 
 /**

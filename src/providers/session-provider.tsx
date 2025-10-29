@@ -4,7 +4,7 @@ import type { School, User } from "@/types/db";
 import { createContext, useContext, ReactNode } from "react";
 
 interface SessionContextValue {
-  user: User | null;
+  user: (User & { schools?: School[] }) | null;
   school: School | null;
 }
 

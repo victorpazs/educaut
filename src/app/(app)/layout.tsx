@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { SearchProvider } from "@/providers/search";
 
 import { getAuthContext } from "@/lib/session";
-import { SessionProvider } from "@/components/providers/session-provider";
+import { SessionProvider } from "@/providers/session-provider";
 
 export default async function AppLayout({
   children,
@@ -11,7 +11,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const { user, school } = await getAuthContext();
-
+  console.log(user, school);
   return (
     <SessionProvider value={{ user, school }}>
       <SearchProvider>
