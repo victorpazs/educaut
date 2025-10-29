@@ -4,7 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { EmailInput } from "@/components/ui/email-input";
@@ -13,13 +12,7 @@ import { withValidation } from "@/lib/validation";
 import { loginAction } from "@/app/auth/actions";
 import { toast } from "@/lib/toast";
 import { homeRoute } from "@/lib/contraints";
-
-const LoginSchema = z.object({
-  email: z.string().email("Informe um e-mail válido"),
-  password: z.string().min(1, "Senha é obrigatória"),
-});
-
-export type LoginValues = z.infer<typeof LoginSchema>;
+import { LoginSchema, LoginValues } from "../_models";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -55,6 +48,19 @@ export default function LoginForm() {
       );
     }
   });
+
+  setTimeout(async () => {
+    console.log("inside timeout");
+    const res = await withValidation(LoginSchema, (res) => {
+      console.log("oi", res);
+    })({
+      email: "email",
+      oi: "oi",
+      password: "password",
+    });
+
+    console.log("res", res);
+  }, 6000);
 
   return (
     <div className="w-full space-y-6">

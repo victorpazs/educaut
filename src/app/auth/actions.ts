@@ -5,13 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/jwt";
 import { clearCookies, setAuthCookie, setSchoolCookie } from "@/lib/cookies";
 import { redirect } from "next/navigation";
-import { LoginValues } from "@/components/auth/LoginForm";
 import {
   createErrorResponse,
   createAuthError,
   createValidationError,
 } from "@/lib/server-responses";
 import { ErrorDetail } from "@/lib/server-responses";
+import { LoginValues } from "./login/_models";
 
 export async function loginAction({ email, password }: LoginValues) {
   try {

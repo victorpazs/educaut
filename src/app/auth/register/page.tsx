@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/auth/RegisterForm";
+import RegisterForm from "./_components/RegisterForm";
 
 export const metadata = {
   title: "Registro | EducAut",

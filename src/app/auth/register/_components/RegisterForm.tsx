@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EmailInput } from "@/components/ui/email-input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { IconInput } from "../ui/icon-input";
+import { IconInput } from "../../../../components/ui/icon-input";
 
 const registerSchema = z
   .object({

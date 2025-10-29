@@ -14,6 +14,8 @@ export async function validateForm<T>(
 ): Promise<T | null> {
   try {
     const parsed = schema.safeParse(data);
+    console.log("parsed", parsed);
+    console.log("data", data);
 
     if (!parsed.success) {
       const errorDetails: ErrorDetail[] = [];
