@@ -1,17 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useSearch } from "@/hooks/useSearch";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useLiveQuery } from "@/hooks/useLiveQuery";
 import SearchInput from "./search-input";
 import { SearchOption } from "./search-option";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LiveSearchResult } from "@/app/_search/actions";
+import type { Category } from "./search-input";
 
 export function SearchModal() {
   const { toggle, isOpen } = useSearch();
   const { searchText, setSearchText, isLoading, options } = useLiveQuery();
-  const onOptionClick = (_data: LiveSearchResult) => {};
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 
   return (
     <Dialog open={isOpen} onOpenChange={toggle}>
@@ -21,6 +22,8 @@ export function SearchModal() {
             <SearchInput
               searchText={searchText}
               setSearchText={setSearchText}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
             />
           </div>
           <div className="w-full mt-2">
@@ -33,14 +36,26 @@ export function SearchModal() {
                     <>
                       {options &&
                         options.length > 0 &&
-                        options.map((opt) => (
-                          <SearchOption
-                            key={opt.id}
-                            title={opt.name}
-                            type={opt.type}
-                            onClick={() => onOptionClick(opt)}
-                          />
-                        ))}
+                        options
+                          .filter(
+                            (opt) =>
+                              selectedCategories.some(
+                                (cat) => cat.type === opt.type
+                              ) || selectedCategories?.length === 0
+                          )
+                          .map((opt) => (
+                            <SearchOption
+                              key={opt.id}
+                              id={opt.id}
+                              title={opt.name}
+                              type={opt.type}
+                              onClose={() => {
+                                setSearchText("");
+                                setSelectedCategories([]);
+                                toggle();
+                              }}
+                            />
+                          ))}
                     </>
                   )}
                 </div>

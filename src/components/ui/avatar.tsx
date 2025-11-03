@@ -11,6 +11,7 @@ export type AvatarProps = React.HTMLAttributes<HTMLDivElement> & {
 
 export function Avatar({
   className,
+  children,
   src,
   alt,
   fallback,
@@ -27,6 +28,8 @@ export function Avatar({
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="h-full w-full object-cover" />
+      ) : children ? (
+        children
       ) : (
         <span className="text-muted-foreground">{fallback ?? "?"}</span>
       )}

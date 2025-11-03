@@ -42,7 +42,6 @@ export function useStudents(search: string): UseStudentsResult {
       try {
         const response = await getStudents({
           search,
-          schoolId: school.id,
         });
 
         if (isMounted && requestCounter.current === currentRequest) {

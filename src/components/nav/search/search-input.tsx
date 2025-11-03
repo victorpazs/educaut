@@ -9,22 +9,28 @@ import { SearchInput as SearchInputComponent } from "@/components/ui/search-inpu
 type SearchInputProps = {
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  selectedCategories: Category[];
+  setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
 };
 
-type Category = {
+export type Category = {
+  type: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
 const categories: Category[] = [
-  { label: "Alunos", icon: User },
-  { label: "Atividades", icon: FileCheck },
-  { label: "Agenda", icon: Calendar },
+  { type: "student", label: "Alunos", icon: User },
+  { type: "activity", label: "Atividades", icon: FileCheck },
+  { type: "calendar", label: "Agenda", icon: Calendar },
 ];
 
-const SearchInput = ({ searchText, setSearchText }: SearchInputProps) => {
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-
+const SearchInput = ({
+  searchText,
+  setSearchText,
+  selectedCategories,
+  setSelectedCategories,
+}: SearchInputProps) => {
   const toggleCategory = (category: Category) => {
     setSelectedCategories((prev) =>
       prev.includes(category)

@@ -93,7 +93,7 @@ export async function liveSearch(
         ...students.map((student) => ({
           id: `student:${student.id}`,
           name: student.name,
-          type: "Aluno",
+          type: "student",
         }))
       );
     }
@@ -112,7 +112,7 @@ export async function liveSearch(
           return {
             id: `schedule:${agenda.id}`,
             name: `Aula com ${agenda.student_name} no dia ${formattedDay} às ${formattedTime}`,
-            type: "Agenda",
+            type: "calendar",
           };
         })
       );
