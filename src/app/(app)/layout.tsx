@@ -11,7 +11,6 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const { user, school } = await getAuthContext();
-  console.log(user, school);
   return (
     <SessionProvider value={{ user, school }}>
       <SearchProvider>

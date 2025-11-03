@@ -1,14 +1,23 @@
 "use client";
 
 import type { School, User } from "@/types/db";
-import { createContext, useContext, ReactNode } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 interface SessionContextValue {
   user: (User & { schools?: School[] }) | null;
   school: School | null;
+  setSchool: (school: School | null) => void;
 }
 
-const SessionContext = createContext<SessionContextValue | undefined>(
+export const SessionContext = createContext<SessionContextValue | undefined>(
   undefined
 );
 
@@ -17,18 +26,32 @@ export function SessionProvider({
   value,
 }: {
   children: ReactNode;
-  value: SessionContextValue;
+  value: Omit<SessionContextValue, "setSchool">;
 }) {
-  return (
-    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  const [currentSchool, setCurrentSchool] = useState<School | null>(
+    value.school
   );
-}
 
-// Create a custom hook to easily access the context
-export function useSession() {
-  const context = useContext(SessionContext);
-  if (context === undefined) {
-    throw new Error("useSession must be used within a SessionProvider");
-  }
-  return context;
+  useEffect(() => {
+    setCurrentSchool(value.school);
+  }, [value.school]);
+
+  const handleSetSchool = useCallback((nextSchool: School | null) => {
+    setCurrentSchool(nextSchool);
+  }, []);
+
+  const contextValue = useMemo<SessionContextValue>(
+    () => ({
+      user: value.user,
+      school: currentSchool,
+      setSchool: handleSetSchool,
+    }),
+    [value.user, currentSchool, handleSetSchool]
+  );
+
+  return (
+    <SessionContext.Provider value={contextValue}>
+      {children}
+    </SessionContext.Provider>
+  );
 }

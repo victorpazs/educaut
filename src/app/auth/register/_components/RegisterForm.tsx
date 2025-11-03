@@ -4,55 +4,64 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Facebook, Twitter, User } from "lucide-react";
+import { User, School } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { EmailInput } from "@/components/ui/email-input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { IconInput } from "../../../../components/ui/icon-input";
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, "Informe seu nome"),
-    email: z.string().email("Informe um e-mail válido"),
-    password: z.string().min(6, "A senha deve ter ao menos 6 caracteres"),
-    confirm: z.string().min(6, "Confirme sua senha"),
-  })
-  .refine((data) => data.password === data.confirm, {
-    message: "As senhas não coincidem",
-    path: ["confirm"],
-  });
-
-type RegisterValues = z.infer<typeof registerSchema>;
+import { withValidation } from "@/lib/validation";
+import { toast } from "@/lib/toast";
+import { homeRoute } from "@/lib/contraints";
+import { registerAction } from "@/app/auth/actions";
+import { RegisterSchema, RegisterValues } from "../_models";
 
 export default function RegisterForm() {
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
+    clearErrors,
   } = useForm<RegisterValues>({
-    defaultValues: { name: "", email: "", password: "", confirm: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirm: "",
+      schoolName: "",
+    },
   });
 
-  async function onSubmit(values: RegisterValues) {
-    const parsed = registerSchema.safeParse(values);
-    if (!parsed.success) {
-      parsed.error.issues.forEach((issue) => {
-        const path = issue.path[0] as keyof RegisterValues;
-        setError(path, { type: "zod", message: issue.message });
-      });
-      return;
+  const onSubmit = withValidation(
+    RegisterSchema,
+    async (values: RegisterValues) => {
+      try {
+        clearErrors();
+
+        const response = await registerAction(values);
+
+        if (!response.success) {
+          toast.error(
+            "Erro",
+            response.message || "Não foi possível criar a conta."
+          );
+          return;
+        }
+
+        router.push(homeRoute);
+        router.refresh();
+      } catch (error) {
+        toast.error(
+          "Erro",
+          "Ocorreu um erro inesperado. Por favor, tente novamente."
+        );
+      }
     }
-    router.push("/home");
-  }
+  );
 
   return (
     <div className="w-full space-y-6">
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        {/* Name Field */}
         <div className="space-y-2">
           <label
             htmlFor="name"
@@ -74,6 +83,27 @@ export default function RegisterForm() {
           ) : null}
         </div>
 
+        <div className="space-y-2">
+          <label
+            htmlFor="schoolName"
+            className="block text-sm font-medium text-foreground"
+          >
+            Nome da escola
+          </label>
+          <IconInput
+            startIcon={School}
+            id="schoolName"
+            type="text"
+            autoComplete="organization"
+            placeholder="Nome da escola"
+            className="h-12 bg-background border-border focus:border-primary focus:ring-primary"
+            {...register("schoolName")}
+          />
+          {errors.schoolName?.message ? (
+            <p className="text-xs text-red-600">{errors.schoolName.message}</p>
+          ) : null}
+        </div>
+
         {/* Email Field */}
         <EmailInput
           placeholder="seu.email@exemplo.com"
@@ -85,7 +115,15 @@ export default function RegisterForm() {
         <PasswordInput
           label="Senha"
           error={errors.password?.message}
+          autoComplete="new-password"
           {...register("password")}
+        />
+
+        <PasswordInput
+          label="Confirmar senha"
+          error={errors.confirm?.message}
+          autoComplete="new-password"
+          {...register("confirm")}
         />
 
         {/* Register Button */}

@@ -49,18 +49,6 @@ export default function LoginForm() {
     }
   });
 
-  setTimeout(async () => {
-    console.log("inside timeout");
-    const res = await withValidation(LoginSchema, (res) => {
-      console.log("oi", res);
-    })({
-      email: "email",
-      oi: "oi",
-      password: "password",
-    });
-
-    console.log("res", res);
-  }, 6000);
 
   return (
     <div className="w-full space-y-6">

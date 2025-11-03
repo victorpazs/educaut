@@ -1,4 +1,5 @@
 import {
+  Check,
   ChevronDown,
   LogOut,
   Settings,
@@ -12,16 +13,44 @@ import {
   BarChart3,
   Calendar,
 } from "lucide-react";
+import { useCallback } from "react";
 import { Avatar } from "../ui/avatar";
 import {
   Menu,
   MenuContent,
   MenuItem,
+  MenuLabel,
   MenuSeparator,
   MenuTrigger,
 } from "../ui/menu";
+import { useSession } from "@/hooks/useSession";
+import { useSchoolChange } from "@/hooks/useSchoolChange";
 
 export function UserMenu() {
+  const { user, school } = useSession();
+  const { changeSchool, isPending } = useSchoolChange();
+
+  const schools = user?.schools ?? [];
+  const selectedSchool = school ?? null;
+  const schoolInitials = selectedSchool?.name
+    ? selectedSchool.name.slice(0, 2).toUpperCase()
+    : schools[0]?.name
+    ? schools[0].name.slice(0, 2).toUpperCase()
+    : "??";
+
+  const handleSelectSchool = useCallback(
+    (schoolId: number) => {
+      const nextSchool = schools.find((item) => item.id === schoolId);
+
+      if (!nextSchool) {
+        return;
+      }
+
+      changeSchool(nextSchool);
+    },
+    [changeSchool, schools]
+  );
+
   return (
     <Menu>
       <MenuTrigger>
@@ -36,32 +65,55 @@ export function UserMenu() {
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12" fallback="VP" />
             <div className="flex flex-col">
-              <span className="font-medium text-foreground">
-                Victor paz da silva
-              </span>
-              <span className="text-sm text-muted-foreground">
-                Escola: <b>Educarse</b>
-              </span>
+              <span className="font-medium text-foreground">{user?.name}</span>
             </div>
           </div>
         </div>
-        <div className="py-1">
-          <MenuItem>
-            <div className="flex items-center justify-between w-full">
+        {schools.length > 0 && (
+          <>
+            <MenuSeparator />
+
+            <div className="px-3 py-3">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center text-white text-xs font-bold">
-                  PT
+                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white text-sm font-semibold uppercase">
+                  {schoolInitials}
                 </div>
-                <span>projeto teste 23</span>
+                <div className="flex flex-col">
+                  <span className="font-medium text-foreground">
+                    {selectedSchool?.name ?? "Selecione uma escola"}
+                  </span>
+                </div>
               </div>
-              <ChevronDown className="h-4 w-4" />
             </div>
-          </MenuItem>
-        </div>
 
-        <MenuSeparator />
+            <MenuLabel className="px-3 text-xs font-semibold text-muted-foreground uppercase">
+              Escolas
+            </MenuLabel>
 
-        {/* System Options */}
+            <div className="py-1">
+              {schools.map((userSchool) => (
+                <MenuItem
+                  key={userSchool.id}
+                  onClick={() => handleSelectSchool(userSchool.id)}
+                  disabled={isPending && userSchool.id !== selectedSchool?.id}
+                  className="flex items-center justify-between"
+                >
+                  <span className="text-left text-sm text-foreground">
+                    {userSchool.name}
+                  </span>
+                  {selectedSchool?.id === userSchool.id && (
+                    <Check className="h-4 w-4 text-green-600" />
+                  )}
+                </MenuItem>
+              ))}
+            </div>
+
+            <MenuSeparator />
+          </>
+        )}
+
+        {schools.length === 0 && <MenuSeparator />}
+
         <div className="py-1">
           <MenuItem>
             <Cog className="mr-3 h-4 w-4" />
@@ -86,7 +138,6 @@ export function UserMenu() {
 
         <MenuSeparator />
 
-        {/* Logout */}
         <div className="py-1">
           <MenuItem destructive>
             <LogOut className="mr-3 h-4 w-4" />

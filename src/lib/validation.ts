@@ -14,8 +14,6 @@ export async function validateForm<T>(
 ): Promise<T | null> {
   try {
     const parsed = schema.safeParse(data);
-    console.log("parsed", parsed);
-    console.log("data", data);
 
     if (!parsed.success) {
       const errorDetails: ErrorDetail[] = [];
@@ -28,8 +26,8 @@ export async function validateForm<T>(
       });
 
       if (errorDetails.length > 0) {
-        const errorMessage = errorDetails.map((e) => e.message).join(", ");
-        toast.error("Erro de validação", errorMessage);
+        const errorMessage = errorDetails[0]?.message || "Erro de validação";
+        toast.error("Dados inválidos", errorMessage);
       }
 
       return null;
