@@ -57,7 +57,7 @@ export const getCurrentUser = cache(async () => {
   }
 });
 
-export const getSchoolFromCookie = cache(
+export const getSelectedSchoolById = cache(
   async (schoolId: number, userId: number) => {
     try {
       const foundSchool = await prisma.schools.findFirst({
@@ -87,12 +87,25 @@ export const getAuthContext = cache(async () => {
   }
 
   const schoolIdCookie = await getSchoolId();
-  let schoolId = schoolIdCookie ? schoolIdCookie : NaN;
+
+  if (!schoolIdCookie) {
+    return { user: user, school: null };
+  }
+
+  const selectedSchool = await verifyJwt(schoolIdCookie);
 
   let school = null;
 
-  if (!isNaN(schoolId)) {
-    const foundSchool = await getSchoolFromCookie(schoolId, user.id);
+  if (
+    selectedSchool &&
+    selectedSchool.data &&
+    selectedSchool.data.id &&
+    !isNaN(Number(selectedSchool.data.id))
+  ) {
+    const foundSchool = await getSelectedSchoolById(
+      Number(selectedSchool.data.id),
+      user.id
+    );
 
     if (foundSchool) {
       school = foundSchool;

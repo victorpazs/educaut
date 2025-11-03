@@ -27,10 +27,10 @@ export async function setSchoolCookie(token: string) {
   });
 }
 
-export async function getSchoolId(): Promise<number | undefined> {
+export async function getSchoolId(): Promise<string | undefined> {
   const cookieStore = await cookies();
   const value = cookieStore.get("selected_school")?.value;
-  return value ? Number(value) : undefined;
+  return value ? value : undefined;
 }
 
 export async function clearSchoolCookie() {

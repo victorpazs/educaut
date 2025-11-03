@@ -3,12 +3,18 @@
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/jwt";
-import { clearCookies, setAuthCookie, setSchoolCookie } from "@/lib/cookies";
+import {
+  clearCookies,
+  clearSchoolCookie,
+  setAuthCookie,
+  setSchoolCookie,
+} from "@/lib/cookies";
 import { redirect } from "next/navigation";
 import {
   createErrorResponse,
   createAuthError,
   createValidationError,
+  createSuccessResponse,
 } from "@/lib/server-responses";
 import { ErrorDetail } from "@/lib/server-responses";
 import { LoginValues } from "./login/_models";
@@ -81,6 +87,31 @@ export async function loginAction({ email, password }: LoginValues) {
     return createErrorResponse(
       "Ocorreu um erro inesperado. Por favor, tente novamente.",
       "LOGIN_ERROR",
+      500
+    );
+  }
+}
+
+export async function updateSelectedSchool(schoolId: number | null) {
+  try {
+    if (!schoolId || schoolId == null) {
+      throw new Error("Escola não encontrada.");
+    }
+
+    const schoolToken = await signJwt({ id: schoolId.toString() });
+
+    if (!schoolToken.success || !schoolToken.data) {
+      return schoolToken;
+    }
+
+    await setSchoolCookie(schoolToken.data);
+
+    return createSuccessResponse(null, "Escola atualizada com sucesso.");
+  } catch (error) {
+    console.error("Update selected school error:", error);
+    return createErrorResponse(
+      "Não foi possível atualizar a escola selecionada.",
+      "UPDATE_SCHOOL_ERROR",
       500
     );
   }

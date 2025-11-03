@@ -1,11 +1,12 @@
-export interface IStudent {
-  id: number;
-  name: string;
-  avatar?: string | null;
-  age: number;
-  phone?: string;
-  turma?: string;
-  idade?: number;
-  dataMatricula?: string;
-  status?: string;
-}
+import { Prisma } from "@/generated/prisma";
+
+export type IStudent = Prisma.studentsGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    birth_year: true;
+    school_year: true;
+    created_at: true;
+    status: true;
+  };
+}>;

@@ -2,7 +2,7 @@
 
 import { useCallback, useTransition } from "react";
 
-import { persistSelectedSchool } from "@/actions/session";
+import { updateSelectedSchool } from "@/app/auth/actions";
 import type { School } from "@/types/db";
 import { useSession } from "./useSession";
 
@@ -24,7 +24,7 @@ export function useSchoolChange(): UseSchoolChangeResult {
       setSchool(nextSchool);
 
       startTransition(async () => {
-        await persistSelectedSchool(nextSchool ? nextSchool.id : null);
+        await updateSelectedSchool(nextSchool ? nextSchool.id : null);
       });
     },
     [currentSchool?.id, setSchool]
@@ -32,4 +32,3 @@ export function useSchoolChange(): UseSchoolChangeResult {
 
   return { changeSchool, isPending };
 }
-

@@ -10,6 +10,7 @@ export interface SearchInputProps
   onClear?: () => void;
   showClearButton?: boolean;
   size?: "sm" | "md" | "lg";
+  onSearch?: (value: string) => void;
 }
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
@@ -20,6 +21,9 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       onClear,
       showClearButton = true,
       placeholder = "Buscar...",
+      onSearch,
+      onKeyDown,
+      disabled,
       ...props
     },
     ref
@@ -52,6 +56,21 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       }
     };
 
+    const handleSearch = React.useCallback(() => {
+      if (disabled) {
+        return;
+      }
+      onSearch?.(searchValue as string);
+    }, [disabled, onSearch, searchValue]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      onKeyDown?.(event);
+
+      if (!event.defaultPrevented && event.key === "Enter") {
+        handleSearch();
+      }
+    };
+
     const clearButton =
       showClearButton && searchValue ? (
         <Button
@@ -74,9 +93,13 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         placeholder={placeholder}
         value={searchValue}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         startIcon={Search}
+        onStartIconClick={onSearch ? handleSearch : undefined}
+        startIconAriaLabel={onSearch ? placeholder : undefined}
         endContent={clearButton}
         className="min-w-[200px] text-sm "
+        disabled={disabled}
         {...props}
       />
     );

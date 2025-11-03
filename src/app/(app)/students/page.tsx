@@ -2,98 +2,34 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { SearchInput } from "@/components/ui/search-input";
-import { PageHeader } from "@/components/page-header";
-import { StudentCard } from "./_components/student-card";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 
-// Mock data for students
-const mockStudents = [
-  {
-    id: 1,
-    name: "Ana Silva",
-    avatar: null,
-    age: 12,
-    phone: "(11) 99999-9999",
-    turma: "Turma A",
-    idade: 8,
-    dataMatricula: "15/03/2024",
-    status: "Ativo",
-  },
-  {
-    id: 2,
-    name: "Carlos Santos",
-    avatar: null,
-    age: 12,
-    phone: "(11) 88888-8888",
-    turma: "Turma B",
-    idade: 9,
-    dataMatricula: "20/02/2024",
-    status: "Ativo",
-  },
-  {
-    id: 3,
-    name: "Maria Oliveira",
-    avatar: null,
-    age: 12,
-    phone: "(11) 77777-7777",
-    turma: "Turma A",
-    idade: 7,
-    dataMatricula: "10/01/2024",
-    status: "Ativo",
-  },
-  {
-    id: 4,
-    name: "João Costa",
-    avatar: null,
-    age: 12,
-    phone: "(11) 66666-6666",
-    turma: "Turma C",
-    idade: 8,
-    dataMatricula: "05/04/2024",
-    status: "Inativo",
-  },
-  {
-    id: 5,
-    name: "Sofia Ferreira",
-    avatar: null,
-    age: 12,
-    phone: "(11) 55555-5555",
-    turma: "Turma B",
-    idade: 9,
-    dataMatricula: "25/03/2024",
-    status: "Ativo",
-  },
-  {
-    id: 6,
-    name: "Pedro Lima",
-    avatar: null,
-    age: 12,
-    phone: "(11) 44444-4444",
-    turma: "Turma A",
-    idade: 8,
-    dataMatricula: "12/02/2024",
-    status: "Ativo",
-  },
-];
+import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyMedia,
+} from "@/components/ui/empty";
+import { SearchInput } from "@/components/ui/search-input";
+import { SkeletonCard } from "@/components/ui/skeleton";
+
+import { StudentCard } from "./_components/student-card";
+import { useStudents } from "./_hooks/use-students";
 
 export default function StudentsPage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [search, setSearch] = React.useState("");
+  const { students, isLoading, hasError, hasSchool } = useStudents(search);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (value: string) => {
+    setSearch(value);
   };
 
   const handleSearchClear = () => {
-    setSearchTerm("");
+    setSearch("");
   };
-
-  const filteredStudents = mockStudents.filter(
-    (student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.turma.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <div className="space-y-6">
@@ -104,9 +40,9 @@ export default function StudentsPage() {
           <div className="flex items-center gap-3">
             <SearchInput
               placeholder="Buscar alunos..."
-              value={searchTerm}
-              onChange={handleSearchChange}
+              value={search}
               onClear={handleSearchClear}
+              onSearch={handleSearch}
             />
             <Link href="/students/create">
               <Button>
@@ -118,12 +54,55 @@ export default function StudentsPage() {
         }
       />
 
-      {/* Students Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockStudents.map((student) => (
-          <StudentCard {...student} />
-        ))}
-      </div>
+      {!hasSchool ? (
+        <Empty>
+          <EmptyMedia variant="icon">
+            <Users className="h-6 w-6" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Selecione uma escola</EmptyTitle>
+            <EmptyDescription>
+              É necessário escolher uma escola para visualizar os alunos.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : hasError ? (
+        <Empty>
+          <EmptyMedia variant="icon">
+            <Users className="h-6 w-6" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Erro ao carregar alunos</EmptyTitle>
+            <EmptyDescription>
+              Não foi possível carregar os alunos. Tente novamente em instantes.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : isLoading ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} className="rounded-lg border" />
+          ))}
+        </div>
+      ) : students.length === 0 ? (
+        <Empty>
+          <EmptyMedia variant="icon">
+            <Users className="h-6 w-6" />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Nenhum aluno encontrado</EmptyTitle>
+            <EmptyDescription>
+              Ajuste os filtros de busca ou cadastre um novo aluno.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {students.map((student) => (
+            <StudentCard key={student.id} {...student} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

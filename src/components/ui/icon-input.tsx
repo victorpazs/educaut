@@ -11,6 +11,8 @@ export interface IconInputProps
   startIcon?: React.ComponentType<{ className?: string }>;
   endContent?: React.ReactNode;
   size?: "sm" | "md" | "lg";
+  onStartIconClick?: () => void;
+  startIconAriaLabel?: string;
 }
 
 // Size variants for input fields
@@ -48,6 +50,8 @@ export const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
       endContent,
       size = "md",
       id,
+      onStartIconClick,
+      startIconAriaLabel,
       ...props
     },
     ref
@@ -67,10 +71,29 @@ export const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
         )}
         <div className="relative">
           {StartIcon && (
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <StartIcon
-                className={cn(sizeConfig.iconSize, "text-muted-foreground")}
-              />
+            <div
+              className={cn(
+                "absolute inset-y-0 left-0 pl-3 flex items-center",
+                !onStartIconClick && "pointer-events-none"
+              )}
+            >
+              {onStartIconClick ? (
+                <button
+                  type="button"
+                  onClick={onStartIconClick}
+                  aria-label={startIconAriaLabel}
+                  title={startIconAriaLabel}
+                  className="flex items-center justify-center p-0 text-muted-foreground hover:text-foreground focus:outline-none"
+                >
+                  <StartIcon
+                    className={cn(sizeConfig.iconSize, "text-current")}
+                  />
+                </button>
+              ) : (
+                <StartIcon
+                  className={cn(sizeConfig.iconSize, "text-muted-foreground")}
+                />
+              )}
             </div>
           )}
           <Input

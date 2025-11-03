@@ -6,7 +6,13 @@ import { Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion } from "@/components/ui/accordion";
@@ -213,13 +219,17 @@ export default function EditStudentPage() {
               <Select
                 value={formData.segment}
                 onValueChange={(value) => handleInputChange("segment", value)}
-                placeholder="Selecione o segmento"
               >
-                {segmentOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione o segmento" />
+                </SelectTrigger>
+                <SelectContent>
+                  {segmentOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -232,13 +242,17 @@ export default function EditStudentPage() {
               <Select
                 value={formData.tea}
                 onValueChange={(value) => handleInputChange("tea", value)}
-                placeholder="Selecione o nível de suporte"
               >
-                {teaOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione o nível de suporte" />
+                </SelectTrigger>
+                <SelectContent>
+                  {teaOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
 
@@ -268,13 +282,17 @@ export default function EditStudentPage() {
                 onValueChange={(value) =>
                   handleInputChange("communication", value)
                 }
-                placeholder="Selecione"
               >
-                {communicationOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {communicationOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
           </div>

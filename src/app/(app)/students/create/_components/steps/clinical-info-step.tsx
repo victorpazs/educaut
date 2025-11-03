@@ -1,5 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StudentFormData } from "../../_types";
 
@@ -40,13 +46,17 @@ export function ClinicalInfoStep({
           <Select
             value={formData.tea}
             onValueChange={(value) => onInputChange("tea", value)}
-            placeholder="Selecione o nível de suporte"
           >
-            {teaOptions.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione o nível de suporte" />
+            </SelectTrigger>
+            <SelectContent>
+              {teaOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
 
@@ -72,13 +82,17 @@ export function ClinicalInfoStep({
           <Select
             value={formData.communication}
             onValueChange={(value) => onInputChange("communication", value)}
-            placeholder="Selecione"
           >
-            {communicationOptions.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              {communicationOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </CardContent>

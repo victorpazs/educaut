@@ -1,6 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StudentFormData } from "../../_types";
 
 interface BasicInfoStepProps {
@@ -52,13 +58,17 @@ export function BasicInfoStep({ formData, onInputChange }: BasicInfoStepProps) {
           <Select
             value={formData.segment}
             onValueChange={(value) => onInputChange("segment", value)}
-            placeholder="Selecione o segmento"
           >
-            {segmentOptions.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione o segmento" />
+            </SelectTrigger>
+            <SelectContent>
+              {segmentOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </CardContent>
