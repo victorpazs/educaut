@@ -18,15 +18,18 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
   return (
     <div className={cn("w-full", className)}>
       <nav aria-label="Progress">
-        <ol className="flex items-center justify-between">
+        <ol className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           {steps.map((step, index) => {
             const isCompleted = index < currentStep;
             const isCurrent = index === currentStep;
             const isUpcoming = index > currentStep;
 
             return (
-              <li key={step.id} className="flex items-center flex-1">
-                <div className="flex items-center">
+              <li
+                key={step.id}
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-1"
+              >
+                <div className="flex items-start sm:items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors",
@@ -71,9 +74,19 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
                 {index < steps.length - 1 && (
                   <ChevronRight
                     className={cn(
-                      "w-5 h-5 mx-2 transition-colors",
+                      "hidden w-5 h-5 mx-2 transition-colors sm:block",
                       index < currentStep && "text-primary",
                       index >= currentStep && "text-muted-foreground"
+                    )}
+                  />
+                )}
+                {index < steps.length - 1 && (
+                  <ChevronRight
+                    className={cn(
+                      "block h-5 w-5 self-center transition-colors sm:hidden",
+                      index < currentStep && "text-primary",
+                      index >= currentStep && "text-muted-foreground",
+                      "rotate-90"
                     )}
                   />
                 )}

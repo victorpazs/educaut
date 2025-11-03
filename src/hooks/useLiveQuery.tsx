@@ -1,37 +1,81 @@
 "use client";
 
+import { liveSearch, type LiveSearchResult } from "@/app/_search/actions";
+import { useSession } from "./useSession";
 import { useEffect, useState } from "react";
 
-export function useLiveQuery<T>(apiRoute: string) {
+type UseLiveQueryOptions = {
+  debounceMs?: number;
+};
+
+const DEFAULT_DEBOUNCE_MS = 600;
+
+export function useLiveQuery<T extends LiveSearchResult = LiveSearchResult>(
+  options?: UseLiveQueryOptions
+) {
+  const { school } = useSession();
   const [searchText, setSearchText] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [options, setOptions] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<T[]>([]);
+
+  const debounceMs = options?.debounceMs ?? DEFAULT_DEBOUNCE_MS;
+
   useEffect(() => {
+    const normalizedSearch = searchText.trim();
+
+    if (!normalizedSearch) {
+      setResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    if (!school?.id) {
+      setResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
     setIsLoading(true);
-    let timer = setTimeout(() => {
-      const getData = async (): Promise<void> => {
-        if (!searchText) return setIsLoading(false);
-        try {
-          const data = {} as T[];
-          setOptions(data);
-        } catch (err) {
-          setIsLoading(false);
-        } finally {
+
+    const timer = setTimeout(async () => {
+      try {
+        const response = await liveSearch({
+          query: normalizedSearch,
+          schoolId: school.id,
+        });
+
+        if (isCancelled) {
+          return;
+        }
+
+        if (response.success && response.data) {
+          setResults(response.data as T[]);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setResults([]);
+        }
+      } finally {
+        if (!isCancelled) {
           setIsLoading(false);
         }
-      };
-      getData();
-    }, 1000);
+      }
+    }, debounceMs);
 
     return () => {
-      if (timer !== null) clearTimeout(timer);
+      isCancelled = true;
+      clearTimeout(timer);
     };
-  }, [searchText]);
+  }, [debounceMs, school?.id, searchText]);
 
   return {
     isLoading,
     searchText,
     setSearchText,
-    options,
+    options: results,
   };
 }

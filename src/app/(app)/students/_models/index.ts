@@ -8,5 +8,6 @@ export type IStudent = Prisma.studentsGetPayload<{
     school_year: true;
     created_at: true;
     status: true;
+    school_segment: true;
   };
 }>;

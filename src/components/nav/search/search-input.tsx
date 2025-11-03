@@ -1,18 +1,26 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { FileCheck, User, Calendar } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Chip } from "@/components/ui/chip";
+import { SearchInput as SearchInputComponent } from "@/components/ui/search-input";
 
 type SearchInputProps = {
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
 };
 
-type Category = "Alunos" | "Atividades" | "Agenda";
+type Category = {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
 
-const categories: Category[] = ["Alunos", "Atividades", "Agenda"];
+const categories: Category[] = [
+  { label: "Alunos", icon: User },
+  { label: "Atividades", icon: FileCheck },
+  { label: "Agenda", icon: Calendar },
+];
 
 const SearchInput = ({ searchText, setSearchText }: SearchInputProps) => {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
@@ -27,29 +35,26 @@ const SearchInput = ({ searchText, setSearchText }: SearchInputProps) => {
 
   return (
     <div className="flex flex-col">
-      {/* Search Input */}
-      <div className="flex grow items-center h-[24px] gap-x-2 py-2 pl-[16px] pr-[12px] sm:h-[48px] sm:gap-x-[12px] sm:px-[20px] sm:py-[12px] text-foreground">
-        <input
-          autoFocus
-          value={searchText}
-          className="grow bg-transparent text-sm placeholder:text-gray-500 border-none outline-none"
-          placeholder="Busca inteligente"
-          type="text"
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-      </div>
+      <SearchInputComponent
+        autoFocus
+        showClearButton={false}
+        value={searchText}
+        className="grow bg-transparent text-sm placeholder:text-gray-500 border-none outline-none"
+        placeholder="Busca inteligente"
+        onChange={(e) => setSearchText(e.target.value)}
+      />
 
       <div className="border-b border-border mx-4" />
 
-      {/* Category Filter Chips */}
       <div className="px-4 py-2">
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => {
             const isSelected = selectedCategories.includes(category);
             return (
               <Chip
-                key={category}
-                label={category}
+                startIcon={category.icon}
+                key={category.label}
+                label={category.label}
                 onClick={() => toggleCategory(category)}
                 variant={isSelected ? "standard" : "outlined"}
                 color={isSelected ? "primary" : "default"}

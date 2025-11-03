@@ -223,7 +223,6 @@ export async function registerAction({
 export async function logoutAction() {
   try {
     await clearCookies();
-    redirect("/auth/login");
   } catch (error) {
     console.error("Logout error:", error);
     return createErrorResponse(
@@ -232,4 +231,6 @@ export async function logoutAction() {
       500
     );
   }
+
+  redirect("/auth/login");
 }

@@ -100,12 +100,27 @@ export const MenuContent = React.forwardRef<HTMLDivElement, MenuContentProps>(
 
     React.useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
-        if (
-          contentRef.current &&
-          !contentRef.current.contains(event.target as Node)
-        ) {
-          setOpen(false);
+        const target = event.target as Node | null;
+
+        if (!contentRef.current) {
+          return;
         }
+
+        if (target && contentRef.current.contains(target)) {
+          return;
+        }
+
+        if (target instanceof Element) {
+          const interactiveTarget = target.closest(
+            "[data-slot='select-content']"
+          );
+
+          if (interactiveTarget) {
+            return;
+          }
+        }
+
+        setOpen(false);
       }
 
       if (open) {

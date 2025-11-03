@@ -6,21 +6,16 @@ import { useLiveQuery } from "@/hooks/useLiveQuery";
 import SearchInput from "./search-input";
 import { SearchOption } from "./search-option";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface iSearchOptions {
-  name: string;
-  type: string;
-}
+import { LiveSearchResult } from "@/app/_search/actions";
 
 export function SearchModal() {
   const { toggle, isOpen } = useSearch();
-  const { searchText, setSearchText, isLoading, options } =
-    useLiveQuery<iSearchOptions>("/query");
-  const onOptionClick = (data: any) => {};
+  const { searchText, setSearchText, isLoading, options } = useLiveQuery();
+  const onOptionClick = (_data: LiveSearchResult) => {};
 
   return (
     <Dialog open={isOpen} onOpenChange={toggle}>
-      <DialogContent className="rounded-xl">
+      <DialogContent className="rounded-xl py-6 px-4">
         <div className="w-full flex flex-col">
           <div className="w-full">
             <SearchInput
@@ -40,24 +35,12 @@ export function SearchModal() {
                         options.length > 0 &&
                         options.map((opt) => (
                           <SearchOption
+                            key={opt.id}
                             title={opt.name}
                             type={opt.type}
-                            // icon={utils.getIconByType(opt.type)}
-                            onClick={() =>
-                              onOptionClick({
-                                title: opt.name,
-                                type: opt.type,
-                              })
-                            }
+                            onClick={() => onOptionClick(opt)}
                           />
                         ))}
-                      <SearchOption
-                        title={`"${searchText}"`}
-                        type={`Search on jobs`}
-                        onClick={() =>
-                          onOptionClick({ type: "search", title: searchText })
-                        }
-                      />
                     </>
                   )}
                 </div>

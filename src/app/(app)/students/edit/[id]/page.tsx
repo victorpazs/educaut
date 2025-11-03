@@ -364,9 +364,7 @@ export default function EditStudentPage() {
             <label className="text-sm font-medium">Observação</label>
             <Textarea
               value={formData.observation}
-              onChange={(e) =>
-                handleInputChange("observation", e.target.value)
-              }
+              onChange={(e) => handleInputChange("observation", e.target.value)}
               placeholder="Digite observações adicionais sobre o aluno..."
               rows={4}
             />

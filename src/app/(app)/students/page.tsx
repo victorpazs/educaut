@@ -18,6 +18,7 @@ import { SkeletonCard } from "@/components/ui/skeleton";
 
 import { StudentCard } from "./_components/student-card";
 import { useStudents } from "./_hooks/use-students";
+import { PageLoader } from "@/components/page-loader";
 
 export default function StudentsPage() {
   const [search, setSearch] = React.useState("");
@@ -79,11 +80,7 @@ export default function StudentsPage() {
           </EmptyHeader>
         </Empty>
       ) : isLoading ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCard key={index} className="rounded-lg border" />
-          ))}
-        </div>
+        <PageLoader />
       ) : students.length === 0 ? (
         <Empty>
           <EmptyMedia variant="icon">

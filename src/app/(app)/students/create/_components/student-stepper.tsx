@@ -202,7 +202,7 @@ export function StudentStepper({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-5xl space-y-6 px-4 lg:px-0">
       {/* Stepper */}
       <Card>
         <CardContent className="pt-6">
@@ -211,12 +211,14 @@ export function StudentStepper({
       </Card>
 
       {/* Step Content */}
-      <div className="min-h-[400px] lg:min-h-[500px]">{renderStepContent()}</div>
+      <div className="min-h-[320px] sm:min-h-[360px] lg:min-h-[500px]">
+        {renderStepContent()}
+      </div>
 
       {/* Navigation Buttons - Responsive positioning */}
-      <div className="sticky bottom-0 z-50 lg:relative lg:bottom-auto lg:z-auto">
-        <div className="max-w-7xl mx-auto px-4 lg:px-0">
-          <Card className="backdrop-blur-sm bg-white/95 shadow-lg lg:shadow-none lg:bg-transparent lg:border-none">
+      <div className="sticky bottom-0 z-50 w-full lg:relative lg:bottom-auto lg:z-auto">
+        <div className="mx-auto w-full max-w-5xl px-0">
+          <Card className="w-full backdrop-blur-sm bg-white/95 shadow-lg lg:shadow-none lg:bg-transparent lg:border-none">
             <CardContent className="p-4 lg:p-0">
               <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
                 <Button
