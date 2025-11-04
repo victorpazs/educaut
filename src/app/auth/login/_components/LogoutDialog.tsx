@@ -14,11 +14,9 @@ import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/app/auth/actions";
 
 export function LogoutDialog({
-  children,
   onClose,
   open,
 }: {
-  children: React.ReactNode;
   onClose: () => void;
   open: boolean;
 }) {
@@ -33,8 +31,6 @@ export function LogoutDialog({
 
   return (
     <>
-      {children}
-
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent>
           <DialogHeader>

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -76,6 +77,7 @@ export function DialogContent({
 }: DialogContentProps) {
   const { open, onOpenChange } = React.useContext(DialogContext);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -119,9 +121,13 @@ export function DialogContent({
     };
   }, [open]);
 
-  if (!open) return null;
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  return (
+  if (!open || !isMounted) return null;
+
+  return createPortal(
     <div
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center",
@@ -158,7 +164,8 @@ export function DialogContent({
 
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

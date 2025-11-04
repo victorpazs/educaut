@@ -7,15 +7,15 @@ import {
   School,
   LogOut,
 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar } from "../ui/avatar";
 import {
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-  MenuTrigger,
-} from "../ui/menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -35,13 +35,49 @@ export function UserMenu() {
   const { changeSchool, isPending } = useSchoolChange();
   const router = useRouter();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const preventCloseRef = useRef(false);
+  const preventCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
   const schools = user?.schools ?? [];
   const selectedSchool = school ?? null;
   const isSelectDisabled = isPending;
 
+  const allowMenuCloseSoon = useCallback(() => {
+    preventCloseRef.current = true;
+
+    if (preventCloseTimeoutRef.current) {
+      clearTimeout(preventCloseTimeoutRef.current);
+    }
+
+    preventCloseTimeoutRef.current = setTimeout(() => {
+      preventCloseRef.current = false;
+      preventCloseTimeoutRef.current = null;
+    }, 160);
+  }, []);
+
+  const handleMenuOpenChange = useCallback((open: boolean) => {
+    if (!open && preventCloseRef.current) {
+      return;
+    }
+
+    setIsMenuOpen(open);
+  }, []);
+
+  const handleSelectOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        allowMenuCloseSoon();
+      }
+    },
+    [allowMenuCloseSoon]
+  );
+
   const handleSelectSchool = useCallback(
     (schoolId: string) => {
       if (schoolId === "__new_school__") {
+        setIsMenuOpen(false);
         router.push("/settings/schools");
         return;
       }
@@ -52,22 +88,35 @@ export function UserMenu() {
         return;
       }
 
+      allowMenuCloseSoon();
       changeSchool(nextSchool);
     },
-    [changeSchool, router, schools]
+    [allowMenuCloseSoon, changeSchool, router, schools]
   );
+
+  useEffect(() => {
+    return () => {
+      if (preventCloseTimeoutRef.current) {
+        clearTimeout(preventCloseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
-      <Menu>
-        <MenuTrigger>
+      <LogoutDialog
+        onClose={() => setIsLogoutDialogOpen(false)}
+        open={isLogoutDialogOpen}
+      />
+      <DropdownMenu open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
+        <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <Avatar className="h-8 w-8" fallback="VP" />
 
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
-        </MenuTrigger>
-        <MenuContent align="start" className="w-64">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-72">
           <div className="px-3 py-3 ">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12" fallback="VP" />
@@ -75,23 +124,17 @@ export function UserMenu() {
                 <span className="font-medium text-foreground">
                   {user?.name}
                 </span>
-                <Link
-                  className="text-xs text-muted-foreground flex items-center gap-1"
-                  href="/profile"
-                >
-                  Editar perfil
-                  <PencilIcon className="size-3" />
-                </Link>
+                <span className="text-xs text-foreground">{user?.email}</span>
               </div>
             </div>
           </div>
-          <MenuSeparator />
 
           <div className="px-3 py-3">
             <Select
               value={selectedSchool ? String(selectedSchool.id) : undefined}
               onValueChange={handleSelectSchool}
               disabled={isSelectDisabled}
+              onOpenChange={handleSelectOpenChange}
             >
               <SelectTrigger
                 className="w-full justify-between"
@@ -120,39 +163,37 @@ export function UserMenu() {
             </Select>
           </div>
 
-          <MenuSeparator />
+          <DropdownMenuSeparator />
 
           <div className="py-1">
-            <MenuItem>
-              <Calendar className="mr-3 h-4 w-4" />
+            <DropdownMenuItem>
+              <Calendar className="mr-3 h-4 w-4 text-black" />
               <span>Minha agenda</span>
-            </MenuItem>
+            </DropdownMenuItem>
 
-            <MenuItem>
-              <School className="mr-3 h-4 w-4" />
+            <DropdownMenuItem>
+              <School className="mr-3 h-4 w-4 text-black" />
               <span>Escolas</span>
-            </MenuItem>
-            <MenuItem>
-              <Cog className="mr-3 h-4 w-4" />
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Cog className="mr-3 h-4 w-4 text-black" />
               <span>Configurações</span>
-            </MenuItem>
+            </DropdownMenuItem>
           </div>
 
-          <MenuSeparator />
+          <DropdownMenuSeparator />
 
           <div className="py-1">
-            <LogoutDialog
-              onClose={() => setIsLogoutDialogOpen(false)}
-              open={isLogoutDialogOpen}
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={() => setIsLogoutDialogOpen(true)}
             >
-              <MenuItem destructive onClick={() => setIsLogoutDialogOpen(true)}>
-                <LogOut className="mr-3 h-4 w-4" />
-                <span>Sair</span>
-              </MenuItem>
-            </LogoutDialog>
+              <LogOut className="mr-3 h-4 w-4 text-black" />
+              <span>Sair</span>
+            </DropdownMenuItem>
           </div>
-        </MenuContent>
-      </Menu>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </>
   );
 }

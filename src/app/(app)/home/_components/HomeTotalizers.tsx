@@ -30,7 +30,7 @@ export function HomeTotalizers() {
         ? Array.from({ length: totalizers.length }).map((_, index) => (
             <div
               key={`insight-skeleton-${index}`}
-              className="col-span-12 md:col-span-6 lg:col-span-4"
+              className="col-span-12 md:col-span-6 lg:col-span-3"
             >
               <TotalizerCardSkeleton />
             </div>
