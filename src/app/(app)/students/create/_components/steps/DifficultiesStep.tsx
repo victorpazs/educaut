@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { StudentFormData } from "../../_types";
+import { StudentFormData } from "../../_models";
 
 interface DifficultiesStepProps {
   formData: StudentFormData;

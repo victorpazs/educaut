@@ -16,12 +16,14 @@ interface UseAgendaResult {
 }
 
 function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
-  const start = schedule.start_time instanceof Date
-    ? schedule.start_time
-    : new Date(schedule.start_time);
-  const end = schedule.end_time instanceof Date
-    ? schedule.end_time
-    : new Date(schedule.end_time);
+  const start =
+    schedule.start_time instanceof Date
+      ? schedule.start_time
+      : new Date(schedule.start_time);
+  const end =
+    schedule.end_time instanceof Date
+      ? schedule.end_time
+      : new Date(schedule.end_time);
 
   const fallbackTitle = schedule.students?.name
     ? `Aula com ${schedule.students.name}`
@@ -103,4 +105,3 @@ export function useAgenda(): UseAgendaResult {
     hasSchool: Boolean(school?.id),
   };
 }
-

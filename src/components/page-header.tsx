@@ -25,7 +25,7 @@ export function PageHeader({ title, subtitle, goBack, actions }: IPageHeader) {
         ) : null}
         <div className="flex flex-col">
           <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-          <p className="text-secondary">{subtitle}</p>
+          <p className="text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       {actions}

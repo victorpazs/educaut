@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { StudentFormData } from "../../_types";
+import { StudentFormData } from "../../_models";
 
 interface ClinicalInfoStepProps {
   formData: StudentFormData;

@@ -2,10 +2,10 @@ import {
   ChevronDown,
   Cog,
   Calendar,
-  PencilIcon,
   PlusCircleIcon,
   School,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar } from "../ui/avatar";
@@ -29,6 +29,8 @@ import { useSchoolChange } from "@/hooks/useSchoolChange";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogoutDialog } from "@/app/auth/login/_components/LogoutDialog";
+import { Button } from "../ui/button";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 
 export function UserMenu() {
   const { user, school } = useSession();
@@ -118,14 +120,19 @@ export function UserMenu() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-72">
           <div className="px-3 py-3 ">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-12 w-12" fallback="VP" />
-              <div className="flex flex-col">
-                <span className="font-medium text-foreground">
-                  {user?.name}
-                </span>
-                <span className="text-xs text-foreground">{user?.email}</span>
+            <div className="flex items-center w-full justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12" fallback="VP" />
+                <div className="flex flex-col">
+                  <span className="font-medium text-foreground">
+                    {user?.name}
+                  </span>
+                  <span className="text-xs text-foreground">{user?.email}</span>
+                </div>
               </div>
+              <Button variant="ghost" size="icon">
+                <Settings className="h-4 w-4 text-black" />
+              </Button>
             </div>
           </div>
 
@@ -145,20 +152,28 @@ export function UserMenu() {
                 </div>
               </SelectTrigger>
               <SelectContent align="start" className="min-w-[12rem]">
-                {schools.map((userSchool) => (
-                  <SelectItem
-                    key={userSchool.id}
-                    value={String(userSchool.id)}
-                    disabled={isPending && userSchool.id !== selectedSchool?.id}
-                  >
-                    {userSchool.name}
+                <SelectGroup>
+                  <SelectLabel className="text-xs text-secondary px-1.5 py-1.5">
+                    Escolas
+                  </SelectLabel>
+
+                  {schools.map((userSchool) => (
+                    <SelectItem
+                      key={userSchool.id}
+                      value={String(userSchool.id)}
+                      disabled={
+                        isPending && userSchool.id !== selectedSchool?.id
+                      }
+                    >
+                      {userSchool.name}
+                    </SelectItem>
+                  ))}
+                  <SelectSeparator />
+                  <SelectItem value="__new_school__">
+                    <PlusCircleIcon className="text-black" />
+                    Nova escola
                   </SelectItem>
-                ))}
-                <SelectSeparator />
-                <SelectItem value="__new_school__">
-                  <PlusCircleIcon className="text-black" />
-                  Nova escola
-                </SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>

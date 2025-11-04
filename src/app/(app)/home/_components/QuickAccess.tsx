@@ -27,12 +27,10 @@ const quickAccessButtons: QuickAccessButtonProps[] = [
 ];
 export const QuickAccess = () => {
   return (
-    <div className="col-span-12 md:col-span-6 lg:col-span-3">
-      <div className="flex flex-col gap-3">
-        {quickAccessButtons.map((button) => (
-          <QuickAccessButton key={button.label} {...button} />
-        ))}
-      </div>
+    <div className="flex flex-col gap-3">
+      {quickAccessButtons.map((button) => (
+        <QuickAccessButton key={button.label} {...button} />
+      ))}
     </div>
   );
 };

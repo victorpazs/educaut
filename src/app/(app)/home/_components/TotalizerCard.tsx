@@ -12,7 +12,9 @@ const TotalizerCard = ({ title, value, icon }: TotalizerCardProps) => {
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className="text-sm text-muted-foreground font-semibold">
+              {title}
+            </p>
             <p className="text-3xl font-bold mt-2">{value}</p>
           </div>
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">

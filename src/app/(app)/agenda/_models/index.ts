@@ -28,4 +28,3 @@ export interface IAgendaCalendarEvent {
   studentId: number;
   studentName: string | null;
 }
-

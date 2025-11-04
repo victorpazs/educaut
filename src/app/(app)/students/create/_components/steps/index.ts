@@ -1,5 +1,5 @@
-export { BasicInfoStep } from "./basic-info-step";
-export { ClinicalInfoStep } from "./clinical-info-step";
-export { CharacteristicsStep } from "./characteristics-step";
-export { DifficultiesStep } from "./difficulties-step";
-export { StudentStepper } from "../student-stepper";
+export { BasicInfoStep } from "./BasicInfoStep";
+export { ClinicalInfoStep } from "./ClinicalInfoStep";
+export { CharacteristicsStep } from "./CharacteristicsStep";
+export { DifficultiesStep } from "./DifficultiesStep";
+export { StudentStepper } from "../StudentTabContent";

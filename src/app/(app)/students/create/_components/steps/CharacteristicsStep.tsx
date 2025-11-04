@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { StudentFormData } from "../../_types";
+import { StudentFormData } from "../../_models";
 
 interface CharacteristicsStepProps {
   formData: StudentFormData;

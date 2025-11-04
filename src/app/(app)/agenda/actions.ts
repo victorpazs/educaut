@@ -11,7 +11,9 @@ import {
 
 import type { IAgendaSchedule } from "./_models";
 
-export async function getAgenda(): Promise<ApiResponse<IAgendaSchedule[] | null>> {
+export async function getAgenda(): Promise<
+  ApiResponse<IAgendaSchedule[] | null>
+> {
   try {
     const { school } = await getAuthContext();
     const schoolId = school?.id;
@@ -58,4 +60,3 @@ export async function getAgenda(): Promise<ApiResponse<IAgendaSchedule[] | null>
     return handleServerError(error);
   }
 }
-
