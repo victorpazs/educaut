@@ -4,7 +4,7 @@ export type IStudent = Prisma.studentsGetPayload<{
   select: {
     id: true;
     name: true;
-    birth_year: true;
+    birthday: true;
     school_year: true;
     created_at: true;
     status: true;
@@ -16,11 +16,11 @@ export type IStudentDetail = Prisma.studentsGetPayload<{
   select: {
     id: true;
     name: true;
-    birth_year: true;
+    birthday: true;
+    non_verbal: true;
     school_year: true;
     school_segment: true;
     tea_support_level: true;
-    communication: true;
     description: true;
     created_at: true;
     status: true;

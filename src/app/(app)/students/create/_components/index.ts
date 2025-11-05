@@ -1,2 +1,2 @@
-export { StudentStepper } from "./StudentTabContent";
+export { StudentTabContent } from "./StudentTabContent";
 export * from "./steps";

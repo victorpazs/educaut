@@ -54,7 +54,7 @@ export async function getStudents({
       select: {
         id: true,
         name: true,
-        birth_year: true,
+        birthday: true,
         school_year: true,
         created_at: true,
         status: true,
@@ -102,11 +102,11 @@ export async function getStudentById(
       select: {
         id: true,
         name: true,
-        birth_year: true,
+        birthday: true,
         school_year: true,
         school_segment: true,
         tea_support_level: true,
-        communication: true,
+        non_verbal: true,
         description: true,
         created_at: true,
         status: true,

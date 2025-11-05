@@ -3,13 +3,15 @@
 import { createContext, useMemo, type ReactNode } from "react";
 
 import type {
-  Attribute,
   AttributesByType,
+  AttributesData,
+  AttributeOption,
 } from "@/app/(app)/_attributes/_models";
 
 interface AttributesContextValue {
   attributesByType: AttributesByType;
-  getByType: (typeId: number) => Attribute[];
+  attributeTypes: string[];
+  getByType: (typeName: string) => AttributeOption[];
 }
 
 export const AttributesContext = createContext<
@@ -18,14 +20,15 @@ export const AttributesContext = createContext<
 
 interface AttributesProviderProps {
   children: ReactNode;
-  value: AttributesByType;
+  value: AttributesData;
 }
 
 function AttributesProvider({ children, value }: AttributesProviderProps) {
   const contextValue = useMemo<AttributesContextValue>(
     () => ({
-      attributesByType: value,
-      getByType: (typeId: number) => value[typeId] ?? [],
+      attributesByType: value.attributesByType,
+      attributeTypes: value.attributeTypes,
+      getByType: (typeName: string) => value.attributesByType[typeName] ?? [],
     }),
     [value]
   );

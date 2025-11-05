@@ -62,7 +62,6 @@ model students {
   id                 Int                  @id @default(autoincrement())
   school_id          Int
   name               String               @db.VarChar(100)
-  birth_year         Int
   school_segment     String?              @db.VarChar(50)
   description        String?
   created_at         DateTime?            @default(now()) @db.Timestamp(6)
@@ -70,6 +69,7 @@ model students {
   school_year        Int?
   tea_support_level  Int?
   non_verbal         Boolean?
+  birthday           DateTime?            @db.Timestamptz(6)
   schedules          schedules[]
   student_attributes student_attributes[]
   schools            schools              @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)

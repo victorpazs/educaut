@@ -1,21 +1,29 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageLoader } from "@/components/page-loader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import moment from "moment";
+import "moment/locale/pt-br";
 import {
   Calendar,
   momentLocalizer,
   type EventPropGetter,
   type ToolbarProps,
+  type View,
 } from "react-big-calendar";
 
 import { useAgenda } from "../_hooks/use-agenda";
 import type { IAgendaCalendarEvent } from "../_models";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../calendar-styles.css";
+import "./calendar-styles.css";
 
 const localizer = momentLocalizer(moment);
 moment.locale("pt-br");
@@ -30,27 +38,39 @@ const eventStyleGetter: EventPropGetter<IAgendaCalendarEvent> = () => ({
   },
 });
 
-const calendarViews = ["day", "month", "agenda"] as const;
+type CalendarView = Extract<View, "month" | "day" | "week">;
+
+const calendarViews: CalendarView[] = ["month", "day", "week"];
 
 const CalendarToolbar = ({
   localizer,
   view,
   onView,
+  label,
 }: ToolbarProps<IAgendaCalendarEvent>) => {
   const labels = localizer.messages as Record<string, string>;
 
   return (
-    <div className="flex justify-end gap-2 px-4 py-3">
-      {calendarViews.map((calendarView) => (
-        <Button
-          key={calendarView}
-          size="sm"
-          variant={view === calendarView ? "default" : "outline"}
-          onClick={() => onView(calendarView)}
-        >
-          {labels[calendarView] ?? calendarView}
-        </Button>
-      ))}
+    <div className="flex items-center justify-between gap-4 px-4 py-3">
+      <span className="text-lg font-semibold text-foreground">{label}</span>
+      <Select
+        value={view}
+        onValueChange={(nextView) => onView(nextView as CalendarView)}
+      >
+        <SelectTrigger size="default">
+          <SelectValue
+            placeholder={labels[view] ?? view}
+            aria-label={labels[view] ?? view}
+          />
+        </SelectTrigger>
+        <SelectContent align="end">
+          {calendarViews.map((calendarView) => (
+            <SelectItem key={calendarView} value={calendarView}>
+              {labels[calendarView] ?? calendarView}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

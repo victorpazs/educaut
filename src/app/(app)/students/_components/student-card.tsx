@@ -18,12 +18,12 @@ type StudentCardProps = IStudent;
 export function StudentCard({
   id,
   name,
-  birth_year,
+  birthday,
   school_year,
   school_segment,
 }: StudentCardProps) {
   const currentYear = new Date().getFullYear();
-  const age = birth_year ? currentYear - birth_year : null;
+  const age = birthday ? currentYear - birthday.getFullYear() : null;
 
   return (
     <Card className="transition duration-200 hover:-translate-y-1 rounded-sm">
@@ -39,7 +39,7 @@ export function StudentCard({
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {school_year && (
                 <Chip
-                  label={school_year}
+                  label={school_year.toString()}
                   color="default"
                   size="sm"
                   startIcon={GraduationCap}

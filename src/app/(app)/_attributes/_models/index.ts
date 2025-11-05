@@ -1,11 +1,7 @@
-import { Prisma } from "@/generated/prisma";
+export type AttributeOption = { label: string; id: number };
+export type AttributesByType = Record<string, AttributeOption[]>;
 
-export type Attribute = Prisma.attributesGetPayload<{
-  select: {
-    id: true;
-    name: true;
-    type_id: true;
-  };
-}>;
-
-export type AttributesByType = Record<number, Attribute[]>;
+export interface AttributesData {
+  attributesByType: AttributesByType;
+  attributeTypes: string[];
+}

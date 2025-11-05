@@ -1,7 +1,7 @@
 import * as React from "react";
 import { AppShell } from "@/components/app-shell";
 import { getAttributesByType } from "@/app/(app)/_attributes/actions";
-import type { AttributesByType } from "@/app/(app)/_attributes/_models";
+import type { AttributesData } from "@/app/(app)/_attributes/_models";
 import { AttributesProvider } from "@/providers/attributes";
 import { SearchProvider } from "@/providers/search";
 
@@ -15,14 +15,14 @@ export default async function AppLayout({
 }) {
   const { user, school } = await getAuthContext();
   const attributesResponse = await getAttributesByType();
-  const attributesByType: AttributesByType =
+  const attributesData: AttributesData =
     attributesResponse.success && attributesResponse.data
       ? attributesResponse.data
-      : {};
+      : { attributesByType: {}, attributeTypes: [] };
 
   return (
     <SessionProvider value={{ user, school }}>
-      <AttributesProvider value={attributesByType}>
+      <AttributesProvider value={attributesData}>
         <SearchProvider>
           <AppShell>{children}</AppShell>
         </SearchProvider>

@@ -104,6 +104,30 @@ export function UserMenu() {
     };
   }, []);
 
+  const onOptionClick = (href: string) => {
+    router.push(href);
+    setIsMenuOpen(false);
+  };
+
+  const menuOptions = [
+    {
+      label: "Minha agenda",
+      icon: Calendar,
+      href: "/agenda",
+    },
+
+    {
+      label: "Escolas",
+      icon: School,
+      href: "/settings/schools",
+    },
+    {
+      label: "Configurações",
+      icon: Settings,
+      href: "/settings",
+    },
+  ];
+
   return (
     <>
       <LogoutDialog
@@ -130,7 +154,11 @@ export function UserMenu() {
                   <span className="text-xs text-foreground">{user?.email}</span>
                 </div>
               </div>
-              <Button variant="ghost" size="icon">
+              <Button
+                onClick={() => onOptionClick("/settings/profile")}
+                variant="ghost"
+                size="icon"
+              >
                 <Settings className="h-4 w-4 text-black" />
               </Button>
             </div>
@@ -181,32 +209,26 @@ export function UserMenu() {
           <DropdownMenuSeparator />
 
           <div className="py-1">
-            <DropdownMenuItem>
-              <Calendar className="mr-3 h-4 w-4 text-black" />
-              <span>Minha agenda</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem>
-              <School className="mr-3 h-4 w-4 text-black" />
-              <span>Escolas</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Cog className="mr-3 h-4 w-4 text-black" />
-              <span>Configurações</span>
-            </DropdownMenuItem>
+            {menuOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.href}
+                onClick={() => onOptionClick(option.href)}
+              >
+                <option.icon className="mr-3 h-4 w-4 text-black" />
+                <span>{option.label}</span>
+              </DropdownMenuItem>
+            ))}
           </div>
 
           <DropdownMenuSeparator />
 
-          <div className="py-1">
-            <DropdownMenuItem
-              variant="destructive"
-              onSelect={() => setIsLogoutDialogOpen(true)}
-            >
-              <LogOut className="mr-3 h-4 w-4 text-black" />
-              <span>Sair</span>
-            </DropdownMenuItem>
-          </div>
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => setIsLogoutDialogOpen(true)}
+          >
+            <LogOut className="mr-3 h-4 w-4 text-black" />
+            <span>Sair</span>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

@@ -8,10 +8,10 @@ import {
   type ApiResponse,
 } from "@/lib/server-responses";
 
-import type { AttributesByType } from "./_models";
+import type { AttributesByType, AttributesData } from "./_models";
 
 export const getAttributesByType = cache(
-  async (): Promise<ApiResponse<AttributesByType | null>> => {
+  async (): Promise<ApiResponse<AttributesData | null>> => {
     try {
       const attributeTypes = await prisma.attribute_types.findMany({
         orderBy: {
@@ -19,6 +19,7 @@ export const getAttributesByType = cache(
         },
         select: {
           id: true,
+          name: true,
           attributes: {
             orderBy: {
               name: "asc",
@@ -26,7 +27,6 @@ export const getAttributesByType = cache(
             select: {
               id: true,
               name: true,
-              type_id: true,
             },
           },
         },
@@ -34,14 +34,22 @@ export const getAttributesByType = cache(
 
       const groupedAttributes = attributeTypes.reduce<AttributesByType>(
         (accumulator, type) => {
-          accumulator[type.id] = type.attributes;
+          accumulator[type.name] = type.attributes.map((attribute) => ({
+            label: attribute.name,
+            id: attribute.id,
+          }));
           return accumulator;
         },
         {}
       );
 
+      const normalizedAttributeTypes: string[] = Object.keys(groupedAttributes);
+
       return createSuccessResponse(
-        groupedAttributes,
+        {
+          attributesByType: groupedAttributes,
+          attributeTypes: normalizedAttributeTypes,
+        },
         "Atributos carregados com sucesso."
       );
     } catch (error) {

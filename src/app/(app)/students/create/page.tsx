@@ -4,69 +4,54 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { CheckboxField, StudentFormData } from "./_models";
+import { StudentCreateSteps, StudentFormData } from "./_models";
 import { StudentTabContent } from "./_components/StudentTabContent";
 import { TabsSidebar } from "@/components/tabs-sidebar";
+import { useAttributes } from "@/hooks/useAttributes";
+import { getAttributeIcon, getAttributeLabel } from "@/lib/attributes.utils";
+import { SubmitActions } from "./_components/SubmitActions";
 
 export default function CreateStudentPage() {
+  const { attributeTypes } = useAttributes();
   const router = useRouter();
-  const [activeTab, setActiveTab] = React.useState<string>("basic-info");
+  const [activeTab, setActiveTab] = React.useState<StudentCreateSteps>(
+    StudentCreateSteps.BASIC_INFO
+  );
   const [formData, setFormData] = React.useState<StudentFormData>({
     name: "",
-    age: "",
-    segment: "",
-    tea: "",
-    otherDisorders: [],
-    communication: "",
-    hyperfocus: [],
-    preferences: [],
-    difficulties: [],
-    observation: "",
+    birthday: new Date(),
+    school_year: "",
+    school_segment: "",
+    tea_support_level: null,
+    non_verbal: null,
+    description: "",
+    student_attributes: [],
   });
 
-  const handleSubmit = async (formData: StudentFormData) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Creating student:", formData);
+  const handleBack = React.useCallback(() => {
     router.push("/students");
-  };
+  }, [router]);
 
-  const handleBack = () => {
-    router.push("/students");
-  };
+  const options = React.useMemo(
+    () => [
+      {
+        label: "Informações Básicas",
+        identifier: StudentCreateSteps.BASIC_INFO,
+        icon: User,
+      },
+      ...attributeTypes?.map((type) => ({
+        label: getAttributeLabel(type),
+        identifier: type as StudentCreateSteps,
+        icon: getAttributeIcon(type),
+      })),
+    ],
+    [attributeTypes]
+  );
 
-  const options = [
-    {
-      label: "Informações Básicas",
-      identifier: "basic-info",
-      icon: User,
-    },
-  ];
-
-  const handleTabClick = (identifier: string) => {
-    setActiveTab(identifier);
-  };
-
-  const handleInputChange = (field: keyof StudentFormData, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleCheckboxChange = (
-    field: CheckboxField,
-    option: string,
-    checked: boolean
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: checked
-        ? [...prev[field], option]
-        : prev[field].filter((item) => item !== option),
-    }));
-  };
-
+  const handleTabClick = React.useCallback((identifier: string) => {
+    setActiveTab(identifier as StudentCreateSteps);
+  }, []);
+  console.log(formData);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">
@@ -79,7 +64,8 @@ export default function CreateStudentPage() {
         </div>
         <div className="col-span-12 md:col-span-4 lg:col-span-3">
           <TabsSidebar
-            options={options.map((opt) => ({
+            currentTab={activeTab}
+            options={options?.map((opt) => ({
               ...opt,
               onClick: handleTabClick,
             }))}
@@ -89,8 +75,13 @@ export default function CreateStudentPage() {
           <StudentTabContent
             activeTab={activeTab}
             formData={formData}
-            onInputChange={handleInputChange}
-            onCheckboxChange={handleCheckboxChange}
+            setFormData={setFormData}
+          />
+
+          <SubmitActions
+            formData={formData}
+            currentStep={activeTab}
+            handleBack={handleBack}
           />
         </div>
       </div>
