@@ -1,158 +1,427 @@
-/* Custom styles for react-big-calendar to match theme */
-.rbc-calendar {
-  color: hsl(var(--foreground));
-  background-color: hsl(var(--background));
+/* Usar tokens de tema globais hsl(var(--...)) */
+
+.fc {
+  background: transparent;
+  color: var(--foreground);
 }
 
-.rbc-header {
-  font-weight: 500;
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 1.5em;
+  padding: 0.5rem;
 }
 
-.rbc-month-view {
-  border: 1px solid hsl(var(--border));
-  border-radius: 20px;
-  overflow: hidden;
+.fc .fc-toolbar-title {
+  font-size: 1.1em;
+  color: var(--foreground);
 }
 
-.rbc-date-cell {
-  border-right: 1px solid hsl(var(--border));
-  border-bottom: 1px solid hsl(var(--border));
+.fc .fc-button-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: normal;
+  text-transform: capitalize;
+  padding: 4px 8px;
+  font-size: 0.9em;
 }
 
-.rbc-date-cell a {
-  color: hsl(var(--foreground));
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
 }
 
-.rbc-date-cell.rbc-off-range-bg {
-  background-color: hsl(var(--muted));
+.fc .fc-button-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
 }
 
-.rbc-today {
-  background-color: hsl(var(--primary) / 0.1);
+.fc .fc-button-primary:focus {
+  outline: none;
 }
 
-.rbc-current-time-indicator {
-  background-color: hsl(var(--primary));
+.fc-button-primary:focus {
+  box-shadow: none !important;
 }
 
-.rbc-toolbar {
-  margin-bottom: 20px;
-  padding: 0;
+.fc table {
+  border-radius: 5px !important;
 }
 
-.rbc-toolbar button {
-  background-color: hsl(var(--background));
-  border: 1px solid hsl(var(--border));
-  color: hsl(var(--foreground));
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: var(--border);
 }
 
-.rbc-toolbar button:hover {
-  background-color: hsl(var(--muted));
-  border-color: hsl(var(--border));
-}
-
-.rbc-toolbar button.rbc-active {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-color: hsl(var(--primary));
-}
-
-.rbc-toolbar-label {
-  color: hsl(var(--foreground));
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 16px;
-}
-
-.rbc-label {
-  color: var(--secondary);
-  font-size: 12px;
-}
-
-.rbc-button-link {
-  font-size: 12px;
-}
-
-.rbc-event {
-  background-color: hsl(var(--primary));
+.fc-scrollgrid {
+  border-radius: 5px !important;
   border: none;
+}
+
+.fc-timegrid-slot-label {
+  color: var(--secondary);
+  font-size: 0.9em;
+}
+
+.fc-timegrid-axis {
+  background-color: var(--muted);
+  border-color: var(--secondary);
+}
+
+.fc-timegrid-slot {
+  height: 3rem !important;
+}
+
+.fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fc-primary-main) transparent;
+  overflow-x: hidden;
+  border-radius: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  border-radius: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 4px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
+.fc-timegrid-now-indicator-line {
+  border-color: var(--primary);
+}
+
+.fc-timegrid-now-indicator-arrow {
+  border-color: var(--primary);
+  border-width: 5px;
+}
+
+.fc-col-header-cell {
+  background-color: transparent;
+  padding: 8px 0;
+}
+
+.fc-timegrid-col-frame {
+  background-color: transparent;
+}
+
+.fc-popover {
+  z-index: 1050 !important;
+  background-color: transparent !important;
+}
+
+.fc-col-header-cell-cushion {
+  font-weight: 400;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border: none;
+}
+
+.fc .fc-timegrid-slot {
+  height: 44px;
+}
+
+.fc-direction-ltr .fc-timegrid-slot-label-frame {
+  color: #666;
+}
+
+.fc .fc-timegrid-slot-label {
+  vertical-align: bottom;
+}
+
+.fc-col-header {
+  width: 100%;
+}
+
+.fc-timegrid-header thead .fc-col-header-cell:first-child {
+  border-right: 1px solid var(--secondary) !important;
+}
+
+.fc .fc-timegrid-axis {
+  border-bottom: 1px solid var(--secondary) !important;
+  width: 73px;
+}
+
+.fc-scroller-harness {
+  max-width: 100%;
+}
+
+.fc .fc-highlight {
+  border-radius: 3px;
+}
+
+.fc-event-main {
+  padding: 0px !important;
+}
+
+.fc-v-event {
+  background-color: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
+}
+
+/* Estilos específicos para eventos na visualização mensal */
+.fc-daygrid-event-harness {
+  margin-top: 2px !important;
+}
+
+.fc-daygrid-dot-event {
+  padding: 0 !important;
+}
+
+.fc-daygrid-event {
+  max-width: calc(100% - 50px) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Estilo para células do dia */
+.fc-daygrid-day {
+  height: 110px !important;
+  max-height: 120px !important;
+}
+
+.fc-day-today {
+  background-color: var(--primary) !important;
+}
+
+/* Remover bordas e backgrounds padrões */
+.fc-daygrid-event.fc-event {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Limite de altura para visualização mensal */
+.fc-daygrid-event-harness {
+  max-height: 20px !important;
+  margin-bottom: 0 !important;
+}
+
+/* Estilo para popover de mais eventos */
+.fc-popover {
+  height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: transparent !important;
+  border: 1px solid var(--secondary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Estilo da scrollbar */
+.fc-popover::-webkit-scrollbar {
+  width: 4px;
+  cursor: pointer;
+}
+
+.fc-popover::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.fc-popover::-webkit-scrollbar-thumb {
+  background: var(--primary);
   border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 12px;
 }
 
-.rbc-event.rbc-selected {
-  background-color: hsl(var(--primary) / 0.8);
+.fc-popover::-webkit-scrollbar-thumb:hover {
+  background: #a0d0a0;
 }
 
-.rbc-slot-selection {
-  background-color: hsl(var(--primary) / 0.2);
-  border: 1px solid hsl(var(--primary));
+.fc-popover-header {
+  background-color: transparent !important;
+  color: var(--foreground) !important;
+  padding: 8px !important;
+  font-weight: 500 !important;
+  border-bottom: 1px solid var(--secondary) !important;
 }
 
-.rbc-time-view {
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  overflow: hidden;
+.fc-popover-body {
+  padding: 8px !important;
 }
 
-.rbc-time-header {
-  border-bottom: 1px solid hsl(var(--border));
+/* Estilo para eventos na lista */
+.fc-list-day {
+  background-color: transparent !important;
 }
 
-.rbc-time-content {
-  border-top: 1px solid hsl(var(--border));
+.fc-list-event:hover td {
+  background-color: var(--primary) !important;
 }
 
-.rbc-time-slot {
-  border-top: 1px solid hsl(var(--border) / 0.5);
+.fc-list-event-time {
+  display: none;
+  color: var(--muted-foreground) !important;
 }
 
-.rbc-time-gutter {
-  background-color: hsl(var(--muted) / 0.5);
+.fc-theme-standard th {
+  border-color: var(--border) !important;
 }
 
-.rbc-agenda-view {
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  overflow: hidden;
+/* Ajustar tela inteira para cima */
+.fc {
+  height: calc(100vh - 180px) !important;
+  overflow: hidden !important;
 }
 
-.rbc-agenda-view table {
-  border-spacing: 0;
+/* Eventos na visualização mensal */
+.fc-daygrid-event {
+  padding: 1px 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
-.rbc-agenda-view .rbc-agenda-content {
-  border-top: 1px solid hsl(var(--border));
+.fc-list-event-past {
+  opacity: 0.5 !important;
+  background-color: var(--fc-primary-dark) !important;
+  /* Menos brilho */
 }
 
-.rbc-agenda-date-cell,
-.rbc-agenda-time-cell,
-.rbc-agenda-event-cell {
-  border-bottom: 1px solid hsl(var(--border));
-  padding: 12px;
+/* Estilo consistente para eventos */
+.fc-event {
+  border: none !important;
+  /* background: # !important; */
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
 }
 
-.rbc-agenda-date-cell {
-  background-color: hsl(var(--muted) / 0.5);
-  font-weight: 500;
+.fc-event-main {
+  padding: 0 !important;
 }
 
-.rbc-show-more {
-  background-color: hsl(var(--muted));
-  color: hsl(var(--muted-foreground));
-  border: 1px solid hsl(var(--border));
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 11px;
+.fc-event-title {
+  padding: 0 !important;
 }
 
-.rbc-show-more:hover {
-  background-color: hsl(var(--muted) / 0.8);
+.fc-daygrid-day-frame {
+  min-height: 110px !important;
+  max-height: 120px !important;
+  overflow: hidden !important;
+}
+
+.fc-daygrid-day-events {
+  max-height: 75px !important;
+  overflow: hidden !important;
+}
+
+.fc .fc-daygrid-body-balanced .fc-daygrid-day-events {
+  position: absolute;
+  right: 0;
+  left: 5px;
+  top: 15px;
+}
+
+.fc-daygrid-body {
+  width: 100% !important;
+}
+
+.fc-daygrid-day-frame .fc-daygrid-more-link {
+  color: #b3b3b3 !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  position: absolute !important;
+  top: 63px !important;
+  right: 2px !important;
+  z-index: 5 !important;
+  /* background-color: rgba(
+    30,
+    37,
+    40,
+    0.7
+  ) !important; Fundo semi-transparente */
+  border-radius: 3px !important;
+  line-height: 16px !important;
+  display: block !important;
+  width: auto !important;
+}
+
+/* Estilos específicos para visualização de lista */
+.fc-list-day-cushion {
+  background-color: var(--fc-text-color) !important;
+  padding: 12px 16px !important;
+}
+
+/* Formatação do texto do dia na lista */
+.fc-list-day-text {
+  font-weight: 500 !important;
+  font-size: 16px !important;
+}
+
+.fc-list-day-side-text {
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.fc-day-today .fc-list-day-cushion {
+  background-color: var(--fc-primary-dark) !important;
+  color: var(--fc-primary-main) !important;
+}
+
+.fc-day-past .fc-list-day-cushion {
+  background-color: var(--fc-white-states-default) !important;
+  color: var(--fc-text-secondary) !important;
+}
+
+.fc-day-future .fc-list-day-cushion {
+  background-color: var(--fc-action-hover) !important;
+  color: var(--fc-text-color) !important;
+}
+
+.fc-list-event td {
+  border-width: 0 !important;
+  padding: 4px !important;
+  background-color: transparent !important;
+  cursor: pointer;
+}
+
+.fc-list-event:hover td,
+.fc-event:hover td {
+  background-color: var(--fc-neutral-bg-color) !important;
+}
+
+.fc-list-event-dot {
+  display: none !important;
+}
+
+.fc-list {
+  background-color: transparent !important;
+}
+
+.fc-list-empty {
+  background-color: transparent !important;
+  color: var(--secondary) !important;
+  font-style: italic !important;
+  padding: 20px !important;
+}
+
+.fc-daygrid-day-number {
+  color: var(--secondary);
+}
+
+.fc-timegrid-now-indicator-arrow {
+  border-color: var(--primary) !important;
+  border-bottom-color: transparent !important;
+  border-top-color: transparent !important;
+}
+
+.fc-timegrid-now-indicator-line {
+  border-color: var(--primary) !important;
 }

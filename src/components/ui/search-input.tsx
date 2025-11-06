@@ -72,7 +72,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
     };
 
     const clearButton =
-      showClearButton && searchValue ? (
+      (showClearButton && searchValue) || !!onClear ? (
         <Button
           type="button"
           variant="ghost"

@@ -11,6 +11,7 @@ type SearchInputProps = {
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   selectedCategories: Category[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  onClose: () => void;
 };
 
 export type Category = {
@@ -30,6 +31,7 @@ const SearchInput = ({
   setSearchText,
   selectedCategories,
   setSelectedCategories,
+  onClose,
 }: SearchInputProps) => {
   const toggleCategory = (category: Category) => {
     setSelectedCategories((prev) =>
@@ -43,16 +45,15 @@ const SearchInput = ({
     <div className="flex flex-col">
       <SearchInputComponent
         autoFocus
-        showClearButton={false}
+        showClearButton={true}
         value={searchText}
-        className="grow bg-transparent text-sm placeholder:text-gray-500 border-none outline-none"
+        className="grow bg-transparent text-sm placeholder:text-gray-500 border-primary! shadow-none! outline-none"
         placeholder="Busca inteligente"
         onChange={(e) => setSearchText(e.target.value)}
+        onClear={onClose}
       />
 
-      <div className="border-b border-border mx-4" />
-
-      <div className="px-4 py-2">
+      <div className="py-2">
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => {
             const isSelected = selectedCategories.includes(category);

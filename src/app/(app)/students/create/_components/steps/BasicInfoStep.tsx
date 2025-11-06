@@ -53,11 +53,10 @@ export function BasicInfoStep({
           <label className="text-sm font-medium">Ano escolar *</label>
           <SchoolYearSelect
             value={formData.school_year?.toString() || ""}
-            fields={["school_year", "school_segment"]}
-            onChange={(fields, values) =>
-              onInputChange<string>(
-                fields as (keyof StudentFormData)[],
-                values as string[]
+            onYearAndSegmentChange={(year, segment) =>
+              onInputChange(
+                ["school_year", "school_segment"],
+                [Number(year), segment]
               )
             }
           />
@@ -67,7 +66,12 @@ export function BasicInfoStep({
           <label className="text-sm font-medium">Nível de Suporte TEA *</label>
           <Select
             value={formData.tea_support_level?.toString() || ""}
-            onValueChange={(value) => onInputChange("tea_support_level", value)}
+            onValueChange={(value) =>
+              onInputChange<number | null>(
+                "tea_support_level",
+                value ? Number(value) : null
+              )
+            }
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione o nível de suporte" />
@@ -82,7 +86,7 @@ export function BasicInfoStep({
           </Select>
         </div>
 
-        {Number(formData.tea_support_level) > 0 && (
+        {(formData.tea_support_level ?? 0) > 0 && (
           <div className="col-span-12 md:col-span-4 flex items-end mb-2">
             <Checkbox
               id="non_verbal"

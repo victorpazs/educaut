@@ -29,7 +29,12 @@ export function AttributesStep({
               onAttributeChange(attribute.id, checked)
             }
           />
-          <label className="text-sm font-medium">{attribute.label}</label>
+          <label
+            htmlFor={attribute.id.toString()}
+            className="text-sm font-medium"
+          >
+            {attribute.label}
+          </label>
         </div>
       ))}
     </div>

@@ -1,6 +1,10 @@
 "use client";
 
+import { useMemo, useRef, useState } from "react";
+
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
 import {
   Select,
@@ -9,128 +13,159 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import moment from "moment";
-import "moment/locale/pt-br";
-import {
-  Calendar,
-  momentLocalizer,
-  type EventPropGetter,
-  type ToolbarProps,
-  type View,
-} from "react-big-calendar";
+
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import ptBrLocale from "@fullcalendar/core/locales/pt-br";
+import type {
+  DatesSetArg,
+  EventSourceInput,
+  CalendarApi,
+  DateSelectArg,
+  EventClickArg,
+} from "@fullcalendar/core";
 
 import { useAgenda } from "../_hooks/use-agenda";
-import type { IAgendaCalendarEvent } from "../_models";
 
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./calendar-styles.css";
 
-const localizer = momentLocalizer(moment);
-moment.locale("pt-br");
+type FullCalendarView = "dayGridMonth" | "timeGridWeek" | "timeGridDay";
 
-const eventStyleGetter: EventPropGetter<IAgendaCalendarEvent> = () => ({
-  style: {
-    backgroundColor: "hsl(var(--primary))",
-    color: "hsl(var(--primary-foreground))",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "12px",
-  },
-});
-
-type CalendarView = Extract<View, "month" | "day" | "week">;
-
-const calendarViews: CalendarView[] = ["month", "day", "week"];
-
-const CalendarToolbar = ({
-  localizer,
-  view,
-  onView,
-  label,
-}: ToolbarProps<IAgendaCalendarEvent>) => {
-  const labels = localizer.messages as Record<string, string>;
-
-  return (
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <span className="text-lg font-semibold text-foreground">{label}</span>
-      <Select
-        value={view}
-        onValueChange={(nextView) => onView(nextView as CalendarView)}
-      >
-        <SelectTrigger size="default">
-          <SelectValue
-            placeholder={labels[view] ?? view}
-            aria-label={labels[view] ?? view}
-          />
-        </SelectTrigger>
-        <SelectContent align="end">
-          {calendarViews.map((calendarView) => (
-            <SelectItem key={calendarView} value={calendarView}>
-              {labels[calendarView] ?? calendarView}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-};
+const views: { id: FullCalendarView; label: string }[] = [
+  { id: "dayGridMonth", label: "Mês" },
+  { id: "timeGridWeek", label: "Semana" },
+  { id: "timeGridDay", label: "Dia" },
+];
 
 export function SchoolAgenda() {
   const { events, isLoading, hasSchool } = useAgenda();
+  const calendarRef = useRef<FullCalendar | null>(null);
+  const [currentView, setCurrentView] =
+    useState<FullCalendarView>("dayGridMonth");
+  const [calendarTitle, setCalendarTitle] = useState<string>("");
+
+  const fcEvents: EventSourceInput = useMemo(() => {
+    return events.map((e) => ({
+      id: String(e.id),
+      title: e.title,
+      start: e.start,
+      end: e.end,
+    }));
+  }, [events]);
+
+  const handleChangeView = (nextView: FullCalendarView) => {
+    setCurrentView(nextView);
+    const api: CalendarApi | undefined = calendarRef.current?.getApi?.();
+    api?.changeView(nextView);
+    setCalendarTitle(api?.view?.title ?? "");
+  };
+
+  const nav = {
+    today: () => {
+      const api: CalendarApi | undefined = calendarRef.current?.getApi?.();
+      api?.today();
+      setCalendarTitle(api?.view?.title ?? "");
+    },
+    prev: () => {
+      const api: CalendarApi | undefined = calendarRef.current?.getApi?.();
+      api?.prev();
+      setCalendarTitle(api?.view?.title ?? "");
+    },
+    next: () => {
+      const api: CalendarApi | undefined = calendarRef.current?.getApi?.();
+      api?.next();
+      setCalendarTitle(api?.view?.title ?? "");
+    },
+  };
 
   return (
     <Card className="flex-1">
       {isLoading ? (
         <PageLoader />
       ) : (
-        <Calendar
-          localizer={localizer}
-          events={hasSchool ? events : []}
-          startAccessor="start"
-          endAccessor="end"
-          views={calendarViews}
-          defaultView="month"
-          components={{
-            toolbar: CalendarToolbar,
-          }}
-          style={{
-            height: "calc(100vh - 250px)",
-            fontFamily: "inherit",
-            borderRadius: 12,
-          }}
-          messages={{
-            date: "Data",
-            time: "Hora",
-            event: "Evento",
-            allDay: "Dia todo",
-            week: "Semana",
-            work_week: "Semana de trabalho",
-            day: "Dia",
-            month: "Mês",
-            yesterday: "Ontem",
-            tomorrow: "Amanhã",
-            agenda: "Ano",
-            noEventsInRange: "Não há eventos neste período.",
-            showMore: (total) => `+${total} mais`,
-          }}
-          formats={{
-            monthHeaderFormat: "MMMM YYYY",
-            dayHeaderFormat: "dddd, DD/MM/YYYY",
-            dayRangeHeaderFormat: ({ start, end }) =>
-              `${moment(start).format("DD/MM")} - ${moment(end).format(
-                "DD/MM/YYYY"
-              )}`,
-            agendaDateFormat: "DD/MM/YYYY",
-            agendaTimeFormat: "HH:mm",
-            agendaTimeRangeFormat: ({ start, end }) =>
-              `${moment(start).format("HH:mm")} - ${moment(end).format(
-                "HH:mm"
-              )}`,
-            weekdayFormat: "ddd",
-            dayFormat: "DD",
-          }}
-          eventPropGetter={eventStyleGetter}
-        />
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Tabs defaultValue="idle">
+                <TabsList>
+                  <TabsTrigger
+                    value="prev"
+                    aria-label="Anterior"
+                    onClick={nav.prev}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="next"
+                    aria-label="Próximo"
+                    onClick={nav.next}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            <div className="text-lg font-semibold text-foreground">
+              {calendarTitle}
+            </div>
+            <Select
+              value={currentView}
+              onValueChange={(value) =>
+                handleChangeView(value as FullCalendarView)
+              }
+            >
+              <SelectTrigger size="default">
+                <SelectValue placeholder="Visualização" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {views.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    {v.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView={currentView}
+            headerToolbar={false}
+            height="calc(100vh - 250px)"
+            locale={ptBrLocale}
+            dayMaxEvents={true}
+            selectable={true}
+            selectMirror={true}
+            nowIndicator={true}
+            events={hasSchool ? fcEvents : []}
+            select={(info: DateSelectArg) => {
+              // noop: consumer pode interceptar via props no futuro
+              // por ora, mantemos seleção para criação fora deste componente
+            }}
+            eventClick={(clickInfo: EventClickArg) => {
+              // noop: consumer pode interceptar via props no futuro
+            }}
+            datesSet={(info: DatesSetArg) => {
+              setCurrentView(info.view.type as FullCalendarView);
+              setCalendarTitle(info.view.title);
+            }}
+            slotMinTime="00:00:00"
+            slotMaxTime="24:00:00"
+            allDaySlot={false}
+            slotDuration="01:00:00"
+            scrollTime="06:00:00"
+            eventDisplay="block"
+            moreLinkText="mais"
+            slotLabelFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }}
+          />
+        </div>
       )}
     </Card>
   );

@@ -16,7 +16,7 @@ export function SearchModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={toggle}>
-      <DialogContent className="rounded-xl py-6 px-4">
+      <DialogContent className="rounded-xl p-4" hideCloseButton={true}>
         <div className="w-full flex flex-col">
           <div className="w-full">
             <SearchInput
@@ -24,6 +24,7 @@ export function SearchModal() {
               setSearchText={setSearchText}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
+              onClose={toggle}
             />
           </div>
           <div className="w-full mt-2">

@@ -1,9 +1,11 @@
+import { z } from "zod";
+
 export interface StudentFormData {
   name: string;
   birthday: Date;
-  school_year: string;
+  school_year: number;
   school_segment: string;
-  tea_support_level: string | null;
+  tea_support_level: number | null;
   non_verbal: boolean | null;
   description: string;
   student_attributes: number[];
@@ -23,3 +25,11 @@ export type CheckboxField = {
     ? Key
     : never;
 }[keyof StudentFormData];
+
+export const StudentCreateSchema = z.object({
+  name: z.string().min(1, "Nome é obrigatório"),
+  school_segment: z.string().min(1, "Segmento escolar é obrigatório"),
+  school_year: z.number().int("Ano escolar inválido"),
+});
+
+export type StudentCreateValues = z.infer<typeof StudentCreateSchema>;

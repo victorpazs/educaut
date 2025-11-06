@@ -17,25 +17,21 @@ import {
 type SchoolYearSelectProps = {
   value?: string;
   placeholder?: string;
-  fields: string[];
-  onChange: (fields: string[], values: string[]) => void;
+  onYearAndSegmentChange: (yearValue: string, segment: string) => void;
   className?: string;
 };
 
 export function SchoolYearSelect({
   value,
   placeholder = "Selecione o ano escolar",
-  fields,
-  onChange,
+  onYearAndSegmentChange,
   className,
 }: SchoolYearSelectProps) {
   const groups = getGroupedSchoolYears();
 
   const handleChange = (newValue: string) => {
     const segment = getSchoolSegmentByYear(Number(newValue));
-    const values = [newValue, segment];
-    const trimmedValues = values.slice(0, fields.length);
-    onChange(fields, trimmedValues);
+    onYearAndSegmentChange(newValue, segment);
   };
 
   return (

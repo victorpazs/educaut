@@ -20,7 +20,7 @@ export default function CreateStudentPage() {
   const [formData, setFormData] = React.useState<StudentFormData>({
     name: "",
     birthday: new Date(),
-    school_year: "",
+    school_year: 0,
     school_segment: "",
     tea_support_level: null,
     non_verbal: null,
@@ -51,7 +51,6 @@ export default function CreateStudentPage() {
   const handleTabClick = React.useCallback((identifier: string) => {
     setActiveTab(identifier as StudentCreateSteps);
   }, []);
-  console.log(formData);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">

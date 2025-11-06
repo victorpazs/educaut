@@ -14,7 +14,6 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 import { SearchInput } from "@/components/ui/search-input";
-import { SkeletonCard } from "@/components/ui/skeleton";
 
 import { StudentCard } from "./_components/student-card";
 import { useStudents } from "./_hooks/use-students";
@@ -26,10 +25,6 @@ export default function StudentsPage() {
 
   const handleSearch = (value: string) => {
     setSearch(value);
-  };
-
-  const handleSearchClear = () => {
-    setSearch("");
   };
 
   return (
@@ -44,7 +39,6 @@ export default function StudentsPage() {
                 <SearchInput
                   placeholder="Buscar alunos..."
                   value={search}
-                  onClear={handleSearchClear}
                   onSearch={handleSearch}
                 />
                 <Link href="/students/create">
