@@ -66,8 +66,8 @@
 }
 
 .fc-timegrid-axis {
-  background-color: var(--muted);
-  border-color: var(--secondary);
+  background-color: transparent;
+  border-color: var(--border);
 }
 
 .fc-timegrid-slot {
@@ -149,11 +149,11 @@
 }
 
 .fc-timegrid-header thead .fc-col-header-cell:first-child {
-  border-right: 1px solid var(--secondary) !important;
+  border-right: 1px solid var(--border) !important;
 }
 
 .fc .fc-timegrid-axis {
-  border-bottom: 1px solid var(--secondary) !important;
+  border-bottom: 1px solid var(--border) !important;
   width: 73px;
 }
 
@@ -170,8 +170,8 @@
 }
 
 .fc-v-event {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background-color: var(--primary);
+  color: var(--primary-foreground);
 }
 
 /* Estilos específicos para eventos na visualização mensal */
@@ -197,7 +197,7 @@
 }
 
 .fc-day-today {
-  background-color: var(--primary) !important;
+  background-color: var(--muted) !important;
 }
 
 /* Remover bordas e backgrounds padrões */

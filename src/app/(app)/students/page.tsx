@@ -26,7 +26,10 @@ export default function StudentsPage() {
   const handleSearch = (value: string) => {
     setSearch(value);
   };
-
+  console.log(students);
+  console.log(isLoading);
+  console.log(hasError);
+  console.log(hasSchool);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">

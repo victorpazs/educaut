@@ -42,6 +42,7 @@ model schools {
   name         String         @db.VarChar(150)
   created_at   DateTime?      @default(now()) @db.Timestamp(6)
   status       Int?           @default(1)
+  activities   activities[]
   schedules    schedules[]
   school_users school_users[]
   users        users          @relation(fields: [created_by], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -87,15 +88,41 @@ model users {
 }
 
 model schedules {
-  id          Int       @id @default(autoincrement())
-  school_id   Int
-  student_id  Int
-  title       String?   @db.VarChar(150)
-  description String?
-  start_time  DateTime  @db.Timestamptz(6)
-  end_time    DateTime  @db.Timestamptz(6)
-  created_at  DateTime? @default(now()) @db.Timestamptz(6)
-  status      Int?      @default(1)
-  schools     schools   @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  students    students  @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                   Int                    @id @default(autoincrement())
+  school_id            Int
+  student_id           Int
+  title                String?                @db.VarChar(150)
+  description          String?
+  start_time           DateTime               @db.Timestamptz(6)
+  end_time             DateTime               @db.Timestamptz(6)
+  created_at           DateTime?              @default(now()) @db.Timestamptz(6)
+  status               Int?                   @default(1)
+  schools              schools                @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  students             students               @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  schedules_activities schedules_activities[]
+}
+
+model activities {
+  id                   Int                    @id @default(autoincrement())
+  school_id            Int
+  name                 String                 @db.VarChar(100)
+  description          String?
+  content              Json
+  is_public            Boolean?               @default(false)
+  created_at           DateTime?              @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime?              @default(now()) @db.Timestamptz(6)
+  status               Int?                   @default(1)
+  schools              schools                @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_activities_school")
+  schedules_activities schedules_activities[]
+}
+
+model schedules_activities {
+  schedule_id Int
+  activity_id Int
+  note        String?
+  created_at  DateTime?  @default(now()) @db.Timestamptz(6)
+  activities  activities @relation(fields: [activity_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_activity")
+  schedules   schedules  @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_schedule")
+
+  @@id([schedule_id, activity_id])
 }

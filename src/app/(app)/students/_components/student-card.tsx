@@ -28,10 +28,7 @@ export function StudentCard({
   return (
     <Card className="transition duration-200 hover:-translate-y-1 rounded-sm">
       <CardHeader className="pb-4">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-10 w-10 rounded-sm border-none">
-            {name.charAt(0)}
-          </Avatar>
+        <div className="flex  flex-wrap h-full  justify-between items-center gap-4">
           <div className="flex-1">
             <CardTitle className="text-md font-medium text-foreground">
               {name}

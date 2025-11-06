@@ -23,7 +23,7 @@ export function Chip({
   size = "md",
 }: ChipProps) {
   const baseClasses =
-    "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+    "inline-flex max-w-full items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
   const variants: Record<
     NonNullable<ChipProps["variant"]>,
@@ -68,6 +68,7 @@ export function Chip({
     <Component
       className={cn(
         baseClasses,
+        "overflow-hidden min-w-0",
         variants[variant][color],
         sizes[size].container,
         sizes[size].text,
@@ -76,9 +77,11 @@ export function Chip({
       )}
       onClick={onClick}
     >
-      {StartIcon && <StartIcon className={sizes[size].icon} />}
-      <span>{label}</span>
-      {EndIcon && <EndIcon className={sizes[size].icon} />}
+      {StartIcon && <StartIcon className={cn(sizes[size].icon, "shrink-0")} />}
+      <span className="truncate min-w-0 max-w-[240px]" title={label}>
+        {label}
+      </span>
+      {EndIcon && <EndIcon className={cn(sizes[size].icon, "shrink-0")} />}
     </Component>
   );
 }

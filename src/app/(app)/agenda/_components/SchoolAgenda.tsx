@@ -6,13 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// removed select-based view switcher
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -86,7 +80,7 @@ export function SchoolAgenda() {
         <PageLoader />
       ) : (
         <div className="flex flex-col">
-          <div className="flex items-center justify-between gap-4 px-4 py-3">
+          <div className="flex items-center flex-wrap justify-between gap-4 px-4 py-3">
             <div className="flex items-center gap-2">
               <Tabs defaultValue="idle">
                 <TabsList>
@@ -107,26 +101,23 @@ export function SchoolAgenda() {
                 </TabsList>
               </Tabs>
             </div>
-            <div className="text-lg font-semibold text-foreground">
+            <div className="text-lg min-w-64 flex items-center justify-center font-semibold text-foreground">
               {calendarTitle}
             </div>
-            <Select
+            <Tabs
               value={currentView}
               onValueChange={(value) =>
                 handleChangeView(value as FullCalendarView)
               }
             >
-              <SelectTrigger size="default">
-                <SelectValue placeholder="Visualização" />
-              </SelectTrigger>
-              <SelectContent align="end">
+              <TabsList>
                 {views.map((v) => (
-                  <SelectItem key={v.id} value={v.id}>
+                  <TabsTrigger key={v.id} value={v.id}>
                     {v.label}
-                  </SelectItem>
+                  </TabsTrigger>
                 ))}
-              </SelectContent>
-            </Select>
+              </TabsList>
+            </Tabs>
           </div>
 
           <FullCalendar

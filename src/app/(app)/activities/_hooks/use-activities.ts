@@ -2,63 +2,50 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useSession } from "@/hooks/useSession";
 import { toast } from "@/lib/toast";
 
-import type { IStudent } from "../_models";
-import { getStudents } from "../actions";
+import type { IActivity } from "../_models";
+import { getActivities } from "../actions";
 
-interface UseStudentsResult {
-  students: IStudent[];
+interface UseActivitiesResult {
+  activities: IActivity[];
   isLoading: boolean;
   hasError: boolean;
-  hasSchool: boolean;
 }
 
-export function useStudents(search: string): UseStudentsResult {
-  const { school } = useSession();
-
-  const [students, setStudents] = useState<IStudent[]>([]);
+export function useActivities(search: string): UseActivitiesResult {
+  const [activities, setActivities] = useState<IActivity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
   const requestCounter = useRef(0);
 
   useEffect(() => {
-    if (!school?.id) {
-      setStudents([]);
-      setIsLoading(false);
-      setHasError(false);
-      return;
-    }
-
     let isMounted = true;
     const currentRequest = requestCounter.current + 1;
     requestCounter.current = currentRequest;
 
-    const loadStudents = async () => {
+    const loadActivities = async () => {
       setIsLoading(true);
       setHasError(false);
 
       try {
-        const response = await getStudents({
-          search,
-        });
+        const response = await getActivities({ search });
 
         if (isMounted && requestCounter.current === currentRequest) {
           if (response.success) {
-            setStudents(response.data ?? []);
+            setActivities(response.data ?? []);
             setHasError(false);
           } else {
-            setStudents([]);
+            setActivities([]);
             setHasError(true);
             toast.error(response.message);
           }
         }
       } catch (err) {
         if (isMounted && requestCounter.current === currentRequest) {
-          toast.error("Não foi possível carregar os alunos.");
+          toast.error("Não foi possível carregar as atividades.");
           setHasError(true);
-          setStudents([]);
+          setActivities([]);
         }
       } finally {
         if (isMounted && requestCounter.current === currentRequest) {
@@ -67,17 +54,16 @@ export function useStudents(search: string): UseStudentsResult {
       }
     };
 
-    loadStudents();
+    loadActivities();
 
     return () => {
       isMounted = false;
     };
-  }, [school?.id, search]);
+  }, [search]);
 
   return {
-    students,
+    activities,
     isLoading,
     hasError,
-    hasSchool: Boolean(school?.id),
   };
 }
