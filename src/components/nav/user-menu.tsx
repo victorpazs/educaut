@@ -80,7 +80,7 @@ export function UserMenu() {
     (schoolId: string) => {
       if (schoolId === "__new_school__") {
         setIsMenuOpen(false);
-        router.push("/settings/schools");
+        router.push("/settings/schools?new=1");
         return;
       }
 
@@ -179,7 +179,7 @@ export function UserMenu() {
                   <SelectValue placeholder="Selecione uma escola" />
                 </div>
               </SelectTrigger>
-              <SelectContent align="start" className="min-w-[12rem]">
+              <SelectContent align="start">
                 <SelectGroup>
                   <SelectLabel className="text-xs text-secondary px-1.5 py-1.5">
                     Escolas

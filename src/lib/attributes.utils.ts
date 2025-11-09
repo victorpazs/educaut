@@ -3,6 +3,7 @@ import {
   BicepsFlexed,
   Brain,
   Heart,
+  HeartPulse,
   Target,
   User,
 } from "lucide-react";
@@ -15,6 +16,7 @@ export function getAttributeIcon(attribute: string) {
     potential: BicepsFlexed,
     preference: Heart,
     "basic-info": User,
+    comorbidities: HeartPulse,
   };
   return attributeMap[attribute as keyof typeof attributeMap];
 }
@@ -27,6 +29,7 @@ export function getAttributeLabel(attribute: string) {
     potential: "Potencialidades",
     preference: "Preferências",
     "basic-info": "Informações Básicas",
+    comorbidities: "Comorbidades",
   };
 
   return attributeMap[attribute as keyof typeof attributeMap] || attribute;

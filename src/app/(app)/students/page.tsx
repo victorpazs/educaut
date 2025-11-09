@@ -6,14 +6,8 @@ import { Plus, Users } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-  EmptyMedia,
-} from "@/components/ui/empty";
 import { SearchInput } from "@/components/ui/search-input";
+import { EmptyList } from "@/components/empty-list";
 
 import { StudentCard } from "./_components/student-card";
 import { useStudents } from "./_hooks/use-students";
@@ -56,44 +50,25 @@ export default function StudentsPage() {
         </div>
         <div className="col-span-12">
           {!hasSchool ? (
-            <Empty>
-              <EmptyMedia variant="icon">
-                <Users className="h-6 w-6" />
-              </EmptyMedia>
-              <EmptyHeader>
-                <EmptyTitle>Selecione uma escola</EmptyTitle>
-                <EmptyDescription>
-                  É necessário escolher uma escola para visualizar os alunos.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyList
+              title="Selecione uma escola"
+              description="É necessário escolher uma escola para visualizar os alunos."
+              icon={Users}
+            />
           ) : hasError ? (
-            <Empty>
-              <EmptyMedia variant="icon">
-                <Users className="h-6 w-6" />
-              </EmptyMedia>
-              <EmptyHeader>
-                <EmptyTitle>Erro ao carregar alunos</EmptyTitle>
-                <EmptyDescription>
-                  Não foi possível carregar os alunos. Tente novamente em
-                  instantes.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyList
+              title="Erro ao carregar alunos"
+              description="Não foi possível carregar os alunos. Tente novamente em instantes."
+              icon={Users}
+            />
           ) : isLoading ? (
             <PageLoader />
           ) : students.length === 0 ? (
-            <Empty>
-              <EmptyMedia variant="icon">
-                <Users className="h-6 w-6" />
-              </EmptyMedia>
-              <EmptyHeader>
-                <EmptyTitle>Nenhum aluno encontrado</EmptyTitle>
-                <EmptyDescription>
-                  Ajuste os filtros de busca ou cadastre um novo aluno.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyList
+              title="Nenhum aluno encontrado"
+              description="Ajuste os filtros de busca ou cadastre um novo aluno."
+              icon={Users}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {students.map((student) => (

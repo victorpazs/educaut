@@ -8,6 +8,7 @@ import { getAttributeLabel } from "@/lib/attributes.utils";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAttributes } from "@/hooks/useAttributes";
+import { ContentCard } from "@/components/content-card";
 
 interface StudentTabContentProps {
   activeTab: string;
@@ -100,14 +101,8 @@ export function StudentTabContent({
   };
 
   return (
-    <Card className="p-6">
-      <div className="grid grid-cols-12">
-        <div className="col-span-12">
-          <PageHeader titleSize="sm" title={getAttributeLabel(activeTab)} />
-          <Separator className="mb-4 mt-1" />
-        </div>
-        <div className="col-span-12">{renderStepContent()}</div>
-      </div>
-    </Card>
+    <ContentCard title={getAttributeLabel(activeTab)}>
+      {renderStepContent()}
+    </ContentCard>
   );
 }

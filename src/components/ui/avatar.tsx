@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { UserIcon } from "lucide-react";
 
 export type AvatarProps = React.HTMLAttributes<HTMLDivElement> & {
   src?: string | null;
@@ -31,7 +32,7 @@ export function Avatar({
       ) : children ? (
         children
       ) : (
-        <span className="text-muted-foreground">{fallback ?? "?"}</span>
+        <UserIcon className="h-4 w-4" />
       )}
     </div>
   );

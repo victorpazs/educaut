@@ -5,15 +5,9 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-  EmptyMedia,
-} from "@/components/ui/empty";
+import { EmptyList } from "@/components/empty-list";
 import { useActivities } from "./_hooks/use-activities";
 
 export default function ActivitiesPage() {
@@ -50,26 +44,19 @@ export default function ActivitiesPage() {
         </div>
         <div className="col-span-12">
           {hasError ? (
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>Erro ao carregar atividades</EmptyTitle>
-                <EmptyDescription>
-                  Não foi possível carregar as atividades. Tente novamente em
-                  instantes.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyList
+              title="Erro ao carregar atividades"
+              description="Não foi possível carregar as atividades. Tente novamente em instantes."
+              icon={FileText}
+            />
           ) : isLoading ? (
             <PageLoader />
           ) : !activities || activities.length === 0 ? (
-            <Empty>
-              <EmptyHeader>
-                <EmptyTitle>Nenhuma atividade encontrada</EmptyTitle>
-                <EmptyDescription>
-                  Ajuste os filtros de busca ou crie uma nova atividade.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyList
+              title="Nenhuma atividade encontrada"
+              description="Ajuste os filtros de busca ou crie uma nova atividade."
+              icon={FileText}
+            />
           ) : null}
         </div>
       </div>

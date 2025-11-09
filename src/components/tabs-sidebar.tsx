@@ -104,7 +104,7 @@ export function TabsSidebar({
                   disabled={disabled}
                   className="flex-1 gap-2"
                 >
-                  <Icon className="h-4 w-4" />
+                  {Icon && <Icon className="h-4 w-4" />}
                   {label}
                 </TabsTrigger>
               );
@@ -143,7 +143,7 @@ export function TabsSidebar({
                   isActive ? "bg-muted-foreground! text-white!" : ""
                 )}
               >
-                <Icon className="h-4 w-4 " />
+                {Icon && <Icon className="h-4 w-4 " />}
 
                 <span className="">{label}</span>
               </Button>
