@@ -64,10 +64,12 @@ export function ConfirmationDialog({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={handleDeny}>
+          <Button size="sm" variant="secondary" onClick={handleDeny}>
             {labelDeny}
           </Button>
-          <Button onClick={handleAccept}>{labelAccept}</Button>
+          <Button size="sm" onClick={handleAccept}>
+            {labelAccept}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

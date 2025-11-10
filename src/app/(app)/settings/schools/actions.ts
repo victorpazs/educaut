@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
   createNotFoundError,
@@ -9,7 +10,7 @@ import {
   type ApiResponse,
 } from "@/lib/server-responses";
 import { getCurrentUser } from "@/lib/session";
-import type { ISchool } from "./_models";
+import type { ISchool } from "@/types/db";
 
 interface GetSchoolsParams {
   search?: string;
@@ -61,51 +62,6 @@ export async function getSchools({ search }: GetSchoolsParams = {}): Promise<
     });
 
     return createSuccessResponse(schools, "Escolas carregadas com sucesso.");
-  } catch (error) {
-    return handleServerError(error);
-  }
-}
-
-interface CreateSchoolParams {
-  name: string;
-}
-
-export async function createSchool({
-  name,
-}: CreateSchoolParams): Promise<ApiResponse<ISchool | null>> {
-  try {
-    const user = await getCurrentUser();
-    if (!user?.id) {
-      return createErrorResponse(
-        "Usuário não autenticado.",
-        "AUTH_REQUIRED",
-        401
-      );
-    }
-
-    const normalizedName = name?.trim();
-    if (!normalizedName) {
-      return createErrorResponse(
-        "O nome da escola é obrigatório.",
-        "VALIDATION_ERROR",
-        400
-      );
-    }
-
-    const school = await prisma.schools.create({
-      data: {
-        name: normalizedName,
-        created_by: user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        created_at: true,
-        status: true,
-      },
-    });
-
-    return createSuccessResponse(school, "Escola criada com sucesso.", 201);
   } catch (error) {
     return handleServerError(error);
   }
@@ -179,6 +135,7 @@ export async function updateSchool({
       },
     });
 
+    revalidatePath("/settings/schools");
     return createSuccessResponse(updated, "Escola atualizada com sucesso.");
   } catch (error) {
     return handleServerError(error);
@@ -228,10 +185,11 @@ export async function deleteSchool(
     }
 
     await prisma.schools.update({
-      where: { id: Number(id) },
+      where: { id: Number(id), status: { not: 3 } },
       data: { status: 3 },
     });
 
+    revalidatePath("/settings/schools");
     return createSuccessResponse({ id: Number(id) }, "Escola removida.");
   } catch (error) {
     return handleServerError(error);

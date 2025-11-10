@@ -180,7 +180,7 @@ export function DialogHeader({
   return (
     <div
       className={cn(
-        "flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-0",
+        "flex flex-col space-y-1.5 text-center sm:text-left p-6 pb-4",
         className
       )}
       {...props}
@@ -222,7 +222,5 @@ export function DialogDescription({
   className,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("text-sm text-muted-foreground", className)} {...props} />
-  );
+  return <p className={cn("text-sm text-secondary", className)} {...props} />;
 }

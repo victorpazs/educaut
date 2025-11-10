@@ -1,6 +1,6 @@
 "use client";
 
-import type { School, User } from "@/types/db";
+import type { ISchool, User } from "@/types/db";
 import {
   createContext,
   ReactNode,
@@ -9,11 +9,13 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 
 interface SessionContextValue {
-  user: (User & { schools?: School[] }) | null;
-  school: School | null;
-  setSchool: (school: School | null) => void;
+  user: (User & { schools?: ISchool[] }) | null;
+  school: ISchool | null;
+  setSchool: (school: ISchool | null) => void;
+  reload: () => void;
 }
 
 export const SessionContext = createContext<SessionContextValue | undefined>(
@@ -25,27 +27,33 @@ export function SessionProvider({
   value,
 }: {
   children: ReactNode;
-  value: Omit<SessionContextValue, "setSchool">;
+  value: Omit<SessionContextValue, "setSchool" | "reload">;
 }) {
-  const [currentSchool, setCurrentSchool] = useState<School | null>(
+  const [currentSchool, setCurrentSchool] = useState<ISchool | null>(
     value.school
   );
+  const router = useRouter();
 
   useEffect(() => {
     setCurrentSchool(value.school);
   }, [value.school]);
 
-  const handleSetSchool = useCallback((nextSchool: School | null) => {
+  const handleSetSchool = useCallback((nextSchool: ISchool | null) => {
     setCurrentSchool(nextSchool);
   }, []);
+
+  const handleReload = useCallback(() => {
+    router.refresh();
+  }, [router]);
 
   const contextValue = useMemo<SessionContextValue>(
     () => ({
       user: value.user,
       school: currentSchool,
       setSchool: handleSetSchool,
+      reload: handleReload,
     }),
-    [value.user, currentSchool, handleSetSchool]
+    [value.user, currentSchool, handleSetSchool, handleReload]
   );
 
   return (

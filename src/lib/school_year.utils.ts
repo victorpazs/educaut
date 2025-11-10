@@ -84,3 +84,9 @@ export function getGroupedSchoolYears(): GroupedYears[] {
     options: schoolYears.filter((y) => g.range.includes(y.value)),
   }));
 }
+
+export function getSchoolYearLabel(
+  yearValue: number | null | undefined
+): string {
+  return schoolYears.find((y) => y.value === yearValue)?.label ?? "";
+}

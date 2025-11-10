@@ -35,6 +35,11 @@ export const getCurrentUser = cache(async () => {
         created_at: true,
         avatar: true,
         school_users: {
+          where: {
+            schools: {
+              status: 1,
+            },
+          },
           include: {
             schools: true,
           },
@@ -63,6 +68,7 @@ export const getSelectedSchoolById = cache(
       const foundSchool = await prisma.schools.findFirst({
         where: {
           id: schoolId,
+          status: 1,
           school_users: {
             some: {
               user_id: userId,

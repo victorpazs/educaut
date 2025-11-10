@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyList } from "@/components/empty-list";
 
-import { StudentCard } from "./_components/student-card";
 import { useStudents } from "./_hooks/use-students";
 import { PageLoader } from "@/components/page-loader";
+
+import { Card } from "@/components/ui/card";
+import { StudentsList } from "./_components/List";
 
 export default function StudentsPage() {
   const [search, setSearch] = React.useState("");
@@ -20,10 +22,7 @@ export default function StudentsPage() {
   const handleSearch = (value: string) => {
     setSearch(value);
   };
-  console.log(students);
-  console.log(isLoading);
-  console.log(hasError);
-  console.log(hasSchool);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">
@@ -70,11 +69,9 @@ export default function StudentsPage() {
               icon={Users}
             />
           ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {students.map((student) => (
-                <StudentCard key={student.id} {...student} />
-              ))}
-            </div>
+            <Card className="rounded-sm">
+              <StudentsList students={students} />
+            </Card>
           )}
         </div>
       </div>

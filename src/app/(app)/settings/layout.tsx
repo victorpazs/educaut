@@ -18,6 +18,10 @@ export default function SettingsLayout({
         return "Gerencie os seus dados pessoais na plataforma.";
       case "schools":
         return "Gerencie as suas escolas cadastradas na plataforma.";
+      case "attributes":
+        return "Gerencie os atributos da escola atual.";
+      default:
+        return "Gerencie as suas configurações na plataforma.";
     }
   };
 

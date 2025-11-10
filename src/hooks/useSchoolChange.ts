@@ -3,11 +3,11 @@
 import { useCallback, useTransition } from "react";
 
 import { updateSelectedSchool } from "@/app/auth/actions";
-import type { School } from "@/types/db";
+import type { ISchool } from "@/types/db";
 import { useSession } from "./useSession";
 
 interface UseSchoolChangeResult {
-  changeSchool: (nextSchool: School | null) => void;
+  changeSchool: (nextSchool: ISchool | null) => void;
   isPending: boolean;
 }
 
@@ -16,7 +16,7 @@ export function useSchoolChange(): UseSchoolChangeResult {
   const [isPending, startTransition] = useTransition();
 
   const changeSchool = useCallback(
-    (nextSchool: School | null) => {
+    (nextSchool: ISchool | null) => {
       if (nextSchool?.id === currentSchool?.id) {
         return;
       }

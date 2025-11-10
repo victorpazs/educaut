@@ -1,28 +1,37 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, FileText, Calendar } from "lucide-react";
+import { User, FileText, Calendar, School, Settings, Tag } from "lucide-react";
 import { QuickAccessButton, QuickAccessButtonProps } from "./QuickAccessButton";
 
 const quickAccessButtons: QuickAccessButtonProps[] = [
   {
-    icon: <User className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />,
+    icon: User,
     label: "Novo Aluno",
     path: "/students/create",
   },
   {
-    icon: (
-      <FileText className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
-    ),
+    icon: FileText,
     label: "Nova Atividade",
     path: "/activities/create",
   },
 
   {
-    icon: (
-      <Calendar className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
-    ),
+    icon: Calendar,
     label: "Nova Aula",
     path: "/agenda/create",
+  },
+  {
+    icon: Settings,
+    label: "Meu cadastro",
+    path: "/settings/profile",
+  },
+  {
+    icon: School,
+    label: "Minhas escolas",
+    path: "/settings/schools",
+  },
+  {
+    icon: Tag,
+    label: "Atributos",
+    path: "/settings/attributes",
   },
 ];
 export const QuickAccess = () => {

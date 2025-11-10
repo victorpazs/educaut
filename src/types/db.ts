@@ -5,4 +5,12 @@ export type User = Prisma.usersGetPayload<{
     password_hash: true;
   };
 }>;
-export type School = Prisma.schoolsGetPayload<{}>;
+
+export type ISchool = Prisma.schoolsGetPayload<{
+  select: {
+    id: true;
+    name: true;
+    created_at: true;
+    status: true;
+  };
+}>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { TabsSidebar } from "@/components/tabs-sidebar";
-import { School, User } from "lucide-react";
+import { School, Tags, User } from "lucide-react";
 
 export function TabsWrapper() {
   const options = [
@@ -14,6 +14,11 @@ export function TabsWrapper() {
       label: "Escolas",
       href: "/settings/schools",
       icon: School,
+    },
+    {
+      label: "Atributos",
+      href: "/settings/attributes",
+      icon: Tags,
     },
   ];
   return <TabsSidebar options={options} />;

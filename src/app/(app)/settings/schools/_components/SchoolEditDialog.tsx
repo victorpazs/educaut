@@ -11,10 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { updateSchool } from "../actions";
 import { toast } from "@/lib/toast";
 import type { ISchool } from "../_models";
+import { useSession } from "@/hooks/useSession";
+import { SchoolForm, type SchoolFormValues } from "@/components/school-form";
 
 interface SchoolEditDialogProps {
   school: ISchool;
@@ -23,23 +24,16 @@ interface SchoolEditDialogProps {
 
 export function SchoolEditDialog({ school, onUpdated }: SchoolEditDialogProps) {
   const [open, setOpen] = React.useState(false);
-  const [name, setName] = React.useState(school.name);
   const [submitting, setSubmitting] = React.useState(false);
+  const { reload } = useSession();
 
-  React.useEffect(() => {
-    if (open) {
-      setName(school.name);
-    }
-  }, [open, school.name]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || submitting) return;
-
+  const handleUpdate = async ({ name }: SchoolFormValues) => {
+    if (submitting) return;
     setSubmitting(true);
     try {
-      const response = await updateSchool({ id: school.id, name });
+      const response = await updateSchool({ id: school.id, name: name.trim() });
       if (response.success) {
+        reload();
         toast.success("Escola atualizada com sucesso.");
         setOpen(false);
         onUpdated?.();
@@ -69,36 +63,18 @@ export function SchoolEditDialog({ school, onUpdated }: SchoolEditDialogProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar escola</DialogTitle>
-            <DialogDescription>Atualize as informações da escola.</DialogDescription>
+            <DialogDescription>
+              Atualize as informações da escola.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="px-6">
-              <label className="text-sm mb-2 block">Nome da escola</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nome da escola"
-                required
-              />
-            </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setOpen(false)}
-                disabled={submitting}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? "Salvando..." : "Salvar"}
-              </Button>
-            </DialogFooter>
-          </form>
+          <SchoolForm
+            defaultName={school.name}
+            submitting={submitting}
+            onSubmit={handleUpdate}
+            onCancel={() => setOpen(false)}
+          />
         </DialogContent>
       </Dialog>
     </>
   );
 }
-
-

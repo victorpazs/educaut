@@ -14,7 +14,8 @@ import bcrypt from "bcrypt";
 
 export interface UpdateProfileParams {
   name: string;
-  email: string;
+  // email is intentionally ignored for updates; kept for backward-compat callers
+  email?: string;
   avatar?: string | null;
 }
 
@@ -33,41 +34,20 @@ export async function updateProfile(
 
     const errors: ErrorDetail[] = [];
     const name = values.name?.trim();
-    const email = values.email?.trim().toLowerCase();
     const avatar = values.avatar ?? null;
 
     if (!name || name.length < 2) {
       errors.push({ field: "name", message: "Nome é obrigatório." });
     }
 
-    if (!email) {
-      errors.push({ field: "email", message: "Email é obrigatório." });
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.push({ field: "email", message: "Email inválido." });
-    }
-
     if (errors.length > 0) {
       return createValidationError(errors);
-    }
-
-    // Ensure email is unique (excluding current user)
-    if (email !== current.email) {
-      const existing = await prisma.users.findUnique({
-        where: { email },
-        select: { id: true },
-      });
-      if (existing && existing.id !== current.id) {
-        return createValidationError([
-          { field: "email", message: "Email já está em uso." },
-        ]);
-      }
     }
 
     await prisma.users.update({
       where: { id: current.id },
       data: {
         name,
-        email,
         avatar,
       },
     });
@@ -112,7 +92,10 @@ export async function changePassword(
       });
     }
     if (!newPassword) {
-      errors.push({ field: "newPassword", message: "Nova senha é obrigatória." });
+      errors.push({
+        field: "newPassword",
+        message: "Nova senha é obrigatória.",
+      });
     } else if (newPassword.length < 6) {
       errors.push({
         field: "newPassword",
@@ -159,5 +142,3 @@ export async function changePassword(
     return handleServerError(error);
   }
 }
-
-

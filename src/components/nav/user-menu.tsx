@@ -80,7 +80,7 @@ export function UserMenu() {
     (schoolId: string) => {
       if (schoolId === "__new_school__") {
         setIsMenuOpen(false);
-        router.push("/settings/schools?new=1");
+        router.push("/create-school");
         return;
       }
 

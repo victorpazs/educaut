@@ -59,6 +59,18 @@ export async function getStudents({
         created_at: true,
         status: true,
         school_segment: true,
+        schedules: {
+          where: {
+            status: 1,
+          },
+          orderBy: {
+            start_time: "asc",
+          },
+          take: 1,
+          select: {
+            start_time: true,
+          },
+        },
       },
     });
 
@@ -139,6 +151,60 @@ export async function getStudentById(
     }
 
     return createSuccessResponse(student, "Aluno carregado com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export async function deleteStudentAction(
+  studentId: number
+): Promise<ApiResponse<{ id: number } | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    if (!studentId || isNaN(Number(studentId))) {
+      return createErrorResponse(
+        "ID do aluno inválido.",
+        "INVALID_STUDENT_ID",
+        400
+      );
+    }
+
+    const existing = await prisma.students.findFirst({
+      where: {
+        id: Number(studentId),
+        school_id: schoolId,
+        status: {
+          not: 3,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return createNotFoundError(
+        "Aluno não encontrado ou não pertence à escola selecionada."
+      );
+    }
+
+    await prisma.students.update({
+      where: { id: Number(studentId), school_id: schoolId, status: { not: 3 } },
+      data: { status: 3 },
+    });
+
+    return createSuccessResponse(
+      { id: Number(studentId) },
+      "Aluno removido com sucesso."
+    );
   } catch (error) {
     return handleServerError(error);
   }

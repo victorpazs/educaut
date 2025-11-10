@@ -7,8 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { AvatarInput } from "@/components/avatar-input";
 import { toast } from "@/lib/toast";
-import { updateProfile, changePassword } from "../actions";
-import { Accordion } from "@/components/ui/accordion";
+import { updateProfile } from "../actions";
+import { withValidation } from "@/lib/validation";
+import { PasswordChangeForm } from "./PasswordChangeForm";
+import { profileSchema, ProfileData } from "../_models";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ProfileFormProps {
   initialName: string;
@@ -22,78 +30,68 @@ export function ProfileForm({
   initialAvatar,
 }: ProfileFormProps) {
   const router = useRouter();
-  const [name, setName] = React.useState(initialName ?? "");
-  const [email, setEmail] = React.useState(initialEmail ?? "");
-  const [avatar, setAvatar] = React.useState<string | null>(
-    initialAvatar ?? null
-  );
+  const [userData, setUserData] = React.useState({
+    name: initialName ?? "",
+    email: initialEmail ?? "",
+    avatar: (initialAvatar ?? null) as string | null,
+    currentPassword: "",
+    newPassword: "",
+    confirm: "",
+  });
   const [submitting, setSubmitting] = React.useState(false);
-  const [pwdSubmitting, setPwdSubmitting] = React.useState(false);
-  const [currentPassword, setCurrentPassword] = React.useState("");
-  const [newPassword, setNewPassword] = React.useState("");
-  const [confirm, setConfirm] = React.useState("");
+  const [passwordModalOpen, setPasswordModalOpen] = React.useState(false);
+
+  const submitProfile = withValidation(
+    profileSchema,
+    async (data: ProfileData) => {
+      if (submitting) return;
+      setSubmitting(true);
+      try {
+        const response = await updateProfile({
+          name: data.name,
+          email: data.email,
+          avatar: data.avatar ?? null,
+        });
+        if (response.success) {
+          toast.success("Perfil atualizado com sucesso.");
+          router.refresh();
+        } else {
+          toast.error(response.message);
+        }
+      } catch {
+        toast.error("Não foi possível atualizar o perfil.");
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (submitting) return;
-
-    setSubmitting(true);
-    try {
-      const response = await updateProfile({
-        name,
-        email,
-        avatar,
-      });
-      if (response.success) {
-        toast.success("Perfil atualizado com sucesso.");
-        router.refresh();
-      } else {
-        toast.error(response.message);
-      }
-    } catch {
-      toast.error("Não foi possível atualizar o perfil.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pwdSubmitting) return;
-    setPwdSubmitting(true);
-    try {
-      const response = await changePassword({
-        currentPassword,
-        newPassword,
-        confirm,
-      });
-      if (response.success) {
-        toast.success("Senha atualizada com sucesso.");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirm("");
-      } else {
-        toast.error(response.message);
-      }
-    } catch {
-      toast.error("Não foi possível alterar a senha.");
-    } finally {
-      setPwdSubmitting(false);
-    }
+    await submitProfile({
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar,
+    });
   };
 
   return (
     <div className="space-y-10">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <AvatarInput value={avatar} onChange={setAvatar} />
+        <AvatarInput
+          value={userData.avatar}
+          onChange={(val) => setUserData((prev) => ({ ...prev, avatar: val }))}
+        />
 
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-12 md:col-span-6">
             <Label htmlFor="name">Nome</Label>
             <Input
               id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={userData.name}
+              onChange={(e) =>
+                setUserData((prev) => ({ ...prev, name: e.target.value }))
+              }
               placeholder="Seu nome"
               required
             />
@@ -103,7 +101,7 @@ export function ProfileForm({
             <Input
               id="email"
               type="email"
-              value={email}
+              value={userData.email}
               readOnly
               disabled
               placeholder="voce@exemplo.com"
@@ -111,59 +109,37 @@ export function ProfileForm({
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setPasswordModalOpen(true)}
+          >
+            Alterar senha
+          </Button>
           <Button type="submit" disabled={submitting}>
             {submitting ? "Salvando..." : "Salvar alterações"}
           </Button>
         </div>
       </form>
 
-      <Accordion title="Alterar senha" defaultExpanded={false}>
-        <form onSubmit={handlePasswordChange} className="space-y-4">
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 md:col-span-4">
-              <Label htmlFor="currentPassword">Senha atual</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="••••••"
-                required
-              />
-            </div>
-            <div className="col-span-12 md:col-span-4">
-              <Label htmlFor="newPassword">Nova senha</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="••••••"
-                required
-              />
-            </div>
-            <div className="col-span-12 md:col-span-4">
-              <Label htmlFor="confirm">Confirmar nova senha</Label>
-              <Input
-                id="confirm"
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                placeholder="••••••"
-                required
-              />
-            </div>
+      <Dialog open={passwordModalOpen} onOpenChange={setPasswordModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar senha</DialogTitle>
+          </DialogHeader>
+          <div className="p-6 pt-0">
+            <PasswordChangeForm
+              currentPassword={userData.currentPassword}
+              newPassword={userData.newPassword}
+              confirm={userData.confirm}
+              onChange={(field, value) =>
+                setUserData((prev) => ({ ...prev, [field]: value }))
+              }
+            />
           </div>
-          <div className="flex justify-end">
-            <Button type="submit" disabled={pwdSubmitting}>
-              {pwdSubmitting ? "Atualizando..." : "Alterar senha"}
-            </Button>
-          </div>
-        </form>
-      </Accordion>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
-

@@ -9,6 +9,11 @@ export type IStudent = Prisma.studentsGetPayload<{
     created_at: true;
     status: true;
     school_segment: true;
+    schedules: {
+      select: {
+        start_time: true;
+      };
+    };
   };
 }>;
 

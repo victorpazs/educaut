@@ -1,10 +1,11 @@
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export type QuickAccessButtonProps = {
-  icon: React.ReactNode;
+  icon: LucideIcon;
   label: string;
   path: string;
 };
@@ -21,20 +22,24 @@ export function QuickAccessButton({
   };
 
   return (
-    <Card className="overflow-hidden rounded-lg">
+    <Card className="overflow-hidden">
       <Button
         variant="ghost"
         className="group relative flex h-auto w-full items-center gap-3 overflow-hidden py-6 px-4"
         onClick={handleClick}
       >
         <div className="flex w-full items-center gap-3 transition-all duration-200 ease-out group-hover:blur-xs group-hover:opacity-60">
-          {IconComponent}
+          <Avatar className="bg-muted-foreground/80 h-10 w-10 rounded-lg border-none">
+            <IconComponent className="h-6 w-6 text-white" />
+          </Avatar>
 
-          <span className="text-sm">{label}</span>
+          <span className="text-sm text-muted-foreground">{label}</span>
         </div>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-black opacity-0 transition-all duration-200 ease-out group-hover:opacity-100">
-          <ArrowRight className="h-4 w-4" />
-          <span className="text-xs font-semibold tracking-wide">Acessar</span>
+          <ArrowRight className="h-4 w-4  text-muted-foreground" />
+          <span className="text-xs text-muted-foreground font-bold tracking-wide">
+            Acessar
+          </span>
         </div>
       </Button>
     </Card>

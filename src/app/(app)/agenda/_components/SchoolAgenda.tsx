@@ -133,11 +133,10 @@ export function SchoolAgenda() {
             nowIndicator={true}
             events={hasSchool ? fcEvents : []}
             select={(info: DateSelectArg) => {
-              // noop: consumer pode interceptar via props no futuro
-              // por ora, mantemos seleção para criação fora deste componente
+              console.log("select", info);
             }}
             eventClick={(clickInfo: EventClickArg) => {
-              // noop: consumer pode interceptar via props no futuro
+              console.log("eventClick", clickInfo);
             }}
             datesSet={(info: DatesSetArg) => {
               setCurrentView(info.view.type as FullCalendarView);
