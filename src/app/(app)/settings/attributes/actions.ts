@@ -9,6 +9,7 @@ import {
   type ApiResponse,
 } from "@/lib/server-responses";
 import { getAuthContext } from "@/lib/session";
+import { revalidatePath } from "next/cache";
 
 import type {
   AttributesByType,
@@ -69,3 +70,73 @@ export const getSchoolAttributesByType = cache(
     }
   }
 );
+
+export type CreateAttributeInput =
+  | { name: string; type_id: number }
+  | { name: string; typeName: string };
+
+export async function createAttribute(
+  data: CreateAttributeInput
+): Promise<ApiResponse<{ id: number } | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const normalizedName = data.name?.trim();
+    if (!normalizedName) {
+      return createErrorResponse(
+        "O nome do atributo é obrigatório.",
+        "VALIDATION_ERROR",
+        400
+      );
+    }
+
+    // Resolve type_id from either direct id or provided typeName
+    let resolvedTypeId: number | null = null;
+    if ("type_id" in data && data.type_id) {
+      resolvedTypeId = Number(data.type_id);
+    } else if ("typeName" in data && data.typeName) {
+      const type = await prisma.attribute_types.findUnique({
+        where: { name: data.typeName },
+        select: { id: true },
+      });
+      resolvedTypeId = type?.id ?? null;
+    }
+
+    if (!resolvedTypeId)
+      return createErrorResponse(
+        "O tipo do atributo é obrigatório.",
+        "VALIDATION_ERROR",
+        400
+      );
+
+    const created = await prisma.attributes.create({
+      data: {
+        type_id: resolvedTypeId,
+        name: normalizedName,
+        school_id: schoolId,
+      },
+      select: { id: true },
+    });
+
+    revalidatePath("/settings/attributes");
+    return createSuccessResponse(created, "Atributo criado com sucesso.");
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return createErrorResponse(
+        "Já existe um atributo com esse nome para este tipo.",
+        "DUPLICATE_ATTRIBUTE",
+        409
+      );
+    }
+    return handleServerError(error);
+  }
+}

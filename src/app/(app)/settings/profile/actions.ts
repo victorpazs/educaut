@@ -14,8 +14,6 @@ import bcrypt from "bcrypt";
 
 export interface UpdateProfileParams {
   name: string;
-  // email is intentionally ignored for updates; kept for backward-compat callers
-  email?: string;
   avatar?: string | null;
 }
 

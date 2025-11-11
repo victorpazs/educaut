@@ -8,7 +8,7 @@ import { getSchoolAttributesByType } from "../actions";
 import type { AttributesData } from "@/app/(app)/_attributes/_models";
 import type { UseAttributesResult } from "../_models";
 
-export function useAttributes(): UseAttributesResult {
+export function useSchoolAttributes(): UseAttributesResult {
   const { school } = useSession();
 
   const [data, setData] = useState<AttributesData | null>(null);

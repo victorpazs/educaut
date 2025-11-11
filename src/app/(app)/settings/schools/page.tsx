@@ -9,11 +9,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SchoolList } from "./_components/List";
 import { Plus } from "lucide-react";
+import { useContext } from "react";
+import { ModalsContext } from "@/providers/modals";
 
 export default function SettingsSchoolsPage() {
   const [search, setSearch] = React.useState("");
 
   const { schools, isLoading, hasError, reload } = useSchools(search);
+  const { openSchoolCreateDialog } = useContext(ModalsContext);
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -29,12 +32,10 @@ export default function SettingsSchoolsPage() {
             value={search}
             onSearch={handleSearch}
           />
-          <Link href="/create-school">
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Nova escola
-            </Button>
-          </Link>
+          <Button size="sm" onClick={openSchoolCreateDialog}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nova escola
+          </Button>
         </div>
       }
       title="Escolas"

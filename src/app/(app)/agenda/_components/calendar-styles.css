@@ -203,7 +203,7 @@
 /* Remover bordas e backgrounds padrões */
 .fc-daygrid-event.fc-event {
   border: none !important;
-  background: transparent !important;
+  background: var(--primary) !important;
 }
 
 /* Limite de altura para visualização mensal */
@@ -294,7 +294,7 @@
 /* Estilo consistente para eventos */
 .fc-event {
   border: none !important;
-  /* background: # !important; */
+  background: var(--primary) !important;
   margin: 0 !important;
   padding: 0 !important;
   opacity: 1 !important;
@@ -394,7 +394,7 @@
 
 .fc-list-event:hover td,
 .fc-event:hover td {
-  background-color: var(--fc-neutral-bg-color) !important;
+  background-color: var(--primary) !important;
 }
 
 .fc-list-event-dot {

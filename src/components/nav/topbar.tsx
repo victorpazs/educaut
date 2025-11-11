@@ -25,11 +25,7 @@ export function Topbar() {
 
         <SearchButton onClick={onSearchClick} />
 
-        {/* Right side - User data */}
-        <div className="flex items-center gap-8">
-          {/* User Avatar and Dropdown */}
-          <UserMenu />
-        </div>
+        <UserMenu />
       </div>
     </header>
   );

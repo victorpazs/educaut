@@ -11,12 +11,6 @@ import { updateProfile } from "../actions";
 import { withValidation } from "@/lib/validation";
 import { PasswordChangeForm } from "./PasswordChangeForm";
 import { profileSchema, ProfileData } from "../_models";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 interface ProfileFormProps {
   initialName: string;
@@ -49,7 +43,6 @@ export function ProfileForm({
       try {
         const response = await updateProfile({
           name: data.name,
-          email: data.email,
           avatar: data.avatar ?? null,
         });
         if (response.success) {
@@ -70,7 +63,6 @@ export function ProfileForm({
     e.preventDefault();
     await submitProfile({
       name: userData.name,
-      email: userData.email,
       avatar: userData.avatar,
     });
   };
@@ -78,68 +70,70 @@ export function ProfileForm({
   return (
     <div className="space-y-10">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <AvatarInput
-          value={userData.avatar}
-          onChange={(val) => setUserData((prev) => ({ ...prev, avatar: val }))}
-        />
-
         <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 md:col-span-6">
-            <Label htmlFor="name">Nome</Label>
-            <Input
-              id="name"
-              value={userData.name}
-              onChange={(e) =>
-                setUserData((prev) => ({ ...prev, name: e.target.value }))
+          <div className="col-span-12 md:col-span-3">
+            <AvatarInput
+              value={userData.avatar}
+              onChange={(val) =>
+                setUserData((prev) => ({ ...prev, avatar: val }))
               }
-              placeholder="Seu nome"
-              required
             />
           </div>
-          <div className="col-span-12 md:col-span-6">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={userData.email}
-              readOnly
-              disabled
-              placeholder="voce@exemplo.com"
-            />
+
+          <div className="col-span-12 md:col-span-9">
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-12">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  value={userData.name}
+                  onChange={(e) =>
+                    setUserData((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  placeholder="Seu nome"
+                  required
+                />
+              </div>
+              <div className="col-span-12">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={userData.email}
+                  readOnly
+                  disabled
+                  placeholder="voce@exemplo.com"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
           <Button
+            size="sm"
             type="button"
-            variant="outline"
+            variant="secondary"
             onClick={() => setPasswordModalOpen(true)}
           >
             Alterar senha
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button size="sm" type="submit" disabled={submitting}>
             {submitting ? "Salvando..." : "Salvar alterações"}
           </Button>
         </div>
       </form>
 
-      <Dialog open={passwordModalOpen} onOpenChange={setPasswordModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Alterar senha</DialogTitle>
-          </DialogHeader>
-          <div className="p-6 pt-0">
-            <PasswordChangeForm
-              currentPassword={userData.currentPassword}
-              newPassword={userData.newPassword}
-              confirm={userData.confirm}
-              onChange={(field, value) =>
-                setUserData((prev) => ({ ...prev, [field]: value }))
-              }
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PasswordChangeForm
+        open={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+        currentPassword={userData.currentPassword}
+        newPassword={userData.newPassword}
+        confirm={userData.confirm}
+        onChange={(field, value) =>
+          setUserData((prev) => ({ ...prev, [field]: value }))
+        }
+      />
     </div>
   );
 }

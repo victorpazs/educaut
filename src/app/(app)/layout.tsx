@@ -7,13 +7,12 @@ import { SearchProvider } from "@/providers/search";
 
 import { getAuthContext } from "@/lib/session";
 import { SessionProvider } from "@/providers/session-provider";
+import { ModalsProvider } from "@/providers/modals";
 
 export default async function AppLayout({
   children,
-  modals,
 }: {
   children: React.ReactNode;
-  modals: React.ReactNode;
 }) {
   const { user, school } = await getAuthContext();
   const attributesResponse = await getAttributesByType();
@@ -25,12 +24,11 @@ export default async function AppLayout({
   return (
     <SessionProvider value={{ user, school }}>
       <AttributesProvider value={attributesData}>
-        <SearchProvider>
-          <AppShell>
-            {children}
-            {modals}
-          </AppShell>
-        </SearchProvider>
+        <ModalsProvider>
+          <SearchProvider>
+            <AppShell>{children}</AppShell>
+          </SearchProvider>
+        </ModalsProvider>
       </AttributesProvider>
     </SessionProvider>
   );

@@ -3,15 +3,43 @@
 import { EmptyList } from "@/components/empty-list";
 import { Tags } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
-import { useAttributes } from "./_hooks/use-attributes";
-import { AttributesTabs } from "./_components/AttributesTabs";
-import { Card } from "@/components/ui/card";
+import { useSchoolAttributes } from "./_hooks/use-school-attributes";
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import type {
+  AttributesByType,
+  AttributesData,
+} from "@/app/(app)/_attributes/_models";
+import { ContentCard } from "@/components/content-card";
+import { CreateAttributeDialog } from "./_components/CreateAttributeDialog";
+import { useAttributes } from "@/hooks/useAttributes";
+import { getAttributeLabel } from "@/lib/attributes.utils";
+import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { AttributeCell } from "./_components/AttributeCell";
 
 export default function AttributesSettingsPage() {
-  const { data, isLoading, hasError, hasSchool } = useAttributes();
+  const router = useRouter();
+  const { attributeTypes } = useAttributes();
+
+  const { data, isLoading, hasError, hasSchool } = useSchoolAttributes();
 
   return (
-    <Card className="space-y-4">
+    <ContentCard
+      title="Atributos"
+      actions={
+        <CreateAttributeDialog
+          attributeTypes={attributeTypes ?? []}
+          onSuccess={() => router.refresh()}
+        />
+      }
+    >
       {!hasSchool ? (
         <EmptyList
           title="Selecione uma escola"
@@ -26,15 +54,41 @@ export default function AttributesSettingsPage() {
           description="Não foi possível carregar os atributos. Tente novamente em instantes."
           icon={Tags}
         />
-      ) : !data.attributeTypes.length ? (
-        <EmptyList
-          title="Nenhum atributo cadastrado"
-          description="Quando houver atributos cadastrados, eles aparecerão aqui separados por categoria."
-          icon={Tags}
-        />
       ) : (
-        <AttributesTabs data={data} />
+        <div className="space-y-4">
+          {attributeTypes.map((type, index) => {
+            const items = data.attributesByType[type] ?? [];
+            return (
+              <div key={type} className="space-y-2">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {getAttributeLabel(type)}
+                </span>
+                <Separator />
+                {items.length === 0 ? (
+                  <EmptyList
+                    title="Nenhum atributo"
+                    description="Crie um novo atributo para este tipo."
+                    icon={Tags}
+                  />
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {items.map((option) => (
+                        <AttributeCell key={option.id} option={option} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
-    </Card>
+    </ContentCard>
   );
 }

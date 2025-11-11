@@ -9,6 +9,13 @@ import { withValidation } from "@/lib/validation";
 import { toast } from "@/lib/toast";
 import { changePassword } from "../actions";
 import { passwordSchema, PasswordChangeData } from "../_models";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { PasswordInput } from "@/components/ui/password-input";
 
 interface PasswordChangeFormProps {
   currentPassword: string;
@@ -18,6 +25,8 @@ interface PasswordChangeFormProps {
     field: "currentPassword" | "newPassword" | "confirm",
     value: string
   ) => void;
+  open: boolean;
+  onClose: () => void;
 }
 
 export function PasswordChangeForm({
@@ -25,6 +34,8 @@ export function PasswordChangeForm({
   newPassword,
   confirm,
   onChange,
+  open,
+  onClose,
 }: PasswordChangeFormProps) {
   const [pwdSubmitting, setPwdSubmitting] = React.useState(false);
 
@@ -65,49 +76,58 @@ export function PasswordChangeForm({
   };
 
   return (
-    <Accordion title="Alterar senha" defaultExpanded={false}>
-      <form onSubmit={handlePasswordChange} className="space-y-4">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 md:col-span-4">
-            <Label htmlFor="currentPassword">Senha atual</Label>
-            <Input
-              id="currentPassword"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => onChange("currentPassword", e.target.value)}
-              placeholder="••••••"
-              required
-            />
-          </div>
-          <div className="col-span-12 md:col-span-4">
-            <Label htmlFor="newPassword">Nova senha</Label>
-            <Input
-              id="newPassword"
-              type="password"
-              value={newPassword}
-              onChange={(e) => onChange("newPassword", e.target.value)}
-              placeholder="••••••"
-              required
-            />
-          </div>
-          <div className="col-span-12 md:col-span-4">
-            <Label htmlFor="confirm">Confirmar nova senha</Label>
-            <Input
-              id="confirm"
-              type="password"
-              value={confirm}
-              onChange={(e) => onChange("confirm", e.target.value)}
-              placeholder="••••••"
-              required
-            />
-          </div>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
+      <DialogContent className="max-w-sm!">
+        <DialogHeader>
+          <DialogTitle>Alterar senha</DialogTitle>
+        </DialogHeader>
+        <div className="p-6 pt-0">
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div className="grid grid-cols-12 gap-4">
+              <div className="col-span-12 ">
+                <PasswordInput
+                  id="currentPassword"
+                  label="Senha atual"
+                  value={currentPassword}
+                  onChange={(e) => onChange("currentPassword", e.target.value)}
+                  placeholder="••••••"
+                  required
+                />
+              </div>
+              <div className="col-span-12 ">
+                <PasswordInput
+                  id="newPassword"
+                  label="Nova senha"
+                  value={newPassword}
+                  onChange={(e) => onChange("newPassword", e.target.value)}
+                  placeholder="••••••"
+                  required
+                />
+              </div>
+              <div className="col-span-12 ">
+                <PasswordInput
+                  id="confirm"
+                  label="Confirmar nova senha"
+                  value={confirm}
+                  onChange={(e) => onChange("confirm", e.target.value)}
+                  placeholder="••••••"
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={pwdSubmitting}>
+                {pwdSubmitting ? "Atualizando..." : "Alterar senha"}
+              </Button>
+            </div>
+          </form>{" "}
         </div>
-        <div className="flex justify-end">
-          <Button type="submit" disabled={pwdSubmitting}>
-            {pwdSubmitting ? "Atualizando..." : "Alterar senha"}
-          </Button>
-        </div>
-      </form>
-    </Accordion>
+      </DialogContent>
+    </Dialog>
   );
 }

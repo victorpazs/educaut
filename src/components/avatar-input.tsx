@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
+import { Camera } from "lucide-react";
 
 export interface AvatarInputProps {
   value?: string | null;
@@ -109,7 +110,9 @@ export function AvatarInput({
   };
 
   return (
-    <div className={cn("flex items-center gap-4", className)}>
+    <div
+      className={cn("flex items-center justify-center h-full gap-4", className)}
+    >
       <input
         ref={fileInputRef}
         type="file"
@@ -132,34 +135,26 @@ export function AvatarInput({
         aria-disabled={disabled || isLoading}
       >
         <Avatar
-          className="h-16 w-16"
+          className="h-24 w-24 group-hover:blur-xs group-hover:opacity-60"
           src={preview ?? undefined}
           alt="Avatar preview"
         />
         <div
           className={cn(
-            "pointer-events-none absolute inset-0 flex items-center justify-center rounded-full opacity-0 transition-all duration-200 ease-out",
+            "pointer-events-none absolute inset-0 flex flex-col gap-1 items-center justify-center rounded-full opacity-0 transition-all duration-200 ease-out",
             "bg-background/60",
             "group-hover:opacity-100",
             isDragOver ? "opacity-100" : ""
           )}
         >
+          <Camera className="h-5 w-5 text-muted-foreground" />
           <span className="text-xs text-muted-foreground font-bold tracking-wide">
             Upload
           </span>
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <span className="text-sm text-muted-foreground">{label}</span>
         <div className="flex gap-2">
-          <Button
-            type="button"
-            size="sm"
-            onClick={handlePick}
-            disabled={disabled || isLoading}
-          >
-            {isLoading ? "Carregando..." : preview ? "Trocar" : "Escolher"}
-          </Button>
           {preview ? (
             <Button
               type="button"

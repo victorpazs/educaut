@@ -60,3 +60,62 @@ export async function getAgenda(): Promise<
     return handleServerError(error);
   }
 }
+
+export async function getScheduleById(
+  id: number
+): Promise<ApiResponse<IAgendaSchedule | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const schedule = await prisma.schedules.findFirst({
+      where: {
+        id,
+        school_id: schoolId,
+        status: 1,
+        students: {
+          status: 1,
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        start_time: true,
+        end_time: true,
+        status: true,
+        student_id: true,
+        students: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    if (!schedule) {
+      return createErrorResponse(
+        "Agendamento não encontrado.",
+        "NOT_FOUND",
+        404
+      );
+    }
+
+    return createSuccessResponse(
+      schedule,
+      "Agendamento carregado com sucesso."
+    );
+  } catch (error) {
+    return handleServerError(error);
+  }
+}

@@ -12,7 +12,6 @@ interface UseAgendaResult {
   events: IAgendaCalendarEvent[];
   isLoading: boolean;
   hasError: boolean;
-  hasSchool: boolean;
 }
 
 function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
@@ -102,6 +101,5 @@ export function useAgenda(): UseAgendaResult {
     events,
     isLoading,
     hasError,
-    hasSchool: Boolean(school?.id),
   };
 }

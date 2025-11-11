@@ -27,6 +27,9 @@ export const PasswordInput = React.forwardRef<
       setShowPassword(!showPassword);
     };
 
+    // Remover a prop `size` numérica do HTMLInput para não conflitar com `IconInput.size`
+    const { size: _htmlInputSize, ...restProps } = props;
+
     const toggleButton = showToggle ? (
       <Button
         type="button"
@@ -56,7 +59,7 @@ export const PasswordInput = React.forwardRef<
         error={error}
         startIcon={showIcon ? Lock : undefined}
         endContent={toggleButton}
-        {...props}
+        {...restProps}
       />
     );
   }

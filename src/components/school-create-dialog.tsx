@@ -12,14 +12,24 @@ import {
 import { toast } from "@/lib/toast";
 import { useSession } from "@/hooks/useSession";
 import { SchoolForm, type SchoolFormValues } from "@/components/school-form";
-import { createSchool } from "@/app/(app)/create-school/actions";
+import { createSchool } from "@/app/(app)/_create-school/actions";
 
-export default function SchoolCreateDialog() {
+export default function SchoolCreateDialog({
+  onClose,
+}: {
+  onClose?: () => void;
+}) {
   const router = useRouter();
   const { reload } = useSession();
   const [submitting, setSubmitting] = React.useState(false);
 
-  const close = () => router.back();
+  const close = () => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+    router.back();
+  };
 
   const handleCreate = async ({ name }: SchoolFormValues) => {
     if (submitting) return;
@@ -30,6 +40,11 @@ export default function SchoolCreateDialog() {
         reload();
         toast.success("Escola criada com sucesso.");
         close();
+        if (typeof window !== "undefined") {
+          setTimeout(() => {
+            window.location.reload();
+          }, 0);
+        }
       } else {
         toast.error(response.message);
       }
