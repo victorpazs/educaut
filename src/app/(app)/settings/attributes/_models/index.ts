@@ -5,4 +5,5 @@ export interface UseAttributesResult {
   isLoading: boolean;
   hasError: boolean;
   hasSchool: boolean;
+  reFetch: () => Promise<void>;
 }

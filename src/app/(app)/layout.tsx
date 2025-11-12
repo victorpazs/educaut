@@ -8,6 +8,8 @@ import { SearchProvider } from "@/providers/search";
 import { getAuthContext } from "@/lib/session";
 import { SessionProvider } from "@/providers/session-provider";
 import { ModalsProvider } from "@/providers/modals";
+import { StudentsProvider } from "@/providers/students";
+import { getSchoolStudentsOptions } from "@/app/(app)/_school_students/actions";
 
 export default async function AppLayout({
   children,
@@ -20,15 +22,22 @@ export default async function AppLayout({
     attributesResponse.success && attributesResponse.data
       ? attributesResponse.data
       : { attributesByType: {}, attributeTypes: [] };
+  const studentsResponse = await getSchoolStudentsOptions();
+  const studentsOptions =
+    studentsResponse.success && studentsResponse.data
+      ? studentsResponse.data
+      : [];
 
   return (
     <SessionProvider value={{ user, school }}>
       <AttributesProvider value={attributesData}>
-        <ModalsProvider>
-          <SearchProvider>
-            <AppShell>{children}</AppShell>
-          </SearchProvider>
-        </ModalsProvider>
+        <StudentsProvider value={studentsOptions}>
+          <ModalsProvider>
+            <SearchProvider>
+              <AppShell>{children}</AppShell>
+            </SearchProvider>
+          </ModalsProvider>
+        </StudentsProvider>
       </AttributesProvider>
     </SessionProvider>
   );

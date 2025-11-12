@@ -6,29 +6,19 @@ import { PageLoader } from "@/components/page-loader";
 import { useSchoolAttributes } from "./_hooks/use-school-attributes";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import type {
-  AttributesByType,
-  AttributesData,
-} from "@/app/(app)/_attributes/_models";
 import { ContentCard } from "@/components/content-card";
 import { CreateAttributeDialog } from "./_components/CreateAttributeDialog";
 import { useAttributes } from "@/hooks/useAttributes";
 import { getAttributeLabel } from "@/lib/attributes.utils";
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { AttributeCell } from "./_components/AttributeCell";
 
 export default function AttributesSettingsPage() {
   const router = useRouter();
   const { attributeTypes } = useAttributes();
 
-  const { data, isLoading, hasError, hasSchool } = useSchoolAttributes();
+  const { data, isLoading, hasError, hasSchool, reFetch } = useSchoolAttributes();
 
   return (
     <ContentCard
@@ -36,7 +26,7 @@ export default function AttributesSettingsPage() {
       actions={
         <CreateAttributeDialog
           attributeTypes={attributeTypes ?? []}
-          onSuccess={() => router.refresh()}
+          onSuccess={reFetch}
         />
       }
     >
@@ -59,30 +49,26 @@ export default function AttributesSettingsPage() {
           {attributeTypes.map((type, index) => {
             const items = data.attributesByType[type] ?? [];
             return (
-              <div key={type} className="space-y-2">
+              <div key={type} className="space-y-4 pb-4">
                 <span className="text-sm font-medium text-muted-foreground">
                   {getAttributeLabel(type)}
                 </span>
                 <Separator />
                 {items.length === 0 ? (
-                  <EmptyList
-                    title="Nenhum atributo"
-                    description="Crie um novo atributo para este tipo."
-                    icon={Tags}
-                  />
+                  <span className="text-xs text-secondary">
+                    Nenhum atributo criado para {getAttributeLabel(type)}.
+                  </span>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nome</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {items.map((option) => (
-                        <AttributeCell key={option.id} option={option} />
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <div className="grid grid-cols-12 gap-3">
+                    {items.map((option) => (
+                      <div
+                        className="col-span-12 sm:col-span-6 lg:col-span-3"
+                        key={option.id}
+                      >
+                        <AttributeCell option={option} onChanged={reFetch} />
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             );

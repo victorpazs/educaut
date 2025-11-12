@@ -28,8 +28,8 @@ type ConfirmationDialogProps = {
 export function ConfirmationDialog({
   title = "Confirmação",
   description = "Tem certeza que deseja continuar?",
-  onAccept = () => console.log("accepted"),
-  onDeny = () => console.log("denied"),
+  onAccept = () => {},
+  onDeny = () => {},
   labelAccept = "Sim",
   labelDeny = "Não",
   trigger,

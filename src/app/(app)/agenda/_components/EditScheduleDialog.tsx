@@ -8,93 +8,61 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
-import { getScheduleById } from "../actions";
+import {
+  formatDate,
+  formatDateTimeLocal,
+  parseDateTimeLocal,
+} from "@/lib/utils";
+import { useEditSchedule } from "../_hooks/use-edit-schedule";
+import { updateScheduleAction } from "../actions";
+import { toast } from "@/lib/toast";
+import { useAgenda } from "../_hooks/use-agenda";
+import { ScheduleForm, type ScheduleFormState } from "./ScheduleForm";
+import { User, Trash2 } from "lucide-react";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import { deleteScheduleAction } from "../actions";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion } from "@/components/ui/accordion";
+import { Avatar } from "@/components/ui/avatar";
+import { ScheduleFormSkeleton } from "./ScheduleFormSkeleton";
 
 type EditScheduleDialogProps = {
+  refetch: () => void;
   open: boolean;
   onClose: () => void;
   scheduleId: number;
 };
 
-function formatDateTimeLocal(date: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function parseDateTimeLocal(value: string): Date {
-  const [datePart, timePart] = value.split("T");
-  const [y, m, d] = datePart.split("-").map((v) => Number(v));
-  const [hh, mm] = timePart.split(":").map((v) => Number(v));
-  return new Date(y, m - 1, d, hh, mm, 0, 0);
-}
-
 export function EditScheduleDialog({
+  refetch,
   open,
   onClose,
   scheduleId,
 }: EditScheduleDialogProps) {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [scheduleData, setScheduleData] = useState<{
-    title: string;
-    description: string;
-    startInput: string;
-    endInput: string;
-  }>({
-    title: "",
-    description: "",
-    startInput: formatDateTimeLocal(new Date()),
-    endInput: formatDateTimeLocal(new Date()),
-  });
+  const { scheduleData, setScheduleData, loading, loadError, studentName } =
+    useEditSchedule({
+      open,
+      scheduleId,
+    });
   const [errors, setErrors] = useState<{ title?: string; time?: string }>({});
+  const [saving, setSaving] = useState<boolean>(false);
+  const handleFormChange = (next: ScheduleFormState) => {
+    setScheduleData((prev) => ({
+      ...prev,
+      ...next,
+    }));
+    setErrors((prev) => ({ ...prev, time: undefined }));
+  };
+  const [openDelete, setOpenDelete] = useState<boolean>(false);
 
   useEffect(() => {
-    let active = true;
-    if (!open || !scheduleId) return;
-    const load = async () => {
-      setLoading(true);
-      setErrors({});
-      try {
-        const result = await getScheduleById(scheduleId);
-        if (!active) return;
-        if (result.success && result.data) {
-          const start =
-            result.data.start_time instanceof Date
-              ? result.data.start_time
-              : new Date(result.data.start_time);
-          const end =
-            result.data.end_time instanceof Date
-              ? result.data.end_time
-              : new Date(result.data.end_time);
-          setScheduleData({
-            title: result.data.title ?? "",
-            description: result.data.description ?? "",
-            startInput: formatDateTimeLocal(start),
-            endInput: formatDateTimeLocal(end),
-          });
-        } else {
-          setErrors({
-            title: result.message || "Falha ao carregar agendamento",
-          });
-        }
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      active = false;
-    };
-  }, [open, scheduleId]);
+    if (loadError) {
+      setErrors({ title: loadError });
+    } else {
+      setErrors((prev) => ({ time: prev.time }));
+    }
+  }, [loadError]);
 
   const canSave = useMemo(() => {
     if (!scheduleData.title.trim()) return false;
@@ -104,7 +72,7 @@ export function EditScheduleDialog({
     return s.getTime() < e.getTime();
   }, [scheduleData]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors: typeof errors = {};
     if (!scheduleData.title.trim()) {
       newErrors.title = "Informe o título";
@@ -118,104 +86,119 @@ export function EditScheduleDialog({
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    // No escopo atual, apenas carregamos e exibimos os dados.
-    onClose();
+    if (!scheduleId) return;
+    setSaving(true);
+    try {
+      const result = await updateScheduleAction({
+        id: scheduleId,
+        title: scheduleData.title.trim(),
+        description: scheduleData.description.trim() || undefined,
+        start: s,
+        end: e,
+      });
+      if (!result.success) {
+        toast.error(result.message || "Não foi possível atualizar a aula.");
+        return;
+      }
+      toast.success("Aula atualizada com sucesso.");
+      refetch();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent onClose={onClose}>
-        <DialogHeader>
-          <DialogTitle>Editar aula</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+        <DialogContent onClose={onClose}>
+          <DialogHeader>
+            <DialogTitle>Editar aula</DialogTitle>
+          </DialogHeader>
 
-        <div className="px-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="start">Data de início</Label>
-              <Input
-                id="start"
-                type="datetime-local"
-                value={scheduleData.startInput}
-                onChange={(e) =>
-                  setScheduleData((prev) => ({
-                    ...prev,
-                    startInput: e.target.value,
-                  }))
-                }
-                aria-invalid={Boolean(errors.time)}
+          {loading ? (
+            <div className="px-6 space-y-4">
+              <ScheduleFormSkeleton />
+            </div>
+          ) : (
+            <div className="px-6 space-y-4">
+              <ScheduleForm
+                value={{
+                  title: scheduleData.title,
+                  description: scheduleData.description,
+                  startInput: scheduleData.startInput,
+                  endInput: scheduleData.endInput,
+                }}
+                onChange={handleFormChange}
+                errors={errors}
                 disabled={loading}
               />
+              {studentName && (
+                <Card>
+                  <CardContent className="p-4!">
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <Avatar>
+                        <User className="h-4 w-4" />
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">
+                          {studentName}
+                        </span>
+                        <span className="text-xs text-secondary">
+                          Aluno(a) selecionado
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              <Accordion title="Avançado" defaultExpanded={false} size="sm">
+                <div className="flex">
+                  <Button
+                    className="w-full rounded-xl"
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setOpenDelete(true)}
+                    disabled={loading || saving}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir aula
+                  </Button>
+                </div>
+              </Accordion>
             </div>
-            <div>
-              <Label htmlFor="end">Data de fim</Label>
-              <Input
-                id="end"
-                type="datetime-local"
-                value={scheduleData.endInput}
-                onChange={(e) =>
-                  setScheduleData((prev) => ({
-                    ...prev,
-                    endInput: e.target.value,
-                  }))
-                }
-                aria-invalid={Boolean(errors.time)}
-                disabled={loading}
-              />
-            </div>
-          </div>
-          {errors.time && (
-            <p className="text-sm text-destructive">{errors.time}</p>
           )}
 
-          <div>
-            <Label htmlFor="title">Título</Label>
-            <Input
-              id="title"
-              value={scheduleData.title}
-              onChange={(e) =>
-                setScheduleData((prev) => ({ ...prev, title: e.target.value }))
-              }
-              placeholder="Ex.: Aula de Matemática"
-              aria-invalid={Boolean(errors.title)}
-              disabled={loading}
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive mt-1">{errors.title}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={scheduleData.description}
-              onChange={(e) =>
-                setScheduleData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Detalhes da aula (opcional)"
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={onClose}
-            disabled={loading}
-          >
-            Fechar
-          </Button>
-          <Button size="sm" onClick={handleSave} disabled={!canSave || loading}>
-            Salvar
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={!canSave || loading || saving}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <ConfirmationDialog
+        open={openDelete}
+        onOpenChange={setOpenDelete}
+        title="Remover aula"
+        description="Tem certeza que deseja remover esta aula? Esta ação não poderá ser desfeita."
+        labelAccept="Remover"
+        labelDeny="Cancelar"
+        onAccept={async () => {
+          const res = await deleteScheduleAction(scheduleId);
+          if (!res.success) {
+            toast.error(res.message || "Não foi possível remover a aula.");
+            return;
+          }
+          toast.success("Aula removida com sucesso.");
+          setOpenDelete(false);
+          refetch();
+          onClose();
+        }}
+      />
+    </>
   );
 }

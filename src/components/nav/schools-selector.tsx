@@ -43,7 +43,10 @@ export function SchoolsSelector() {
       onValueChange={handleSelectSchool}
       disabled={isSelectDisabled}
     >
-      <SelectTrigger className="w-full justify-between" disabled={isSelectDisabled}>
+      <SelectTrigger
+        className="w-full justify-between"
+        disabled={isSelectDisabled}
+      >
         <div className="flex items-center gap-3">
           <SelectValue placeholder="Selecione uma escola" />
         </div>

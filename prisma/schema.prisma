@@ -113,6 +113,7 @@ model activities {
   created_at           DateTime?              @default(now()) @db.Timestamptz(6)
   updated_at           DateTime?              @default(now()) @db.Timestamptz(6)
   status               Int?                   @default(1)
+  tags                 String[]               @default([]) @db.VarChar
   schools              schools                @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_activities_school")
   schedules_activities schedules_activities[]
 }

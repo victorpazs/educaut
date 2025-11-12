@@ -45,6 +45,11 @@ export async function loginAction({ email, password }: LoginValues) {
           include: {
             schools: true,
           },
+          where: {
+            schools: {
+              status: 1,
+            },
+          },
         },
       },
     });

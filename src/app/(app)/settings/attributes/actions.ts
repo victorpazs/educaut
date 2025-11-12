@@ -140,3 +140,94 @@ export async function createAttribute(
     return handleServerError(error);
   }
 }
+
+export async function deleteAttribute(
+  id: number
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const deleteResult = await prisma.attributes.deleteMany({
+      where: { id, school_id: schoolId },
+    });
+
+    if (deleteResult.count === 0) {
+      return createErrorResponse(
+        "Atributo não encontrado.",
+        "ATTRIBUTE_NOT_FOUND",
+        404
+      );
+    }
+
+    revalidatePath("/settings/attributes");
+    return createSuccessResponse(null, "Atributo removido com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export async function updateAttributeName(
+  id: number,
+  name: string
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const normalizedName = name?.trim();
+    if (!normalizedName) {
+      return createErrorResponse(
+        "O nome do atributo é obrigatório.",
+        "VALIDATION_ERROR",
+        400
+      );
+    }
+
+    // Ensure attribute belongs to the current school
+    const existing = await prisma.attributes.findFirst({
+      where: { id, school_id: schoolId },
+      select: { id: true, type_id: true },
+    });
+    if (!existing) {
+      return createErrorResponse(
+        "Atributo não encontrado.",
+        "ATTRIBUTE_NOT_FOUND",
+        404
+      );
+    }
+
+    await prisma.attributes.update({
+      where: { id },
+      data: { name: normalizedName },
+    });
+
+    revalidatePath("/settings/attributes");
+    return createSuccessResponse(null, "Atributo atualizado com sucesso.");
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return createErrorResponse(
+        "Já existe um atributo com esse nome para este tipo.",
+        "DUPLICATE_ATTRIBUTE",
+        409
+      );
+    }
+    return handleServerError(error);
+  }
+}

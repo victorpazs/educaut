@@ -3,6 +3,7 @@
 import React from "react";
 import { AppLogo } from "@/components/app-logo";
 import { usePathname } from "next/navigation";
+import { AuthParticles } from "./_components/AuthParticles";
 
 export default function AuthLayout({
   children,
@@ -16,14 +17,7 @@ export default function AuthLayout({
     <div className="min-h-screen bg-background flex">
       {/* Left Panel - Dashboard Preview */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 bg-muted/30 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10" />
-
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-20 w-32 h-32 bg-primary rounded-full" />
-          <div className="absolute bottom-40 right-32 w-24 h-24 bg-primary rounded-full" />
-          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-primary rounded-full" />
-        </div>
+        <AuthParticles />
       </div>
 
       {/* Right Panel - Auth Form */}

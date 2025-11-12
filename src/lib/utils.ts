@@ -51,3 +51,20 @@ export function getAge(date: Date | null | undefined) {
   const days = diffDays;
   return days === 1 ? "1 dia" : `${days} dias`;
 }
+
+export function formatDateTimeLocal(date: Date) {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+export function parseDateTimeLocal(value: string): Date {
+  const [datePart, timePart] = value.split("T");
+  const [y, m, d] = datePart.split("-").map((v) => Number(v));
+  const [hh, mm] = timePart.split(":").map((v) => Number(v));
+  return new Date(y, m - 1, d, hh, mm, 0, 0);
+}

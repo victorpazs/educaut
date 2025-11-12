@@ -2,14 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -81,12 +74,10 @@ export function CreateAttributeDialog({
         }
       }}
     >
-      <DialogTrigger>
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo atributo
-        </Button>
-      </DialogTrigger>
+      <Button size="sm" onClick={() => setOpen(true)}>
+        <Plus className="h-4 w-4 mr-2" />
+        Novo atributo
+      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Novo atributo</DialogTitle>

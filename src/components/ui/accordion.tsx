@@ -11,10 +11,22 @@ export interface AccordionProps {
   defaultExpanded?: boolean;
   className?: string;
   disabled?: boolean;
+  size?: "sm" | "md";
 }
 
 export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
-  ({ title, children, defaultExpanded = false, className, disabled = false, ...props }, ref) => {
+  (
+    {
+      title,
+      children,
+      defaultExpanded = false,
+      className,
+      disabled = false,
+      size = "md",
+      ...props
+    },
+    ref
+  ) => {
     const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
 
     const toggleExpanded = () => {
@@ -32,10 +44,11 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
 
     return (
       <div ref={ref} className={cn("w-full", className)} {...props}>
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader
             className={cn(
-              "flex flex-row items-center justify-between p-4 cursor-pointer transition-colors hover:bg-muted/50",
+              "flex flex-row items-center justify-between cursor-pointer transition-colors hover:bg-muted/50",
+              size === "sm" ? "p-2" : "p-4",
               disabled && "cursor-not-allowed opacity-50"
             )}
             onClick={toggleExpanded}
@@ -47,7 +60,12 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
           >
             <div className="flex-1">
               {typeof title === "string" ? (
-                <h3 className="text-lg font-semibold leading-none tracking-tight">
+                <h3
+                  className={cn(
+                    "font-semibold leading-none tracking-tight",
+                    size === "sm" ? "text-sm" : "text-lg"
+                  )}
+                >
                   {title}
                 </h3>
               ) : (
@@ -56,15 +74,18 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
             </div>
             <ChevronDown
               className={cn(
-                "h-5 w-5 transition-transform duration-200 text-muted-foreground",
+                "transition-transform duration-200 text-muted-foreground",
+                size === "sm" ? "h-4 w-4" : "h-5 w-5",
                 isExpanded && "transform rotate-180"
               )}
             />
           </CardHeader>
-          
+
           {isExpanded && (
-            <CardContent className="pt-0 pb-4 px-4">
-              <div className="border-t border-border pt-4">
+            <CardContent
+              className={cn("pt-0", size === "sm" ? "pb-3 px-3" : "pb-4 px-4")}
+            >
+              <div className={cn("pt-4", size === "sm" ? "pt-3" : "pt-4")}>
                 {children}
               </div>
             </CardContent>
@@ -89,19 +110,23 @@ interface AccordionContextProps {
   allowMultiple: boolean;
 }
 
-const AccordionContext = React.createContext<AccordionContextProps | null>(null);
+const AccordionContext = React.createContext<AccordionContextProps | null>(
+  null
+);
 
-export function AccordionGroup({ 
-  children, 
-  allowMultiple = true, 
-  className 
+export function AccordionGroup({
+  children,
+  allowMultiple = true,
+  className,
 }: AccordionGroupProps) {
-  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
+  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(
+    new Set()
+  );
 
   const toggleItem = (id: string) => {
-    setExpandedItems(prev => {
+    setExpandedItems((prev) => {
       const newSet = new Set(prev);
-      
+
       if (newSet.has(id)) {
         newSet.delete(id);
       } else {
@@ -110,16 +135,16 @@ export function AccordionGroup({
         }
         newSet.add(id);
       }
-      
+
       return newSet;
     });
   };
 
   return (
-    <AccordionContext.Provider value={{ expandedItems, toggleItem, allowMultiple }}>
-      <div className={cn("space-y-4", className)}>
-        {children}
-      </div>
+    <AccordionContext.Provider
+      value={{ expandedItems, toggleItem, allowMultiple }}
+    >
+      <div className={cn("space-y-4", className)}>{children}</div>
     </AccordionContext.Provider>
   );
 }
@@ -134,16 +159,16 @@ export interface AccordionItemProps {
   disabled?: boolean;
 }
 
-export function AccordionItem({ 
-  id, 
-  title, 
-  children, 
-  defaultExpanded = false, 
-  className, 
-  disabled = false 
+export function AccordionItem({
+  id,
+  title,
+  children,
+  defaultExpanded = false,
+  className,
+  disabled = false,
 }: AccordionItemProps) {
   const context = React.useContext(AccordionContext);
-  
+
   // Initialize default expanded state
   React.useEffect(() => {
     if (defaultExpanded && context) {
@@ -154,8 +179,8 @@ export function AccordionItem({
   if (!context) {
     // Fallback to standalone accordion if not within group
     return (
-      <Accordion 
-        title={title} 
+      <Accordion
+        title={title}
         defaultExpanded={defaultExpanded}
         className={className}
         disabled={disabled}
@@ -210,12 +235,10 @@ export function AccordionItem({
           )}
         />
       </CardHeader>
-      
+
       {isExpanded && (
         <CardContent className="pt-0 pb-4 px-4">
-          <div className="border-t border-border pt-4">
-            {children}
-          </div>
+          <div className="border-t border-border pt-4">{children}</div>
         </CardContent>
       )}
     </Card>

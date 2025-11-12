@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useSession } from "@/hooks/useSession";
 import { toast } from "@/lib/toast";
@@ -12,6 +19,7 @@ interface UseAgendaResult {
   events: IAgendaCalendarEvent[];
   isLoading: boolean;
   hasError: boolean;
+  refetch: () => void;
 }
 
 function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
@@ -39,13 +47,39 @@ function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
   };
 }
 
-export function useAgenda(): UseAgendaResult {
+const AgendaContext = createContext<UseAgendaResult | null>(null);
+
+export function AgendaProvider({ children }: { children: ReactNode }) {
   const { school } = useSession();
 
   const [events, setEvents] = useState<IAgendaCalendarEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasError, setHasError] = useState<boolean>(false);
-  const requestCounter = useRef(0);
+
+  const loadAgenda = async () => {
+    setIsLoading(true);
+    setHasError(false);
+
+    try {
+      const response = await getAgenda();
+
+      if (response.success) {
+        const schedules = (response.data ?? []).map(mapScheduleToEvent);
+        setEvents(schedules);
+        setHasError(false);
+      } else {
+        setEvents([]);
+        setHasError(true);
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error("Não foi possível carregar a agenda.");
+      setHasError(true);
+      setEvents([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!school?.id) {
@@ -54,52 +88,23 @@ export function useAgenda(): UseAgendaResult {
       setHasError(false);
       return;
     }
-
-    let isMounted = true;
-    const currentRequest = requestCounter.current + 1;
-    requestCounter.current = currentRequest;
-
-    const loadAgenda = async () => {
-      setIsLoading(true);
-      setHasError(false);
-
-      try {
-        const response = await getAgenda();
-
-        if (isMounted && requestCounter.current === currentRequest) {
-          if (response.success) {
-            const schedules = (response.data ?? []).map(mapScheduleToEvent);
-            setEvents(schedules);
-            setHasError(false);
-          } else {
-            setEvents([]);
-            setHasError(true);
-            toast.error(response.message);
-          }
-        }
-      } catch (error) {
-        if (isMounted && requestCounter.current === currentRequest) {
-          toast.error("Não foi possível carregar a agenda.");
-          setHasError(true);
-          setEvents([]);
-        }
-      } finally {
-        if (isMounted && requestCounter.current === currentRequest) {
-          setIsLoading(false);
-        }
-      }
-    };
-
     loadAgenda();
-
-    return () => {
-      isMounted = false;
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [school?.id]);
 
-  return {
-    events,
-    isLoading,
-    hasError,
-  };
+  return (
+    <AgendaContext.Provider
+      value={{ events, isLoading, hasError, refetch: loadAgenda }}
+    >
+      {children}
+    </AgendaContext.Provider>
+  );
+}
+
+export function useAgenda(): UseAgendaResult {
+  const ctx = useContext(AgendaContext);
+  if (!ctx) {
+    throw new Error("useAgenda deve ser usado dentro de AgendaProvider");
+  }
+  return ctx;
 }

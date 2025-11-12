@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
 // removed select-based view switcher
+import { toast } from "@/lib/toast";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -24,6 +25,7 @@ import type {
 
 import { useAgenda } from "../_hooks/use-agenda";
 import { NewScheduleDialog } from "./NewScheduleDialog";
+import { createScheduleAction } from "../actions";
 
 import "./calendar-styles.css";
 import { cn } from "@/lib/utils";
@@ -41,8 +43,9 @@ export function SchoolAgenda({
 }: {
   isPreviewMode?: boolean;
 }) {
-  const { events, isLoading } = useAgenda();
+  const { events, isLoading, refetch } = useAgenda();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const calendarRef = useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] =
@@ -53,7 +56,6 @@ export function SchoolAgenda({
     start: Date;
     end: Date;
   } | null>(null);
-  console.log(events);
   const fcEvents: EventSourceInput = useMemo(() => {
     return events.map((e) => ({
       id: String(e.id),
@@ -167,7 +169,7 @@ export function SchoolAgenda({
                     const params = new URLSearchParams(searchParams.toString());
                     params.set("edit_id", String(clickInfo.event.id));
                     const query = params.toString();
-                    router.push(query ? `?${query}` : ".");
+                    router.push(`${pathname}${query ? `?${query}` : ""}`);
                   }}
                   datesSet={(info: DatesSetArg) => {
                     setCurrentView(info.view.type as FullCalendarView);
@@ -205,13 +207,24 @@ export function SchoolAgenda({
       <NewScheduleDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        onSave={(data) => {
-          console.log("save schedule", data);
+        onSave={async (data) => {
+          const result = await createScheduleAction({
+            title: data.title,
+            description: data.description,
+            start: data.start,
+            end: data.end,
+            studentId: data.studentId,
+          });
+          if (!result.success) {
+            toast.error(result.message || "Não foi possível criar a aula.");
+            return;
+          }
+          toast.success("Aula criada com sucesso.");
           setDialogOpen(false);
+          refetch();
         }}
         start={selectedRange?.start ?? new Date()}
         end={selectedRange?.end ?? new Date()}
-        studentOptions={[]}
       />
     </>
   );

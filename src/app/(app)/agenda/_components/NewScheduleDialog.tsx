@@ -13,41 +13,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Combobox, ComboboxOption } from "@/components/ui/combobox";
-import { formatDate } from "@/lib/utils";
+import { StudentComboboxClient } from "@/components/students-combobox.client";
+import {
+  formatDate,
+  formatDateTimeLocal,
+  parseDateTimeLocal,
+} from "@/lib/utils";
+import { withValidation } from "@/lib/validation";
+import { ScheduleCreateSchema, type ScheduleCreateValues } from "../_models";
+import { ScheduleForm, type ScheduleFormState } from "./ScheduleForm";
 
 type NewScheduleDialogProps = {
   open: boolean;
   onClose: () => void;
-  onSave: (data: {
-    start: Date;
-    end: Date;
-    title: string;
-    description?: string;
-    studentId: number | null;
-  }) => void;
+  onSave: (data: ScheduleCreateValues) => void | Promise<void>;
   start: Date;
   end: Date;
-  studentOptions?: ComboboxOption[];
 };
-
-function formatDateTimeLocal(date: Date) {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function parseDateTimeLocal(value: string): Date {
-  // value is in local time "YYYY-MM-DDTHH:mm"
-  const [datePart, timePart] = value.split("T");
-  const [y, m, d] = datePart.split("-").map((v) => Number(v));
-  const [hh, mm] = timePart.split(":").map((v) => Number(v));
-  return new Date(y, m - 1, d, hh, mm, 0, 0);
-}
 
 export function NewScheduleDialog({
   open,
@@ -55,7 +37,6 @@ export function NewScheduleDialog({
   onSave,
   start,
   end,
-  studentOptions = [],
 }: NewScheduleDialogProps) {
   const [scheduleData, setScheduleData] = useState<{
     title: string;
@@ -107,13 +88,25 @@ export function NewScheduleDialog({
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    onSave({
-      start: s,
-      end: e,
+    const values: ScheduleCreateValues = {
       title: scheduleData.title.trim(),
       description: scheduleData.description.trim() || undefined,
-      studentId: scheduleData.studentId,
+      start: s,
+      end: e,
+      studentId: scheduleData.studentId ?? 0,
+    };
+    const submit = withValidation(ScheduleCreateSchema, async (data) => {
+      await onSave(data);
     });
+    submit(values);
+  };
+
+  const handleFormChange = (next: ScheduleFormState) => {
+    setScheduleData((prev) => ({
+      ...prev,
+      ...next,
+    }));
+    setErrors((prev) => ({ ...prev, time: undefined }));
   };
 
   return (
@@ -124,84 +117,23 @@ export function NewScheduleDialog({
         </DialogHeader>
 
         <div className="px-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="start">Data de início</Label>
-              <Input
-                id="start"
-                type="datetime-local"
-                value={scheduleData.startInput}
-                onChange={(e) =>
-                  setScheduleData((prev) => ({
-                    ...prev,
-                    startInput: e.target.value,
-                  }))
-                }
-                aria-invalid={Boolean(errors.time)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="end">Data de fim</Label>
-              <Input
-                id="end"
-                type="datetime-local"
-                value={scheduleData.endInput}
-                onChange={(e) =>
-                  setScheduleData((prev) => ({
-                    ...prev,
-                    endInput: e.target.value,
-                  }))
-                }
-                aria-invalid={Boolean(errors.time)}
-              />
-            </div>
-          </div>
-          {errors.time && (
-            <p className="text-sm text-destructive">{errors.time}</p>
-          )}
-
-          <div>
-            <Label htmlFor="title">Título</Label>
-            <Input
-              id="title"
-              value={scheduleData.title}
-              onChange={(e) =>
-                setScheduleData((prev) => ({ ...prev, title: e.target.value }))
-              }
-              placeholder="Ex.: Aula de Matemática"
-              aria-invalid={Boolean(errors.title)}
-            />
-            {errors.title && (
-              <p className="text-sm text-destructive mt-1">{errors.title}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={scheduleData.description}
-              onChange={(e) =>
-                setScheduleData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Detalhes da aula (opcional)"
-            />
-          </div>
-
+          <ScheduleForm
+            value={{
+              title: scheduleData.title,
+              description: scheduleData.description,
+              startInput: scheduleData.startInput,
+              endInput: scheduleData.endInput,
+            }}
+            onChange={handleFormChange}
+            errors={errors}
+          />
           <div>
             <Label>Estudante</Label>
-            <Combobox
-              options={studentOptions}
+            <StudentComboboxClient
               value={scheduleData.studentId}
               onChange={(v) =>
                 setScheduleData((prev) => ({ ...prev, studentId: v }))
               }
-              placeholder="Selecione o estudante..."
-              searchPlaceholder="Buscar estudante..."
-              emptyText="Nenhum estudante encontrado"
               buttonClassName="w-full"
               className="w-full"
             />

@@ -1,5 +1,5 @@
 import { ChevronDown, Calendar, School, LogOut, Settings } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Avatar } from "../ui/avatar";
 import {
   DropdownMenu,

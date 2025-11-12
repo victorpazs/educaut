@@ -3,13 +3,16 @@
 import { PageHeader } from "@/components/page-header";
 import { SchoolAgenda } from "./_components/SchoolAgenda";
 import { useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { EditScheduleDialog } from "./_components/EditScheduleDialog";
+import { useAgenda } from "./_hooks/use-agenda";
 
 export default function AgendaPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
   const editIdParam = searchParams.get("edit_id");
+  const { refetch } = useAgenda();
   const editId = useMemo(() => {
     const parsed = Number(editIdParam);
     return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
@@ -19,7 +22,7 @@ export default function AgendaPage() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("edit_id");
     const query = params.toString();
-    router.replace(query ? `?${query}` : ".");
+    router.replace(`${pathname}${query ? `?${query}` : ""}`);
   };
 
   return (
@@ -28,8 +31,9 @@ export default function AgendaPage() {
       <SchoolAgenda />
       {editId && (
         <EditScheduleDialog
+          refetch={refetch}
           open={Boolean(editId)}
-          onClose={handleCloseEdit}
+          onClose={() => handleCloseEdit()}
           scheduleId={editId}
         />
       )}

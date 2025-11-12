@@ -1,18 +1,6 @@
 "use client";
 
-import {
-  Home,
-  User,
-  Briefcase,
-  FileCheck,
-  MessageSquare,
-  Compass,
-  Calendar,
-  UserPlus,
-  DollarSign,
-} from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { Home, User, FileCheck, Compass, Calendar } from "lucide-react";
 import { NavItem } from "./nav-item";
 
 export function Sidebar() {
