@@ -10,6 +10,11 @@ export type EditScheduleData = {
   description: string;
   startInput: string;
   endInput: string;
+  student: {
+    id: number;
+    name: string;
+    status: number | null;
+  } | null;
 };
 
 export function useEditSchedule(params: {
@@ -19,7 +24,6 @@ export function useEditSchedule(params: {
   const { open, scheduleId } = params;
   const [loading, setLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [studentName, setStudentName] = useState<string | null>(null);
   const [scheduleData, setScheduleData] = useState<EditScheduleData>(() => {
     const now = new Date();
     const nowStr = formatDateTimeLocal(now);
@@ -28,6 +32,7 @@ export function useEditSchedule(params: {
       description: "",
       startInput: nowStr,
       endInput: nowStr,
+      student: null,
     };
   });
 
@@ -55,8 +60,8 @@ export function useEditSchedule(params: {
             description: result.data.description ?? "",
             startInput: formatDateTimeLocal(start),
             endInput: formatDateTimeLocal(end),
+            student: result.data.students ?? null,
           });
-          setStudentName(result.data.students?.name ?? null);
         } else {
           setLoadError(result.message || "Falha ao carregar agendamento");
         }
@@ -76,6 +81,5 @@ export function useEditSchedule(params: {
     setScheduleData,
     loading,
     loadError,
-    studentName,
   };
 }

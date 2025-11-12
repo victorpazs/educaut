@@ -1,7 +1,4 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chip } from "@/components/ui/chip";
-import { School as SchoolIcon, Calendar } from "lucide-react";
-import type { ISchool } from "../_models";
+import type { ISchool } from "@/types/db";
 import { SchoolEditDialog } from "./SchoolEditDialog";
 
 type SchoolCardProps = ISchool & {
@@ -19,8 +16,6 @@ export function SchoolCard({
     created_at != null
       ? new Date(created_at).toLocaleDateString("pt-BR")
       : null;
-
-  const statusLabel = mapStatus(status);
 
   return (
     <div className="transition duration-200 hover:-translate-y-1 col-span-12 md:col-span-6">

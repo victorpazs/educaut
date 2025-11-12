@@ -11,8 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ISchool } from "../_models";
 import { SchoolCell } from "./Cell";
+import type { ISchool } from "@/types/db";
 
 interface SchoolListProps {
   schools: ISchool[];

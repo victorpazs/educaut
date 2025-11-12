@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
-import type { ISchool } from "../_models";
 import { getSchools } from "../actions";
+import type { ISchool } from "@/types/db";
 
 interface UseSchoolsResult {
   schools: ISchool[];

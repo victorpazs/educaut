@@ -2,13 +2,13 @@ import { TableCell } from "@/components/ui/table";
 
 import { TableRow } from "@/components/ui/table";
 import { SchoolEditDialog } from "./SchoolEditDialog";
-import { ISchool } from "../_models";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
 import { deleteSchool } from "../actions";
 import { Trash2 } from "lucide-react";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import type { ISchool } from "@/types/db";
 
 export function SchoolCell({
   school,

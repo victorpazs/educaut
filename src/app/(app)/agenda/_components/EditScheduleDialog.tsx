@@ -40,11 +40,12 @@ export function EditScheduleDialog({
   onClose,
   scheduleId,
 }: EditScheduleDialogProps) {
-  const { scheduleData, setScheduleData, loading, loadError, studentName } =
-    useEditSchedule({
+  const { scheduleData, setScheduleData, loading, loadError } = useEditSchedule(
+    {
       open,
       scheduleId,
-    });
+    }
+  );
   const [errors, setErrors] = useState<{ title?: string; time?: string }>({});
   const [saving, setSaving] = useState<boolean>(false);
   const handleFormChange = (next: ScheduleFormState) => {
@@ -133,7 +134,7 @@ export function EditScheduleDialog({
                 errors={errors}
                 disabled={loading}
               />
-              {studentName && (
+              {scheduleData && scheduleData.student ? (
                 <Card>
                   <CardContent className="p-4!">
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -142,7 +143,7 @@ export function EditScheduleDialog({
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-medium text-foreground">
-                          {studentName}
+                          {scheduleData.student.name}
                         </span>
                         <span className="text-xs text-secondary">
                           Aluno(a) selecionado
@@ -151,7 +152,7 @@ export function EditScheduleDialog({
                     </div>
                   </CardContent>
                 </Card>
-              )}
+              ) : null}
               <Accordion title="Avançado" defaultExpanded={false} size="sm">
                 <div className="flex">
                   <Button

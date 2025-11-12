@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/dialog";
 import { updateSchool } from "../actions";
 import { toast } from "@/lib/toast";
-import type { ISchool } from "../_models";
 import { useSession } from "@/hooks/useSession";
 import { SchoolForm, type SchoolFormValues } from "@/components/school-form";
+import type { ISchool } from "@/types/db";
 
 interface SchoolEditDialogProps {
   school: ISchool;

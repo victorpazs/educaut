@@ -1,4 +1,4 @@
-import { ZodSchema, ZodError } from "zod";
+import { ZodSchema } from "zod";
 import { toast } from "@/lib/toast";
 import { ErrorDetail } from "@/lib/server-responses";
 
