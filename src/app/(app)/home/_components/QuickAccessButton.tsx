@@ -25,7 +25,7 @@ export function QuickAccessButton({
     <Card className="overflow-hidden">
       <Button
         variant="ghost"
-        className="group relative flex h-auto w-full items-center gap-3 overflow-hidden py-6 px-4"
+        className="group relative flex h-auto w-full items-center gap-3 overflow-hidden py-4! md:py-10! px-4!"
         onClick={handleClick}
       >
         <div className="flex w-full items-center gap-3 transition-all duration-200 ease-out group-hover:blur-xs group-hover:opacity-60">

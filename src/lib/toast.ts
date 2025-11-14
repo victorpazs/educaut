@@ -1,4 +1,5 @@
 import { toast as sonnerToast } from "sonner";
+import type { ExternalToast } from "sonner";
 
 export const toast = {
   success: (message: string, description?: string) => {
@@ -40,7 +41,7 @@ export const toast = {
     }: {
       loading: string;
       success: string | ((data: T) => string);
-      error: string | ((error: any) => string);
+      error: string | ((error: unknown) => string);
     }
   ) => {
     return sonnerToast.promise(promise, {
@@ -58,7 +59,7 @@ export const toast = {
     return sonnerToast.dismiss(id);
   },
 
-  message: (message: string, data?: any) => {
+  message: (message: string, data?: ExternalToast) => {
     return sonnerToast.message(message, data);
   },
 };

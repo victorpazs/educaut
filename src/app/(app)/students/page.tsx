@@ -31,7 +31,7 @@ export default function StudentsPage() {
             title="Alunos"
             subtitle="Cadastre e administre os seus alunos."
             actions={
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-end flex-wrap gap-3">
                 <SearchInput
                   placeholder="Buscar alunos..."
                   value={search}

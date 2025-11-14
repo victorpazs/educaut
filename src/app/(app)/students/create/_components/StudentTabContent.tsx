@@ -29,9 +29,11 @@ export function StudentTabContent({
   ) {
     if (Array.isArray(field) && Array.isArray(value)) {
       setFormData((prev) => {
-        const next = { ...prev } as StudentFormData;
-        field.forEach((f, idx) => {
-          (next as any)[f] = (value as T[])[idx] as any;
+        const next: StudentFormData = { ...prev };
+        const fields = field as (keyof StudentFormData)[];
+        const values = value as unknown[];
+        fields.forEach((f, idx) => {
+          (next as Record<keyof StudentFormData, unknown>)[f] = values[idx];
         });
         return next;
       });
@@ -39,10 +41,10 @@ export function StudentTabContent({
     }
 
     if (!Array.isArray(field)) {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value as T,
-      }));
+      const key = field as keyof StudentFormData;
+      setFormData(
+        (prev) => ({ ...prev, [key]: value as unknown } as StudentFormData)
+      );
     }
   }
 

@@ -6,6 +6,7 @@ import { toast } from "@/lib/toast";
 
 import type { IPublicActivity } from "../_models";
 import { getPublicActivities } from "../actions";
+import { IDiscoverActivityFilters } from "../page";
 
 interface UseDiscoverResult {
   activities: IPublicActivity[];
@@ -13,7 +14,9 @@ interface UseDiscoverResult {
   hasError: boolean;
 }
 
-export function useDiscover(search: string): UseDiscoverResult {
+export function useDiscover(
+  filters: IDiscoverActivityFilters
+): UseDiscoverResult {
   const [activities, setActivities] = useState<IPublicActivity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -29,7 +32,10 @@ export function useDiscover(search: string): UseDiscoverResult {
       setHasError(false);
 
       try {
-        const response = await getPublicActivities({ search });
+        const response = await getPublicActivities({
+          search: filters.search,
+          tags: filters.tags,
+        });
 
         if (isMounted && requestCounter.current === currentRequest) {
           if (response.success) {
@@ -59,7 +65,7 @@ export function useDiscover(search: string): UseDiscoverResult {
     return () => {
       isMounted = false;
     };
-  }, [search]);
+  }, [filters]);
 
   return {
     activities,

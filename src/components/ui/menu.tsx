@@ -56,10 +56,13 @@ export const MenuTrigger = React.forwardRef<
   const { open, setOpen } = useMenuContext();
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, {
+    const child = children as React.ReactElement<Record<string, unknown>>;
+    return React.cloneElement(child, {
       ...props,
       onClick: (e: React.MouseEvent) => {
-        (children.props as any)?.onClick?.(e);
+        (child.props as { onClick?: (e: React.MouseEvent) => void }).onClick?.(
+          e
+        );
         setOpen(!open);
       },
     });
@@ -435,8 +438,7 @@ export const MenuSubTrigger = React.forwardRef<
 });
 MenuSubTrigger.displayName = "MenuSubTrigger";
 
-export interface MenuSubContentProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+export type MenuSubContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const MenuSubContent = React.forwardRef<
   HTMLDivElement,
@@ -461,8 +463,7 @@ export const MenuSubContent = React.forwardRef<
 MenuSubContent.displayName = "MenuSubContent";
 
 // Shortcut component for displaying keyboard shortcuts
-export interface MenuShortcutProps
-  extends React.HTMLAttributes<HTMLSpanElement> {}
+export type MenuShortcutProps = React.HTMLAttributes<HTMLSpanElement>;
 
 export const MenuShortcut = React.forwardRef<
   HTMLSpanElement,

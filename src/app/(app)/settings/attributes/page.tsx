@@ -5,20 +5,20 @@ import { Tags } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
 import { useSchoolAttributes } from "./_hooks/use-school-attributes";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { ContentCard } from "@/components/content-card";
 import { CreateAttributeDialog } from "./_components/CreateAttributeDialog";
 import { useAttributes } from "@/hooks/useAttributes";
 import { getAttributeLabel } from "@/lib/attributes.utils";
 import { Separator } from "@/components/ui/separator";
 
-import { AttributeCell } from "./_components/AttributeCell";
+import { Table, TableBody } from "@/components/ui/table";
+import { AttributeRow } from "./_components/AttributeRow";
 
 export default function AttributesSettingsPage() {
-  const router = useRouter();
   const { attributeTypes } = useAttributes();
 
-  const { data, isLoading, hasError, hasSchool, reFetch } = useSchoolAttributes();
+  const { data, isLoading, hasError, hasSchool, reFetch } =
+    useSchoolAttributes();
 
   return (
     <ContentCard
@@ -59,16 +59,17 @@ export default function AttributesSettingsPage() {
                     Nenhum atributo criado para {getAttributeLabel(type)}.
                   </span>
                 ) : (
-                  <div className="grid grid-cols-12 gap-3">
-                    {items.map((option) => (
-                      <div
-                        className="col-span-12 sm:col-span-6 lg:col-span-3"
-                        key={option.id}
-                      >
-                        <AttributeCell option={option} onChanged={reFetch} />
-                      </div>
-                    ))}
-                  </div>
+                  <Table>
+                    <TableBody>
+                      {items.map((option) => (
+                        <AttributeRow
+                          key={option.id}
+                          option={option}
+                          onChanged={reFetch}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </div>
             );

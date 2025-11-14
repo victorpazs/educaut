@@ -13,6 +13,10 @@ export interface IconInputProps
   size?: "sm" | "md" | "lg";
   onStartIconClick?: () => void;
   startIconAriaLabel?: string;
+  InputComponent?: React.ForwardRefExoticComponent<
+    React.InputHTMLAttributes<HTMLInputElement> &
+      React.RefAttributes<HTMLInputElement>
+  >;
 }
 
 // Size variants for input fields
@@ -52,11 +56,13 @@ export const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
       id,
       onStartIconClick,
       startIconAriaLabel,
+      InputComponent = Input,
       ...props
     },
     ref
   ) => {
-    const inputId = id || `input-${React.useId()}`;
+    const generatedId = React.useId();
+    const inputId = id ?? `input-${generatedId}`;
     const sizeConfig = sizes[size];
 
     return (
@@ -96,7 +102,7 @@ export const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
               )}
             </div>
           )}
-          <Input
+          <InputComponent
             ref={ref}
             id={inputId}
             className={cn(

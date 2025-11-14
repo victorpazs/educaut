@@ -11,6 +11,10 @@ export interface SearchInputProps
   showClearButton?: boolean;
   size?: "sm" | "md" | "lg";
   onSearch?: (value: string) => void;
+  InputComponent?: React.ForwardRefExoticComponent<
+    React.InputHTMLAttributes<HTMLInputElement> &
+      React.RefAttributes<HTMLInputElement>
+  >;
 }
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
@@ -24,6 +28,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       onSearch,
       onKeyDown,
       disabled,
+      InputComponent,
       ...props
     },
     ref
@@ -100,6 +105,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         endContent={clearButton}
         className="min-w-[200px] text-sm "
         disabled={disabled}
+        InputComponent={InputComponent}
         {...props}
       />
     );

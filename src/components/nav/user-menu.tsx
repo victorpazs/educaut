@@ -19,8 +19,10 @@ export function UserMenu() {
   const { user, school } = useSession();
   const router = useRouter();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const onOptionClick = (href: string) => {
+    setIsMenuOpen(false);
     router.push(href);
   };
 
@@ -49,11 +51,10 @@ export function UserMenu() {
         onClose={() => setIsLogoutDialogOpen(false)}
         open={isLogoutDialogOpen}
       />
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <Avatar className="h-8 w-8" fallback="VP" />
-
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
         </DropdownMenuTrigger>
@@ -101,7 +102,10 @@ export function UserMenu() {
 
           <DropdownMenuItem
             variant="destructive"
-            onSelect={() => setIsLogoutDialogOpen(true)}
+            onSelect={() => {
+              setIsMenuOpen(false);
+              setIsLogoutDialogOpen(true);
+            }}
           >
             <LogOut className="mr-3 h-4 w-4 text-black" />
             <span>Sair</span>

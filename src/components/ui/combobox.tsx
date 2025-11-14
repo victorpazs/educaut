@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ type BaseProps = {
   emptyText?: string;
   className?: string;
   buttonClassName?: string;
+  emptyComponent?: React.ReactNode;
 };
 
 type UncontrolledProps = {
@@ -52,6 +53,7 @@ export function Combobox({
   emptyText = "Nada encontrado.",
   className,
   buttonClassName,
+  emptyComponent,
   ...maybeControlled
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
@@ -94,11 +96,15 @@ export function Combobox({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("w-[200px] p-0", className)}>
+      <PopoverContent align="start" className={cn("w-[200px] p-0", className)}>
         <Command>
           <CommandInput placeholder={searchPlaceholder} className="h-9" />
           <CommandList>
-            <CommandEmpty>{emptyText}</CommandEmpty>
+            <CommandEmpty>
+              {emptyComponent
+                ? emptyComponent
+                : emptyText || "Nenhum resultado encontrado"}
+            </CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem

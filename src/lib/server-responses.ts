@@ -1,15 +1,25 @@
 /**
  * Standardized API response interface
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   status: number;
   message: string;
   data?: T | null;
   error?: {
     code: string;
-    details?: any;
+    details?: unknown;
   };
+}
+
+function isApiResponse<T>(value: unknown): value is ApiResponse<T> {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<ApiResponse<T>>;
+  return (
+    typeof candidate.success === "boolean" &&
+    typeof candidate.status === "number" &&
+    typeof candidate.message === "string"
+  );
 }
 
 /**
@@ -116,9 +126,9 @@ export function createServerError(
  * @param error - The error to handle
  * @returns Standardized error response
  */
-export function handleServerError(error: any): ApiResponse<null> {
-  if (error && typeof error === "object" && "success" in error) {
-    return error;
+export function handleServerError(error: unknown): ApiResponse<null> {
+  if (isApiResponse<null>(error)) {
+    return error as ApiResponse<null>;
   }
 
   console.error("Server Error:", error);

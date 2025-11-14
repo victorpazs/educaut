@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
@@ -44,6 +44,7 @@ export function SchoolAgenda({
   isPreviewMode?: boolean;
 }) {
   const { events, isLoading, refetch } = useAgenda();
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -71,6 +72,26 @@ export function SchoolAgenda({
     api?.changeView(nextView);
     setCalendarTitle(api?.view?.title ?? "");
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const handleChange = () => {
+      setIsMobile(mediaQuery.matches);
+    };
+    handleChange();
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile && currentView !== "timeGridDay") {
+      const api: CalendarApi | undefined = calendarRef.current?.getApi?.();
+      setCurrentView("timeGridDay");
+      api?.changeView("timeGridDay");
+      setCalendarTitle(api?.view?.title ?? "");
+    }
+  }, [isMobile, currentView]);
 
   const nav = {
     today: () => {
@@ -102,7 +123,7 @@ export function SchoolAgenda({
           <PageLoader />
         ) : (
           <div className="flex flex-col">
-            <div className="flex items-center flex-wrap justify-between gap-4 px-4 py-3">
+            <div className="flex items-center flex-wrap md:justify-between justify-center gap-4 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Tabs defaultValue="idle">
                   <TabsList>
@@ -131,6 +152,7 @@ export function SchoolAgenda({
                 onValueChange={(value) =>
                   handleChangeView(value as FullCalendarView)
                 }
+                className="hidden md:flex"
               >
                 <TabsList>
                   {views.map((v) => (

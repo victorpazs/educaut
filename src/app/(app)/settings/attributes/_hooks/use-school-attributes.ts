@@ -23,7 +23,7 @@ export function useSchoolAttributes(): UseAttributesResult {
       setHasError(false);
       return;
     }
-    let isMounted = true;
+    const isMounted = true;
     const currentRequest = requestCounter.current + 1;
     requestCounter.current = currentRequest;
 
@@ -34,7 +34,9 @@ export function useSchoolAttributes(): UseAttributesResult {
       const response = await getSchoolAttributesByType();
       if (isMounted && requestCounter.current === currentRequest) {
         if (response.success) {
-          setData(response.data ?? { attributesByType: {}, attributeTypes: [] });
+          setData(
+            response.data ?? { attributesByType: {}, attributeTypes: [] }
+          );
           setHasError(false);
         } else {
           setData(null);

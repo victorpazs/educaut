@@ -4,7 +4,8 @@ import { ReactNode, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { formatDateTimeLocal, parseDateTimeLocal } from "@/lib/utils";
 import { getAfternoonRange, getAllDayRange, getMorningRange } from "../utils";
 
@@ -90,60 +91,58 @@ export function ScheduleForm({
           disabled={disabled}
         />
       </div>
-      <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-12 ">
-          <Label htmlFor="start">Data de início</Label>
-          <Input
-            id="start"
-            type="datetime-local"
-            value={value.startInput}
-            onChange={(e) =>
-              onChange({
-                ...value,
-                startInput: e.target.value,
-              })
-            }
-            aria-invalid={Boolean(errors?.time)}
-            disabled={disabled}
-          />
-        </div>
-        <div className="col-span-12 ">
-          <Label htmlFor="end">Data de fim</Label>
-          <Input
-            id="end"
-            type="datetime-local"
-            value={value.endInput}
-            onChange={(e) =>
-              onChange({
-                ...value,
-                endInput: e.target.value,
-              })
-            }
-            aria-invalid={Boolean(errors?.time)}
-            disabled={disabled}
-          />
-        </div>
-      </div>
+
       <div className="flex items-start mb-6 gap-4">
-        <Checkbox
-          id="preset_all"
-          checked={preset === "all"}
-          onCheckedChange={(v) => v && applyPreset("all")}
-          label="Dia inteiro"
-        />
-        <Checkbox
-          id="preset_morning"
-          checked={preset === "morning"}
-          onCheckedChange={(v) => v && applyPreset("morning")}
-          label="Período da manhã"
-        />
-        <Checkbox
-          id="preset_afternoon"
-          checked={preset === "afternoon"}
-          onCheckedChange={(v) => v && applyPreset("afternoon")}
-          label="Período da tarde"
-        />
+        <Tabs
+          className="w-full"
+          value={preset ?? "none"}
+          onValueChange={(v) => {
+            if (v === "none") {
+              setPreset(null);
+              return;
+            }
+            applyPreset(v as "all" | "morning" | "afternoon");
+          }}
+        >
+          <TabsList>
+            <TabsTrigger value="all">Dia inteiro</TabsTrigger>
+            <TabsTrigger value="morning">Período da manhã</TabsTrigger>
+            <TabsTrigger value="afternoon">Período da tarde</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-12">
+          <DateTimePicker
+            id="start"
+            label="Data de início"
+            value={value.startInput}
+            onChange={(newVal) => {
+              onChange({
+                ...value,
+                startInput: newVal,
+              });
+              setPreset(null);
+            }}
+          />
+        </div>
+        <div className="col-span-12">
+          <DateTimePicker
+            id="end"
+            label="Data de fim"
+            value={value.endInput}
+            onChange={(newVal) => {
+              onChange({
+                ...value,
+                endInput: newVal,
+              });
+
+              setPreset(null);
+            }}
+          />
+        </div>
+      </div>
+
       {errors?.time && (
         <p className="text-sm text-destructive">{errors.time}</p>
       )}

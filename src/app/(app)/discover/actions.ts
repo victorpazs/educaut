@@ -11,10 +11,12 @@ import type { IPublicActivity } from "./_models";
 
 interface GetPublicActivitiesParams {
   search?: string;
+  tags?: string[];
 }
 
 export async function getPublicActivities({
   search,
+  tags,
 }: GetPublicActivitiesParams): Promise<ApiResponse<IPublicActivity[] | null>> {
   try {
     const normalizedSearch = search?.trim();
@@ -30,6 +32,13 @@ export async function getPublicActivities({
               name: {
                 contains: normalizedSearch,
                 mode: "insensitive",
+              },
+            }
+          : {}),
+        ...(tags && tags.length > 0
+          ? {
+              tags: {
+                hasSome: tags,
               },
             }
           : {}),

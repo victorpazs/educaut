@@ -20,10 +20,10 @@ export const variants: Record<NonNullable<ButtonProps["variant"]>, string> = {
 };
 
 const sizes: Record<NonNullable<ButtonProps["size"]>, string> = {
-  sm: "h-8 px-3",
-  md: "h-10 px-4",
-  lg: "h-12 px-6 text-base",
-  icon: "h-10 w-10",
+  sm: "h-7 px-2.5 md:h-8 md:px-3",
+  md: "h-9 px-3.5 md:h-10 md:px-4",
+  lg: "h-10 px-5 text-sm md:h-12 md:px-6 md:text-base",
+  icon: "h-9 w-9 md:h-10 md:w-10",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

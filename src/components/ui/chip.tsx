@@ -35,9 +35,9 @@ export function Chip({
     },
     outlined: {
       primary:
-        "border border-primary text-primary bg-transparent hover:bg-primary/10",
+        "outline outline-primary text-primary bg-transparent hover:bg-primary/10",
       default:
-        "border border-border text-foreground bg-transparent hover:bg-muted/60",
+        "outline outline-border text-foreground bg-transparent hover:bg-muted/60",
     },
   };
 

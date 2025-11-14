@@ -94,7 +94,7 @@ export function TabsSidebar({
           value={activeValue}
           onValueChange={handleTabChange}
         >
-          <TabsList className="w-full overflow-x-auto">
+          <TabsList className="w-full justify-evenly overflow-x-auto">
             {options.map(({ label, icon: Icon, disabled }, index) => {
               const value = getOptionValue(options[index], index);
               return (

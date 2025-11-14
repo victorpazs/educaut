@@ -12,11 +12,11 @@ const Search = ({ disabled, onClick }: SearchProps) => {
         onClick={onClick}
         disabled={disabled}
         className={cn(
-          "fixed bottom-22 right-2 z-40 md:hidden flex items-center justify-center w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200",
+          "fixed bottom-22 right-2 z-40 md:hidden flex items-center justify-center w-12 h-12 bg-muted-foreground text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200",
           disabled && "pointer-events-none opacity-70"
         )}
       >
-        <SearchIcon className="w-4 h-4 text-gray-500" />
+        <SearchIcon className="w-4 h-4 text-white" />
       </button>
 
       <button

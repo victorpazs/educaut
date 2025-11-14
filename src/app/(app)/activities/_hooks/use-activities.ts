@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 
 import type { IActivity } from "../_models";
-import { getActivities } from "../actions";
+import { getActivities, GetActivitiesParams } from "../actions";
 
 interface UseActivitiesResult {
   activities: IActivity[];
@@ -13,7 +13,9 @@ interface UseActivitiesResult {
   hasError: boolean;
 }
 
-export function useActivities(search: string): UseActivitiesResult {
+export function useActivities(
+  params: GetActivitiesParams
+): UseActivitiesResult {
   const [activities, setActivities] = useState<IActivity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
@@ -29,7 +31,10 @@ export function useActivities(search: string): UseActivitiesResult {
       setHasError(false);
 
       try {
-        const response = await getActivities({ search });
+        const response = await getActivities({
+          search: params.search,
+          tags: params.tags ?? [],
+        });
 
         if (isMounted && requestCounter.current === currentRequest) {
           if (response.success) {
@@ -59,7 +64,7 @@ export function useActivities(search: string): UseActivitiesResult {
     return () => {
       isMounted = false;
     };
-  }, [search]);
+  }, [params]);
 
   return {
     activities,

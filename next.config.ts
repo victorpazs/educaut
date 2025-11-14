@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   /* config options here */
   experimental: {
-    optimizeCss: true,
+    optimizeCss: false,
     optimizePackageImports: ["lucide-react"],
   },
 };

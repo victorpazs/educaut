@@ -24,11 +24,12 @@ export const AuthParticles = () => {
   return (
     <Particles
       className="absolute inset-0 w-full h-full"
-      options={{ ...(config as any), fullScreen: { enable: false, zIndex: 0 } }}
+      options={{ ...config, fullScreen: { enable: false, zIndex: 0 } }}
     />
   );
 };
-const config = {
+type ParticlesOptions = Record<string, unknown>;
+const config: ParticlesOptions = {
   autoPlay: true,
   background: {
     color: {

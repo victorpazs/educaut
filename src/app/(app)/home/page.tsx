@@ -19,12 +19,15 @@ export default function DashboardPage() {
         <div className="col-span-12 md:col-span-8 lg:col-span-9">
           <div className="grid grid-cols-12 gap-4">
             <HomeTotalizers />
+            <div className="col-span-12 md:hidden">
+              <QuickAccess />
+            </div>
 
             <HomeAgenda />
           </div>
         </div>
 
-        <div className="col-span-12 md:col-span-4 lg:col-span-3">
+        <div className="hidden md:block col-span-12 md:col-span-4 lg:col-span-3">
           <QuickAccess />
         </div>
       </div>

@@ -129,8 +129,13 @@ export async function createAttribute(
 
     revalidatePath("/settings/attributes");
     return createSuccessResponse(created, "Atributo criado com sucesso.");
-  } catch (error: any) {
-    if (error?.code === "P2002") {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: string }).code === "P2002"
+    ) {
       return createErrorResponse(
         "Já existe um atributo com esse nome para este tipo.",
         "DUPLICATE_ATTRIBUTE",
@@ -141,9 +146,7 @@ export async function createAttribute(
   }
 }
 
-export async function deleteAttribute(
-  id: number
-): Promise<ApiResponse<null>> {
+export async function deleteAttribute(id: number): Promise<ApiResponse<null>> {
   try {
     const { school } = await getAuthContext();
     const schoolId = school?.id;
@@ -220,8 +223,13 @@ export async function updateAttributeName(
 
     revalidatePath("/settings/attributes");
     return createSuccessResponse(null, "Atributo atualizado com sucesso.");
-  } catch (error: any) {
-    if (error?.code === "P2002") {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: string }).code === "P2002"
+    ) {
       return createErrorResponse(
         "Já existe um atributo com esse nome para este tipo.",
         "DUPLICATE_ATTRIBUTE",

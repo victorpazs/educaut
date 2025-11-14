@@ -4,18 +4,37 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { SearchInput } from "@/components/ui/search-input";
-import Link from "next/link";
 import { Plus, FileText } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
 import { EmptyList } from "@/components/empty-list";
 import { useActivities } from "./_hooks/use-activities";
+import { useRouter } from "next/navigation";
+import { NewActivityDialog } from "./_components/NewActivityDialog";
+import { ActivitiesTags } from "@/components/activities_tags";
+import { GetActivitiesParams } from "./actions";
+import { ActivityCell } from "./_components/ActivityCell";
 
 export default function ActivitiesPage() {
-  const [search, setSearch] = useState("");
-  const { activities, isLoading, hasError } = useActivities(search);
+  const [filter, setFilter] = useState<GetActivitiesParams>({
+    search: "",
+    tags: [],
+  });
+  const { activities, isLoading, hasError } = useActivities(filter);
+  const router = useRouter();
+
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleSearch = (value: string) => {
-    setSearch(value);
+    setFilter((prev) => ({ ...prev, search: value }));
+  };
+
+  const handleTagClick = (tag: string) => {
+    setFilter((prev) => {
+      if (prev.tags?.includes(tag)) {
+        return { ...prev, tags: (prev.tags ?? []).filter((t) => t !== tag) };
+      }
+      return { ...prev, tags: [...(prev.tags ?? []), tag] };
+    });
   };
 
   return (
@@ -26,20 +45,29 @@ export default function ActivitiesPage() {
             title="Atividades"
             subtitle="Cadastre e administre as atividades dos seus alunos."
             actions={
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-end flex-wrap gap-3">
                 <SearchInput
                   placeholder="Buscar atividades..."
-                  value={search}
+                  value={filter.search}
                   onSearch={handleSearch}
                 />
-                <Link href="/activities/create">
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nova atividade
-                  </Button>
-                </Link>
+                <Button onClick={() => setIsCreateOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova atividade
+                </Button>
+                <NewActivityDialog
+                  open={isCreateOpen}
+                  onOpenChange={setIsCreateOpen}
+                  onCreated={(id) => router.push(`/activities/editor/${id}`)}
+                />
               </div>
             }
+          />
+        </div>
+        <div className="col-span-12">
+          <ActivitiesTags
+            selectedTags={filter.tags || []}
+            onToggleTag={handleTagClick}
           />
         </div>
         <div className="col-span-12">
@@ -57,7 +85,18 @@ export default function ActivitiesPage() {
               description="Ajuste os filtros de busca ou crie uma nova atividade."
               icon={FileText}
             />
-          ) : null}
+          ) : (
+            <div className="grid grid-cols-12 gap-4">
+              {activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="col-span-12 md:col-span-6 lg:col-span-4"
+                >
+                  <ActivityCell activity={activity} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
