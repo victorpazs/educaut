@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { StudentCreateSteps, StudentFormData } from "./_models";
-import { StudentTabContent } from "./_components/StudentTabContent";
+import { StudentTabContent } from "../_components/StudentTabContent";
 import { TabsSidebar } from "@/components/tabs-sidebar";
 import { useAttributes } from "@/hooks/useAttributes";
 import { getAttributeIcon, getAttributeLabel } from "@/lib/attributes.utils";
@@ -35,7 +35,7 @@ export default function CreateStudentPage() {
   const options = React.useMemo(
     () => [
       {
-        label: "Informações Básicas",
+        label: "Informações básicas",
         identifier: StudentCreateSteps.BASIC_INFO,
         icon: User,
       },

@@ -9,7 +9,7 @@ import {
 } from "@/lib/server-responses";
 import { getAuthContext } from "@/lib/session";
 
-import type { IActivity } from "./_models";
+import type { IActivity, IActivityContent } from "./_models";
 
 export interface GetActivitiesParams {
   search?: string;
@@ -208,6 +208,137 @@ export async function deleteActivity(id: number): Promise<ApiResponse<null>> {
     });
 
     return createSuccessResponse(null, "Atividade removida com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export type UpdateActivityInput = {
+  id: number;
+  name: string;
+  description?: string | null;
+  tags?: string[] | null;
+};
+
+export async function updateActivityAction(
+  input: UpdateActivityInput
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    if (!input?.id || isNaN(Number(input.id))) {
+      return createErrorResponse(
+        "ID da atividade inválido.",
+        "INVALID_ACTIVITY_ID",
+        400
+      );
+    }
+
+    if (!input?.name?.trim()) {
+      return createErrorResponse(
+        "Nome da atividade é obrigatório.",
+        "VALIDATION_ERROR",
+        400
+      );
+    }
+
+    const existing = await prisma.activities.findFirst({
+      where: {
+        id: Number(input.id),
+        school_id: schoolId,
+        status: { not: 3 },
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return createErrorResponse(
+        "Atividade não encontrada ou não pertence à escola selecionada.",
+        "ACTIVITY_NOT_FOUND",
+        404
+      );
+    }
+
+    await prisma.activities.update({
+      where: { id: Number(existing.id) },
+      data: {
+        name: input.name.trim(),
+        description: input.description?.trim() || null,
+        tags: Array.isArray(input.tags) ? input.tags : [],
+      },
+    });
+
+    return createSuccessResponse(null, "Atividade atualizada com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export type UpdateActivityContentInput = {
+  id: number;
+  data: IActivityContent;
+};
+
+export async function updateActivityContentAction(
+  input: UpdateActivityContentInput
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    if (!input?.id || isNaN(Number(input.id))) {
+      return createErrorResponse(
+        "ID da atividade inválido.",
+        "INVALID_ACTIVITY_ID",
+        400
+      );
+    }
+
+    const existing = await prisma.activities.findFirst({
+      where: {
+        id: Number(input.id),
+        school_id: schoolId,
+        status: { not: 3 },
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return createErrorResponse(
+        "Atividade não encontrada ou não pertence à escola selecionada.",
+        "ACTIVITY_NOT_FOUND",
+        404
+      );
+    }
+
+    await prisma.activities.update({
+      where: { id: Number(existing.id) },
+      data: {
+        content: {
+          type: "canvas",
+          data: input.data as any,
+        },
+      },
+    });
+
+    return createSuccessResponse(null, "Conteúdo da atividade salvo.");
   } catch (error) {
     return handleServerError(error);
   }

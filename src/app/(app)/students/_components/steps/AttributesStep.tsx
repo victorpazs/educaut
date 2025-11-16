@@ -1,5 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { StudentFormData } from "../../_models";
+import { StudentFormData } from "../../create/_models";
 import { AttributeOption } from "@/app/(app)/_attributes/_models";
 
 interface AttributesStepProps {

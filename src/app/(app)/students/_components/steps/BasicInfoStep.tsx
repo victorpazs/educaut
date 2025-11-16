@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StudentFormData } from "../../_models";
+import { StudentFormData } from "../../create/_models";
 import { supportLevels } from "@/lib/tea_levels.utils";
 import { SchoolYearSelect } from "@/components/school-year-select";
 import { BirthdayPicker } from "@/components/birthday-picker";
@@ -33,11 +33,11 @@ export function BasicInfoStep({
     <>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 md:col-span-8">
-          <label className="text-sm font-medium">Aluno *</label>
+          <label className="text-sm font-medium">Nome *</label>
           <Input
             value={formData.name}
             onChange={(e) => onInputChange<string>("name", e.target.value)}
-            placeholder="Nome do aluno"
+            placeholder="Nome completo do aluno"
             required
           />
         </div>

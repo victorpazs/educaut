@@ -17,7 +17,9 @@ export default function Toolbar({
 }: ToolbarProps) {
   return (
     <div
-      className={`flex items-center justify-between gap-3 ${className ?? ""}`}
+      className={`flex items-center px-2 justify-between gap-3 ${
+        className ?? ""
+      }`}
     >
       <Options className={optionsClassName} />
       <Actions className={actionsClassName} />

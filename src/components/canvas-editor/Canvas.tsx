@@ -2,6 +2,7 @@
 import React from "react";
 import { useCanvasEditor } from "./context";
 import { Card, CardContent } from "../ui/card";
+import ObjectToolbar from "./ObjectToolbar";
 
 export default function Canvas() {
   const [isDragOver, setIsDragOver] = React.useState(false);
@@ -11,7 +12,7 @@ export default function Canvas() {
     addCircleAt,
     addLineAt,
     addTextAt,
-    addImageFileAt,
+    addImageUrlAt,
     preview,
   } = useCanvasEditor();
 
@@ -49,19 +50,11 @@ export default function Canvas() {
         addTextAt(x, y, "Text");
         break;
       case "image": {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.style.display = "none";
-        document.body.appendChild(input);
-        input.onchange = async () => {
-          const file = input.files?.[0];
-          if (file) {
-            await addImageFileAt(file, x, y);
-          }
-          document.body.removeChild(input);
-        };
-        input.click();
+        const placeholderUrl =
+          typeof window !== "undefined"
+            ? `${window.location.origin}/upload-here.png`
+            : "/upload-here.png";
+        void addImageUrlAt(placeholderUrl, x, y);
         break;
       }
     }
@@ -74,7 +67,7 @@ export default function Canvas() {
     >
       <CardContent className="p-0!">
         <div
-          className={`w-full ${
+          className={`w-full relative ${
             preview ? "pointer-events-none select-none" : ""
           }`}
           onDragOver={handleDragOver}
@@ -82,6 +75,7 @@ export default function Canvas() {
           onDragLeave={handleDragLeave}
         >
           <canvas className="rounded-lg!" ref={canvasRef} />
+          <ObjectToolbar />
         </div>
       </CardContent>
     </Card>

@@ -133,6 +133,7 @@ export function EditScheduleDialog({
                 onChange={handleFormChange}
                 errors={errors}
                 disabled={loading}
+                isEditing={true}
               />
               {scheduleData && scheduleData.student ? (
                 <Card>

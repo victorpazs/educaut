@@ -7,7 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { formatDateTimeLocal, parseDateTimeLocal } from "@/lib/utils";
-import { getAfternoonRange, getAllDayRange, getMorningRange } from "../utils";
+import { getPresetRange } from "../utils";
+import type { Presets } from "../utils";
+import { Moon, Sun, Sunrise } from "lucide-react";
 
 export type ScheduleFormState = {
   title: string;
@@ -27,25 +29,23 @@ export function ScheduleForm({
   errors,
   disabled,
   extraFields,
+  isEditing = false,
 }: {
   value: ScheduleFormState;
   onChange: (next: ScheduleFormState) => void;
   errors?: ScheduleFormErrors;
   disabled?: boolean;
   extraFields?: ReactNode;
+  isEditing?: boolean;
 }) {
-  const [preset, setPreset] = useState<"all" | "morning" | "afternoon" | null>(
-    null
-  );
+  const [preset, setPreset] = useState<Presets | null>(null);
 
-  const applyPreset = (type: "all" | "morning" | "afternoon") => {
+  const applyPreset = (type: Presets) => {
     const base = parseDateTimeLocal(value.startInput);
-    const { start: s, end: e } =
-      type === "all"
-        ? getAllDayRange(base)
-        : type === "morning"
-        ? getMorningRange(base)
-        : getAfternoonRange(base);
+    const { start: s, end: e } = getPresetRange(type, base) ?? {
+      start: base,
+      end: base,
+    };
     onChange({
       ...value,
       startInput: formatDateTimeLocal(s),
@@ -92,25 +92,36 @@ export function ScheduleForm({
         />
       </div>
 
-      <div className="flex items-start mb-6 gap-4">
-        <Tabs
-          className="w-full"
-          value={preset ?? "none"}
-          onValueChange={(v) => {
-            if (v === "none") {
-              setPreset(null);
-              return;
-            }
-            applyPreset(v as "all" | "morning" | "afternoon");
-          }}
-        >
-          <TabsList>
-            <TabsTrigger value="all">Dia inteiro</TabsTrigger>
-            <TabsTrigger value="morning">Período da manhã</TabsTrigger>
-            <TabsTrigger value="afternoon">Período da tarde</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      {!isEditing ? (
+        <div className="mb-6">
+          <Tabs
+            className="w-full! min-w-full!"
+            value={preset ?? "none"}
+            onValueChange={(v) => {
+              if (v === "none") {
+                setPreset(null);
+                return;
+              }
+              applyPreset(v as Presets);
+            }}
+          >
+            <TabsList>
+              <TabsTrigger value="morning">
+                <Sunrise className="h-4 w-4" />
+                Matutino
+              </TabsTrigger>
+              <TabsTrigger value="afternoon">
+                <Sun className="h-4 w-4" />
+                Vespertino
+              </TabsTrigger>
+              <TabsTrigger value="evening">
+                <Moon className="h-4 w-4" />
+                Noturno
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      ) : null}
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
           <DateTimePicker

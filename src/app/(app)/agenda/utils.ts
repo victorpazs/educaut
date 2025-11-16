@@ -60,9 +60,9 @@ function withTime(base: Date, hours: number, minutes = 0) {
     0
   );
 }
+export type Presets = "morning" | "afternoon" | "evening";
 
 export function getAllDayRange(base: Date): { start: Date; end: Date } {
-  // Considera jornada padrão escolar
   const start = withTime(base, 8, 0);
   const end = withTime(base, 18, 0);
   return { start, end };
@@ -78,4 +78,23 @@ export function getAfternoonRange(base: Date): { start: Date; end: Date } {
   const start = withTime(base, 13, 0);
   const end = withTime(base, 18, 0);
   return { start, end };
+}
+
+export function getEveningRange(base: Date): { start: Date; end: Date } {
+  const start = withTime(base, 19, 0);
+  const end = withTime(base, 22, 0);
+  return { start, end };
+}
+
+export function getPresetRange(
+  type: Presets,
+  base: Date
+): { start: Date; end: Date } {
+  return type === "morning"
+    ? getMorningRange(base)
+    : type === "afternoon"
+    ? getAfternoonRange(base)
+    : type === "evening"
+    ? getEveningRange(base)
+    : { start: base, end: base };
 }

@@ -53,10 +53,10 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   };
   return (
     <Card
-      className="overflow-hidden outline outline-border hover:shadow-sm transition-shadow"
+      className="overflow-hidden bg-muted outline h-full outline-border hover:shadow-sm transition-shadow"
       onClick={onClick}
     >
-      <div className="w-full">
+      <div className="w-full p-4">
         <CanvasEditor
           initialState={canvasInitialState}
           height={180}

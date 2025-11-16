@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDownIcon } from "lucide-react";
+import { CalendarIcon, ChevronDownIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -144,7 +144,7 @@ export function DateTimePicker({
               }`}
             >
               {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
-              <ChevronDownIcon className="h-4 w-4 text-secondary" />
+              <CalendarIcon className="h-4 w-4 text-secondary" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto overflow-hidden p-0" align="start">

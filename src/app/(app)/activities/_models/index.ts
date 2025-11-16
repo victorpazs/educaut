@@ -12,7 +12,7 @@ export type IActivity = Prisma.activitiesGetPayload<{
   };
 }>;
 
-interface IActivityContent {
+export interface IActivityContent {
   type: string;
   data: {
     version: string;

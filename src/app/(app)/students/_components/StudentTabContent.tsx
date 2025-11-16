@@ -2,11 +2,13 @@
 
 import * as React from "react";
 import { BasicInfoStep, AttributesStep } from "./steps";
-import { StudentFormData } from "../_models";
+import { StudentFormData } from "../create/_models";
 import { PageHeader } from "@/components/page-header";
-import { getAttributeLabel } from "@/lib/attributes.utils";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import {
+  getAttributeLabel,
+  getAttributeSubtitle,
+} from "@/lib/attributes.utils";
+
 import { useAttributes } from "@/hooks/useAttributes";
 import { ContentCard } from "@/components/content-card";
 
@@ -85,6 +87,7 @@ export function StudentTabContent({
           />
         );
 
+      case "comorbidities":
       case "disorder":
       case "hyperfocus":
       case "difficulty":
@@ -103,7 +106,10 @@ export function StudentTabContent({
   };
 
   return (
-    <ContentCard title={getAttributeLabel(activeTab)}>
+    <ContentCard
+      title={getAttributeLabel(activeTab)}
+      subtitle={getAttributeSubtitle(activeTab)}
+    >
       {renderStepContent()}
     </ContentCard>
   );

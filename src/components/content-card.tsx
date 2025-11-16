@@ -3,10 +3,12 @@ import { Separator } from "@/components/ui/separator";
 
 export function ContentCard({
   title,
+  subtitle,
   children,
   actions,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
 }) {
@@ -15,7 +17,12 @@ export function ContentCard({
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-lg font-medium">{title}</span>
+            <div className="flex flex-col text-start items-start">
+              <span className="text-lg font-medium">{title}</span>
+              {subtitle && (
+                <span className="text-sm text-secondary">{subtitle}</span>
+              )}
+            </div>
             {actions && (
               <div className="flex items-center justify-end gap-3">
                 {actions}

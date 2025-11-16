@@ -90,7 +90,7 @@ export default function ActivitiesPage() {
               {activities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="col-span-12 md:col-span-6 lg:col-span-4"
+                  className="col-span-12 h-full md:col-span-6 lg:col-span-4"
                 >
                   <ActivityCell activity={activity} />
                 </div>

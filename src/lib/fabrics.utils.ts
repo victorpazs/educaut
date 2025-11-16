@@ -51,9 +51,32 @@ export function addText(
   options?: Record<string, any>
 ): void {
   if (!canvas || !fabricNS) return;
-  const itext = new fabricNS.IText(text, options ?? {});
-  canvas.add(itext);
-  canvas.setActiveObject(itext);
+  const textbox = new fabricNS.Textbox(text, {
+    width: 240,
+    editable: true,
+    ...options,
+  });
+  textbox.on("scaling", () => {
+    try {
+      const nextWidth =
+        typeof textbox.width === "number" && typeof textbox.scaleX === "number"
+          ? textbox.width * textbox.scaleX
+          : textbox.getScaledWidth?.();
+      if (typeof nextWidth === "number" && isFinite(nextWidth)) {
+        textbox.set({
+          width: Math.max(20, nextWidth),
+          scaleX: 1,
+          scaleY: 1,
+        });
+        textbox.setCoords?.();
+      }
+    } catch {
+      // no-op
+    }
+    canvas.requestRenderAll?.();
+  });
+  canvas.add(textbox);
+  canvas.setActiveObject(textbox);
   canvas.requestRenderAll();
 }
 
@@ -63,20 +86,64 @@ export function addImageFromDataURL(
   dataURL: string,
   options?: Record<string, any>
 ): Promise<any> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve) => {
     if (!fabricNS || !canvas) return resolve(null);
-    fabricNS.Image.fromURL(
-      dataURL,
-      (img: any) => {
+    let loadOptions: any = undefined;
+    try {
+      if (typeof window !== "undefined" && typeof dataURL === "string") {
+        const isData = dataURL.startsWith("data:");
+        const isRelative = dataURL.startsWith("/");
+        const isHttp =
+          dataURL.startsWith("http://") || dataURL.startsWith("https://");
+        if (!isData) {
+          if (isRelative) {
+            loadOptions = undefined;
+          } else if (isHttp) {
+            const u = new URL(dataURL);
+            const sameOrigin = u.origin === window.location.origin;
+            loadOptions = sameOrigin ? undefined : { crossOrigin: "anonymous" };
+          }
+        }
+      }
+    } catch {
+      loadOptions = undefined;
+    }
+    try {
+      // Prefer API moderna do Fabric 6: FabricImage.fromURL(url, loadOptions?, imageOptions?)
+      const ImageKlass =
+        (fabricNS as any).FabricImage ?? (fabricNS as any).Image;
+      if (ImageKlass?.fromURL && (fabricNS as any).FabricImage) {
+        const img = await ImageKlass.fromURL(
+          dataURL,
+          loadOptions,
+          options ?? {}
+        );
         if (!img) return resolve(null);
-        img.set(options ?? {});
+        // Salva URL usada
+        (img as any).imageUrl = dataURL;
+        if (options) img.set(options);
         canvas.add(img);
         canvas.setActiveObject(img);
-        canvas.requestRenderAll();
-        resolve(img);
-      },
-      { crossOrigin: "anonymous" }
-    );
+        canvas.requestRenderAll?.();
+        return resolve(img);
+      }
+      // Fallback: API com callback
+      (fabricNS as any).Image.fromURL(
+        dataURL,
+        (img: any) => {
+          if (!img) return resolve(null);
+          (img as any).imageUrl = dataURL;
+          img.set(options ?? {});
+          canvas.add(img);
+          canvas.setActiveObject(img);
+          canvas.requestRenderAll?.();
+          resolve(img);
+        },
+        loadOptions
+      );
+    } catch {
+      resolve(null);
+    }
   });
 }
 
@@ -92,6 +159,10 @@ export function addImageFromFile(
     reader.onload = async (f) => {
       const data = f.target?.result as string;
       const img = await addImageFromDataURL(fabricNS, canvas, data, options);
+      if (img) {
+        (img as any).imageUrl = data;
+        canvas.requestRenderAll?.();
+      }
       resolve(img);
     };
     reader.readAsDataURL(file);
@@ -179,7 +250,8 @@ export async function printVectorPDF(canvas: any): Promise<void> {
 
 export function getSerializedState(canvas: any): unknown {
   if (!canvas) return null;
-  return canvas.toJSON();
+  // Inclui propriedades customizadas relevantes
+  return canvas.toJSON(["imageUrl"]);
 }
 
 export function addLine(

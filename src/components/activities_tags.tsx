@@ -13,7 +13,7 @@ export function ActivitiesTags({
   onToggleTag?: (tag: string) => void;
   parentTags?: IActivityTag[];
 }) {
-  const { tags, getIconByTag } = useActivityTags();
+  const { tags, getIconByTag, getLabelByTag } = useActivityTags();
 
   const tagsToRender = parentTags.length > 0 ? parentTags : tags;
 
@@ -21,11 +21,12 @@ export function ActivitiesTags({
     <div className="flex flex-wrap gap-2">
       {tagsToRender.map((t) => {
         const selected = selectedTags.includes(t.tag);
+        const label = getLabelByTag(t.tag);
         const Icon = getIconByTag(t.tag);
         return (
           <Chip
             key={t.tag}
-            label={t.label}
+            label={label ?? t.tag}
             startIcon={Icon}
             onClick={() => {
               onToggleTag?.(t.tag) ?? undefined;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { toast } from "@/lib/toast";
 
@@ -11,6 +11,7 @@ interface UseActivityResult {
   activity: IUpdateActivity | null;
   isLoading: boolean;
   hasError: boolean;
+  reFetch: () => void;
 }
 
 export function useActivity(
@@ -20,62 +21,73 @@ export function useActivity(
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
   const requestCounter = useRef(0);
+  const isMountedRef = useRef(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const load = useCallback(async () => {
     const currentRequest = requestCounter.current + 1;
     requestCounter.current = currentRequest;
 
-    const load = async () => {
-      setIsLoading(true);
-      setHasError(false);
+    setIsLoading(true);
+    setHasError(false);
 
-      try {
-        const numericId = Number(id);
-        const response = await getActivityById(numericId);
+    try {
+      if (id === undefined || id === null || Number.isNaN(Number(id))) {
+        setActivity(null);
+        setIsLoading(false);
+        setHasError(true);
+        toast.error("Erro", "ID da atividade inválido.");
+        return;
+      }
 
-        if (!isMounted || requestCounter.current !== currentRequest) return;
+      const numericId = Number(id);
+      const response = await getActivityById(numericId);
 
-        if (response.success && response.data) {
-          setActivity(response.data as unknown as IUpdateActivity);
-          setHasError(false);
-        } else {
-          setActivity(null);
-          setHasError(true);
-          toast.error(
-            "Erro",
-            response.message || "Não foi possível carregar a atividade."
-          );
-        }
-      } catch {
-        if (!isMounted || requestCounter.current !== currentRequest) return;
+      if (!isMountedRef.current || requestCounter.current !== currentRequest)
+        return;
+
+      if (response.success && response.data) {
+        setActivity(response.data as unknown as IUpdateActivity);
+        setHasError(false);
+      } else {
         setActivity(null);
         setHasError(true);
-        toast.error("Erro", "Não foi possível carregar a atividade.");
-      } finally {
-        if (isMounted && requestCounter.current === currentRequest) {
-          setIsLoading(false);
-        }
+        toast.error(
+          "Erro",
+          response.message || "Não foi possível carregar a atividade."
+        );
       }
-    };
-
-    if (id !== undefined && id !== null && !Number.isNaN(Number(id))) {
-      load();
-    } else {
+    } catch {
+      if (!isMountedRef.current || requestCounter.current !== currentRequest)
+        return;
       setActivity(null);
-      setIsLoading(false);
       setHasError(true);
-      toast.error("Erro", "ID da atividade inválido.");
+      toast.error("Erro", "Não foi possível carregar a atividade.");
+    } finally {
+      if (isMountedRef.current && requestCounter.current === currentRequest) {
+        setIsLoading(false);
+      }
     }
-
-    return () => {
-      isMounted = false;
-    };
   }, [id]);
+
+  // Controla o ciclo de vida (mounted/unmounted)
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Chama no mount e sempre que o id mudar
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   return {
     activity,
     isLoading,
     hasError,
+    reFetch: () => {
+      void load();
+    },
   };
 }

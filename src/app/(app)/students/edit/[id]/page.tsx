@@ -8,10 +8,10 @@ import {
   StudentCreateSteps,
   StudentFormData,
 } from "@/app/(app)/students/create/_models";
-import { StudentTabContent } from "@/app/(app)/students/create/_components/StudentTabContent";
 import { TabsSidebar } from "@/components/tabs-sidebar";
 import { useAttributes } from "@/hooks/useAttributes";
 import { getAttributeIcon, getAttributeLabel } from "@/lib/attributes.utils";
+import { StudentTabContent } from "@/app/(app)/students/_components/StudentTabContent";
 import { SubmitActions } from "@/app/(app)/students/edit/_components/SubmitActions";
 import { getStudentById } from "@/app/(app)/students/actions";
 
@@ -74,7 +74,7 @@ export default function EditStudentPage() {
   const options = React.useMemo(
     () => [
       {
-        label: "Informações Básicas",
+        label: "Informações básicas",
         identifier: StudentCreateSteps.BASIC_INFO,
         icon: User,
       },

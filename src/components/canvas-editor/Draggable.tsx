@@ -5,10 +5,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { GripVertical } from "lucide-react";
 
 interface DraggableProps {
   option: {
-    shape: "text" | "line" | "rect" | "circle";
+    shape: "text" | "line" | "rect" | "circle" | "image";
     label: string;
     icon: React.ReactNode;
   };
@@ -28,7 +29,9 @@ export function Draggable({ option, onClick }: DraggableProps) {
         ? "Linha"
         : shape === "rect"
         ? "Retângulo"
-        : "Círculo",
+        : shape === "circle"
+        ? "Círculo"
+        : "Imagem",
     "aria-label":
       shape === "text"
         ? "Adicionar texto"
@@ -36,23 +39,33 @@ export function Draggable({ option, onClick }: DraggableProps) {
         ? "Adicionar linha"
         : shape === "rect"
         ? "Adicionar retângulo"
-        : "Adicionar círculo",
+        : shape === "circle"
+        ? "Adicionar círculo"
+        : "Adicionar imagem",
   });
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          className={
-            "h-8 w-8 flex items-center justify-center rounded-md cursor-grab hover:bg-accent"
-          }
-          onClick={() => onClick()}
-          {...makeDraggableProps(option.shape)}
-        >
-          {option.icon}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent sideOffset={6}>{option.label}</TooltipContent>
-    </Tooltip>
+    <div {...makeDraggableProps(option.shape)} className="w-full">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            title={option.label}
+            aria-label={option.label}
+            onClick={() => onClick()}
+            className="w-full h-10 px-3 flex items-center justify-between rounded-md   hover:bg-accent text-foreground bg-transparent cursor-grab"
+          >
+            <div className="flex items-center gap-2 ">
+              <span className="h-5 w-5 flex items-center justify-center">
+                {option.icon}
+              </span>
+              <span className="text-sm">{option.label}</span>
+            </div>
+            <GripVertical className="h-4 w-4 text-secondary" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{option.label}</TooltipContent>
+      </Tooltip>
+    </div>
   );
 }

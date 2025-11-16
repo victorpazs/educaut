@@ -35,7 +35,7 @@ export function SchoolYearSelect({
   };
 
   return (
-    <Select value={value || ""} onValueChange={handleChange}>
+    <Select value={value} onValueChange={handleChange}>
       <SelectTrigger className={className || "w-full"}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

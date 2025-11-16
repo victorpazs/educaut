@@ -7,14 +7,18 @@ export type CanvasContextValue = {
   canvas: any;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   preview: boolean;
+  lastSavedAt: Date | null;
   name?: string;
   hasSelection: boolean;
   deleteSelected: () => void;
-  setBackground: (color: string) => void;
+  backgroundColor: string;
+  setBackgroundColor: (color: string) => void;
+  isSaving: boolean;
   addTextDefault: () => void;
   addTextAt: (left: number, top: number, text?: string) => void;
   addImageFile: (file: File) => Promise<void>;
   addImageFileAt: (file: File, left: number, top: number) => Promise<void>;
+  addImageUrlAt: (url: string, left: number, top: number) => Promise<void>;
   setDrawActive: (active: boolean) => void;
   setDrawBrush: (color: string, width: number) => void;
   addLineShape: () => void;
@@ -25,7 +29,7 @@ export type CanvasContextValue = {
   addCircleAt: (left: number, top: number) => void;
   exportPDF: (filename?: string) => Promise<void>;
   printPDF: () => Promise<void>;
-  saveState: () => void;
+  saveState: () => Promise<void>;
 };
 
 export const CanvasEditorContext =
