@@ -20,7 +20,7 @@ export default function CreateStudentPage() {
   const [formData, setFormData] = React.useState<StudentFormData>({
     name: "",
     birthday: new Date(),
-    school_year: 0,
+    school_year: 1,
     school_segment: "",
     tea_support_level: null,
     non_verbal: null,

@@ -1,11 +1,12 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from "react";
 import { useCanvasEditor } from "../context";
 import TextSettings from "./TextSettings";
 import ShapeSettings from "./ShapeSettings";
 import ImageSettings from "./ImageSettings";
-import { Image as ImageIcon, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import IconButton from "../../ui/icon-button";
 
 type Coords = { top: number; left: number };

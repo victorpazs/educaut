@@ -62,6 +62,9 @@ export async function getStudents({
         schedules: {
           where: {
             status: 1,
+            start_time: {
+              gt: new Date(),
+            },
           },
           orderBy: {
             start_time: "asc",

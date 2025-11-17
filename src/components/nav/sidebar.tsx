@@ -9,7 +9,7 @@ export function Sidebar() {
     { href: "/students", label: "Alunos", icon: User },
     { href: "/agenda", label: "Agenda", icon: Calendar },
     { href: "/activities", label: "Atividades", icon: FileCheck },
-    { href: "/discover", label: "Descubra", icon: Compass },
+    { href: "/discover", label: "Modelos", icon: Compass },
   ];
 
   return (

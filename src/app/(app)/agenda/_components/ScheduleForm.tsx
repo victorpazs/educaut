@@ -128,6 +128,7 @@ export function ScheduleForm({
             id="start"
             label="Data de início"
             value={value.startInput}
+            rangePeer={value.endInput}
             onChange={(newVal) => {
               onChange({
                 ...value,
@@ -142,6 +143,7 @@ export function ScheduleForm({
             id="end"
             label="Data de fim"
             value={value.endInput}
+            rangePeer={value.startInput}
             onChange={(newVal) => {
               onChange({
                 ...value,

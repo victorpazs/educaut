@@ -14,8 +14,13 @@ interface DraggableProps {
     icon: React.ReactNode;
   };
   onClick: () => void;
+  dragIcon?: boolean;
 }
-export function Draggable({ option, onClick }: DraggableProps) {
+export function Draggable({
+  option,
+  onClick,
+  dragIcon = false,
+}: DraggableProps) {
   const makeDraggableProps = (shape: DraggableProps["option"]["shape"]) => ({
     draggable: true,
     onDragStart: (e: React.DragEvent) => {
@@ -53,15 +58,14 @@ export function Draggable({ option, onClick }: DraggableProps) {
             title={option.label}
             aria-label={option.label}
             onClick={() => onClick()}
-            className="w-full h-10 px-3 flex items-center justify-between rounded-md   hover:bg-accent text-foreground bg-transparent cursor-grab"
+            className="w-full h-7 px-2 flex items-center justify-between rounded-md hover:bg-muted-foreground/10 text-foreground bg-transparent cursor-grab"
           >
-            <div className="flex items-center gap-2 ">
-              <span className="h-5 w-5 flex items-center justify-center">
-                {option.icon}
-              </span>
-              <span className="text-sm">{option.label}</span>
+            <div className="flex items-center gap-2">
+              {option.icon}
+
+              <span className="text-sm font-normal">{option.label}</span>
             </div>
-            <GripVertical className="h-4 w-4 text-secondary" />
+            {dragIcon && <GripVertical className="h-4 w-4 text-secondary" />}
           </button>
         </TooltipTrigger>
         <TooltipContent>{option.label}</TooltipContent>

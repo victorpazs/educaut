@@ -1,14 +1,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Chip } from "@/components/ui/chip";
 import { ActivitiesTags } from "@/components/activities_tags";
-
-type TagItem = {
-  tag: string;
-  label: string;
-  Icon: React.ComponentType<{ className?: string }>;
-};
 
 interface ActivityFormProps {
   name: string;

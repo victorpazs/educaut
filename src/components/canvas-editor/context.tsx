@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from "react";
 
@@ -13,6 +14,8 @@ export type CanvasContextValue = {
   deleteSelected: () => void;
   backgroundColor: string;
   setBackgroundColor: (color: string) => void;
+  orientation: "horizontal" | "vertical";
+  setOrientation: (o: "horizontal" | "vertical") => void;
   isSaving: boolean;
   addTextDefault: () => void;
   addTextAt: (left: number, top: number, text?: string) => void;

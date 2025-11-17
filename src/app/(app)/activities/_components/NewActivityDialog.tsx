@@ -105,7 +105,7 @@ export function NewActivityDialog({
         <DialogFooter>
           <Button
             size="sm"
-            variant="outline"
+            variant="ghost"
             onClick={handleClose}
             disabled={creating}
           >

@@ -14,6 +14,8 @@ import { deleteActivity } from "../../actions";
 import { toast } from "@/lib/toast";
 import { updateActivityContentAction } from "../../actions";
 import { AutoSave } from "../_helpers/AutoSave";
+import { VisibilityToggleButton } from "../../_components/VisibilityToggleButton";
+import type { IActivityContent } from "../../_models";
 
 export default function ActivityEditorPage() {
   const params = useParams<{ id: string }>();
@@ -55,24 +57,36 @@ export default function ActivityEditorPage() {
             subtitle="Edite o conteúdo da sua atividade."
             goBack={() => router.back()}
             actions={
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setOpenSettings(true)}
-                >
-                  <SettingsIcon className="h-4 w-4 mr-2" />
-                  Configurações
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setOpenDeleteDialog(true)}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Deletar atividade
-                </Button>
-              </div>
+              activity ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setOpenDeleteDialog(true)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Deletar atividade
+                    </Button>
+                    {activity && (
+                      <VisibilityToggleButton
+                        activityId={activity.id}
+                        isPublic={!!activity.is_public}
+                        onChanged={() => reFetch()}
+                      />
+                    )}
+
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setOpenSettings(true)}
+                    >
+                      <SettingsIcon className="h-4 w-4 mr-2" />
+                      Configurações
+                    </Button>
+                  </div>
+                </>
+              ) : null
             }
           />
         </div>
@@ -85,11 +99,11 @@ export default function ActivityEditorPage() {
             <CanvasEditor
               name={activity.name}
               initialState={activity.content?.data}
-              onSave={async (state: any) => {
+              onSave={async (state) => {
                 try {
                   await updateActivityContentAction({
                     id: activity.id,
-                    data: state,
+                    data: state as IActivityContent["data"],
                   });
                 } catch (e) {
                   console.error(e);

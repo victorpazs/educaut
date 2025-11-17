@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   addCircle,
@@ -29,8 +30,10 @@ type CanvasEditorProps = {
   children?: React.ReactNode;
   fullWidth?: boolean;
   preview?: boolean;
+  orientation?: "horizontal" | "vertical";
 };
 
+const PORTRAIT_A4_RATIO = 210 / 297;
 export default function CanvasEditor({
   initialState,
   onSave,
@@ -41,6 +44,7 @@ export default function CanvasEditor({
   children,
   fullWidth = false,
   preview = false,
+  orientation = "horizontal",
   name,
 }: CanvasEditorProps) {
   const fabricNSRef = React.useRef<any>(null);
@@ -52,6 +56,9 @@ export default function CanvasEditor({
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [backgroundColorState, setBackgroundColorState] =
     React.useState<string>(backgroundColor);
+  const [orientationState, setOrientationState] = React.useState<
+    "horizontal" | "vertical"
+  >(orientation);
 
   const applyPreviewState = React.useCallback(
     (c: any) => {
@@ -187,10 +194,26 @@ export default function CanvasEditor({
       if (!mounted) return;
       fabricNSRef.current = f;
       const parentEl = canvasRef.current?.parentElement as HTMLElement | null;
-      const initialWidth = fullWidth && parentEl ? parentEl.clientWidth : width;
+      // Compute initial dimensions following orientation rules.
+      const effH = height;
+      let initialWidth: number;
+      if (fullWidth && parentEl) {
+        if (orientationState === "vertical") {
+          const portraitWidth = Math.round(effH * PORTRAIT_A4_RATIO);
+          initialWidth = Math.min(parentEl.clientWidth, portraitWidth);
+        } else {
+          initialWidth = parentEl.clientWidth;
+        }
+      } else {
+        if (orientationState === "vertical") {
+          initialWidth = Math.round(effH * PORTRAIT_A4_RATIO);
+        } else {
+          initialWidth = width;
+        }
+      }
       const inst = new f.Canvas(canvasRef.current, {
         width: initialWidth,
-        height,
+        height: effH,
         backgroundColor: backgroundColorState,
       });
       canvasInstanceRef.current = inst;
@@ -228,15 +251,38 @@ export default function CanvasEditor({
   // Sync prop changes into internal state
   React.useEffect(() => {
     setBackgroundColorState(backgroundColor);
-  }, [backgroundColor]);
+    setOrientationState(orientation);
+  }, [backgroundColor, orientation]);
 
   React.useEffect(() => {
     if (!canvas) return;
-    if (typeof height === "number" && height > 0) {
-      canvas.setHeight(height);
-      canvas.requestRenderAll();
+    const effH = height;
+    if (typeof effH === "number" && effH > 0) {
+      canvas.setHeight(effH);
     }
-  }, [canvas, height]);
+    if (!fullWidth) {
+      if (orientationState === "vertical") {
+        const portraitWidth = Math.round(effH * PORTRAIT_A4_RATIO);
+        canvas.setWidth(portraitWidth);
+      } else if (typeof width === "number" && width > 0) {
+        canvas.setWidth(width);
+      }
+    } else {
+      // Full width: only horizontal fills parent. Vertical keeps A4-proportional width, bounded by parent width.
+      const parentEl = canvasRef.current?.parentElement as HTMLElement | null;
+      if (parentEl) {
+        if (orientationState === "vertical") {
+          const portraitWidth = Math.round(effH * PORTRAIT_A4_RATIO);
+          const bounded = Math.min(parentEl.clientWidth, portraitWidth);
+          canvas.setWidth(bounded);
+        } else {
+          canvas.setWidth(parentEl.clientWidth);
+        }
+      }
+    }
+    canvas.requestRenderAll?.();
+    fitPreviewToContent();
+  }, [canvas, width, height, fullWidth, orientationState, fitPreviewToContent]);
 
   // Re-apply preview state whenever flag changes
   React.useEffect(() => {
@@ -308,8 +354,14 @@ export default function CanvasEditor({
           typeof contentBoxSize === "number" && contentBoxSize > 0
             ? contentBoxSize
             : parentEl.clientWidth;
-        if (newWidth && Math.abs(canvas.getWidth() - newWidth) > 0.5) {
-          canvas.setWidth(newWidth);
+        let targetWidth = newWidth;
+        if (orientationState === "vertical") {
+          const effH = height || canvas.getHeight?.() || 0;
+          const portraitWidth = Math.round(effH * PORTRAIT_A4_RATIO);
+          targetWidth = Math.min(newWidth, portraitWidth);
+        }
+        if (targetWidth && Math.abs(canvas.getWidth() - targetWidth) > 0.5) {
+          canvas.setWidth(targetWidth);
           canvas.requestRenderAll();
           fitPreviewToContent();
         }
@@ -332,6 +384,10 @@ export default function CanvasEditor({
       hasSelection,
       name,
       backgroundColor: backgroundColorState,
+      orientation: orientationState,
+      setOrientation: (o: "horizontal" | "vertical") => {
+        setOrientationState(o);
+      },
       deleteSelected,
       setBackgroundColor: (color: string) => {
         if (!canvas) return;
@@ -446,6 +502,7 @@ export default function CanvasEditor({
       lastSavedAt,
       isSaving,
       backgroundColorState,
+      orientationState,
     ]
   );
 

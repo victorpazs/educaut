@@ -34,7 +34,7 @@ export function SubmitActions({
   return (
     <div className="flex justify-end">
       <Card className="p-4 gap-2 mt-4 flex justify-end items-center w-auto">
-        <Button variant="outline" onClick={handleBack}>
+        <Button variant="ghost" onClick={handleBack}>
           Cancelar
         </Button>
         <Button onClick={() => handleUpdate(formData)}>

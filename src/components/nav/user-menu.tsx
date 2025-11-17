@@ -1,4 +1,11 @@
-import { ChevronDown, Calendar, School, LogOut, Settings } from "lucide-react";
+import {
+  ChevronDown,
+  Calendar,
+  School,
+  LogOut,
+  Settings,
+  Tag,
+} from "lucide-react";
 import { Suspense, useState } from "react";
 import { Avatar } from "../ui/avatar";
 import {
@@ -16,7 +23,7 @@ import { Button } from "../ui/button";
 import { SchoolsSelector } from "./schools-selector";
 
 export function UserMenu() {
-  const { user, school } = useSession();
+  const { user } = useSession();
   const router = useRouter();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,6 +50,11 @@ export function UserMenu() {
       icon: Settings,
       href: "/settings",
     },
+    {
+      label: "Atributos",
+      icon: Tag,
+      href: "/settings/attributes",
+    },
   ];
 
   return (
@@ -61,22 +73,15 @@ export function UserMenu() {
         <DropdownMenuContent align="end" className="w-72">
           <div className="px-3 py-3 ">
             <div className="flex items-center w-full justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center w-full gap-3">
                 <Avatar className="h-12 w-12" fallback="VP" />
                 <div className="flex flex-col">
-                  <span className="font-medium text-foreground">
+                  <span className="font-bold text-foreground text-sm">
                     {user?.name}
                   </span>
                   <span className="text-xs text-foreground">{user?.email}</span>
                 </div>
               </div>
-              <Button
-                onClick={() => onOptionClick("/settings/profile")}
-                variant="ghost"
-                size="icon"
-              >
-                <Settings className="h-4 w-4 text-black" />
-              </Button>
             </div>
           </div>
 

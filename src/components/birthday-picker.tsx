@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CalendarIcon, ChevronDownIcon } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -55,6 +55,7 @@ export function BirthdayPicker({
           <Calendar
             mode="single"
             selected={value}
+            defaultMonth={value}
             captionLayout="dropdown"
             onSelect={(date) => {
               if (date) {

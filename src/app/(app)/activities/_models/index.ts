@@ -9,6 +9,7 @@ export type IActivity = Prisma.activitiesGetPayload<{
     created_at: true;
     status: true;
     tags: true;
+    is_public: true;
   };
 }>;
 

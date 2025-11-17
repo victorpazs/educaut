@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma";
 import {
   createSuccessResponse,
   createErrorResponse,
@@ -21,6 +22,16 @@ export async function getActivities({
   tags,
 }: GetActivitiesParams): Promise<ApiResponse<IActivity[] | null>> {
   try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
     const normalizedSearch = search?.trim();
 
     const activities = await prisma.activities.findMany({
@@ -28,6 +39,7 @@ export async function getActivities({
         status: {
           not: 3,
         },
+        school_id: schoolId,
         ...(normalizedSearch
           ? {
               name: {
@@ -55,6 +67,7 @@ export async function getActivities({
         created_at: true,
         status: true,
         tags: true,
+        is_public: true,
       },
     });
 
@@ -151,6 +164,7 @@ export async function getActivityById(
         created_at: true,
         status: true,
         tags: true,
+        is_public: true,
       },
     });
 
@@ -285,7 +299,7 @@ export async function updateActivityAction(
 
 export type UpdateActivityContentInput = {
   id: number;
-  data: IActivityContent;
+  data: IActivityContent["data"];
 };
 
 export async function updateActivityContentAction(
@@ -333,12 +347,75 @@ export async function updateActivityContentAction(
       data: {
         content: {
           type: "canvas",
-          data: input.data as any,
-        },
+          data: input.data,
+        } as Prisma.InputJsonValue,
       },
     });
 
     return createSuccessResponse(null, "Conteúdo da atividade salvo.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export type UpdateActivityVisibilityInput = {
+  id: number;
+  is_public: boolean;
+};
+
+export async function updateActivityVisibilityAction(
+  input: UpdateActivityVisibilityInput
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    if (!input?.id || isNaN(Number(input.id))) {
+      return createErrorResponse(
+        "ID da atividade inválido.",
+        "INVALID_ACTIVITY_ID",
+        400
+      );
+    }
+
+    const existing = await prisma.activities.findFirst({
+      where: {
+        id: Number(input.id),
+        school_id: schoolId,
+        status: { not: 3 },
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return createErrorResponse(
+        "Atividade não encontrada ou não pertence à escola selecionada.",
+        "ACTIVITY_NOT_FOUND",
+        404
+      );
+    }
+
+    await prisma.activities.update({
+      where: { id: Number(existing.id) },
+      data: {
+        is_public: !!input.is_public,
+      },
+    });
+
+    return createSuccessResponse(
+      null,
+      input.is_public
+        ? "Atividade tornada pública com sucesso."
+        : "Atividade tornada privada com sucesso."
+    );
   } catch (error) {
     return handleServerError(error);
   }

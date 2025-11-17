@@ -189,7 +189,7 @@ export function SchoolAgenda({
                   }}
                   eventClick={(clickInfo: EventClickArg) => {
                     const params = new URLSearchParams(searchParams.toString());
-                    params.set("edit_id", String(clickInfo.event.id));
+                    params.set("scheduleId", String(clickInfo.event.id));
                     const query = params.toString();
                     router.push(`${pathname}${query ? `?${query}` : ""}`);
                   }}

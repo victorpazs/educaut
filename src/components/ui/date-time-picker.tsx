@@ -21,6 +21,12 @@ type DateTimePickerProps = {
   className?: string;
   buttonClassName?: string;
   step?: number; // Seconds step for time input; defines HH:mm vs HH:mm:ss
+  /**
+   * Optional datetime-local string from a "peer" field (e.g., start when editing end).
+   * When provided, the calendar will visually highlight a range between the current value
+   * and this peer date (including range_start, range_middle, range_end styling).
+   */
+  rangePeer?: string;
 };
 
 export function DateTimePicker({
@@ -31,6 +37,7 @@ export function DateTimePicker({
   className,
   buttonClassName,
   step = 60,
+  rangePeer,
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -126,7 +133,43 @@ export function DateTimePicker({
     () => (dateParts ? buildLocalDateFromParts(dateParts) : undefined),
     [dateParts]
   );
+  const peerDate = React.useMemo(() => {
+    const p = parseDatePartsFromValue(rangePeer);
+    return p ? buildLocalDateFromParts(p) : undefined;
+  }, [rangePeer]);
   const timeInputValue = timePart ?? "";
+
+  function isSameDay(a: Date, b: Date) {
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
+  }
+
+  const rangeFrom = React.useMemo(() => {
+    if (selectedDate && peerDate) {
+      return selectedDate < peerDate ? selectedDate : peerDate;
+    }
+    return peerDate ?? selectedDate;
+  }, [selectedDate, peerDate]);
+
+  const rangeTo = React.useMemo(() => {
+    if (selectedDate && peerDate) {
+      return selectedDate < peerDate ? peerDate : selectedDate;
+    }
+    return undefined;
+  }, [selectedDate, peerDate]);
+
+  const modifiers = React.useMemo(() => {
+    if (!rangeFrom && !rangeTo) return undefined;
+    return {
+      range_start: (d: Date) => !!rangeFrom && isSameDay(d, rangeFrom),
+      range_end: (d: Date) => !!rangeTo && isSameDay(d, rangeTo),
+      range_middle: (d: Date) =>
+        !!rangeFrom && !!rangeTo && d > rangeFrom && d < rangeTo,
+    };
+  }, [rangeFrom, rangeTo]);
 
   return (
     <div className="flex gap-4">
@@ -151,7 +194,9 @@ export function DateTimePicker({
             <Calendar
               mode="single"
               selected={selectedDate}
+              defaultMonth={selectedDate ?? peerDate}
               captionLayout="dropdown"
+              modifiers={modifiers}
               onSelect={(pickedDate) => {
                 if (!pickedDate) return;
                 const newDateParts = {

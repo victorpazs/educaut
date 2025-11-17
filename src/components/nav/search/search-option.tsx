@@ -1,4 +1,4 @@
-import { ArrowRight, Calendar, User } from "lucide-react";
+import { ArrowRight, Calendar, FileCheck, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type SearchOptionProps = {
@@ -14,6 +14,8 @@ const getIconByType = (type: string) => {
       return <User className="ml-2 h-4 w-4" />;
     case "calendar":
       return <Calendar className="ml-2 h-4 w-4" />;
+    case "activity":
+      return <FileCheck className="ml-2 h-4 w-4" />;
   }
 };
 
@@ -23,6 +25,8 @@ const getLabelByType = (type: string) => {
       return "Aluno";
     case "calendar":
       return "Agendamento";
+    case "activity":
+      return "Atividade";
   }
 };
 export function SearchOption({ id, title, type, onClose }: SearchOptionProps) {
@@ -37,6 +41,10 @@ export function SearchOption({ id, title, type, onClose }: SearchOptionProps) {
         break;
       case "calendar":
         router.push(`/agenda?scheduleId=${id?.split(":")[1]}`);
+        onClose();
+        break;
+      case "activity":
+        router.push(`/activities/editor/${id?.split(":")[1]}`);
         onClose();
         break;
     }

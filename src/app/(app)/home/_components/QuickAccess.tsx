@@ -10,7 +10,7 @@ const quickAccessButtons: QuickAccessButtonProps[] = [
   {
     icon: FileText,
     label: "Nova Atividade",
-    path: "/activities/create",
+    path: "/activities",
   },
 
   {

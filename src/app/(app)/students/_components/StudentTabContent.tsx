@@ -95,6 +95,7 @@ export function StudentTabContent({
         return (
           <AttributesStep
             formData={formData}
+            attributeType={activeTab}
             attributeFields={attributesByType?.[activeTab] ?? []}
             onAttributeChange={onAttributeChange}
           />

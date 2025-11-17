@@ -136,7 +136,7 @@ export function EditScheduleDialog({
                 isEditing={true}
               />
               {scheduleData && scheduleData.student ? (
-                <Card>
+                <Card className="rounded-xl!">
                   <CardContent className="p-4!">
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <Avatar>
@@ -154,24 +154,19 @@ export function EditScheduleDialog({
                   </CardContent>
                 </Card>
               ) : null}
-              <Accordion title="Avançado" defaultExpanded={false} size="sm">
-                <div className="flex">
-                  <Button
-                    className="w-full rounded-xl"
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setOpenDelete(true)}
-                    disabled={loading || saving}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Excluir aula
-                  </Button>
-                </div>
-              </Accordion>
             </div>
           )}
 
           <DialogFooter>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => setOpenDelete(true)}
+              disabled={loading || saving}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Excluir aula
+            </Button>
             <Button
               size="sm"
               onClick={handleSave}

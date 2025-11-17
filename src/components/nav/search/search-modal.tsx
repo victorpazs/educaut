@@ -22,8 +22,6 @@ export function SearchModal() {
             <SearchInput
               searchText={searchText}
               setSearchText={setSearchText}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
               onClose={toggle}
             />
           </div>

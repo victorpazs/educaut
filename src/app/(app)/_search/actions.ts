@@ -19,14 +19,16 @@ type LiveSearchParams = {
   schoolId?: number | null;
 };
 
-const AGENDA_DAY_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
-  dateStyle: "long",
-  timeZone: "America/Sao_Paulo",
-});
-
 const AGENDA_TIME_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
   hour: "2-digit",
   minute: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
+const AGENDA_DAY_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "2-digit",
   timeZone: "America/Sao_Paulo",
 });
 
@@ -52,7 +54,7 @@ export async function liveSearch(
 
     const likePattern = `%${normalizedQuery}%`;
 
-    const [students, agendas] = await Promise.all([
+    const [students, agendas, activities] = await Promise.all([
       prisma.students.findMany({
         where: {
           school_id: schoolId,
@@ -80,10 +82,32 @@ export async function liveSearch(
         WHERE s.school_id = ${schoolId}
           AND s.status = 1
           AND st.status = 1
-          AND to_char(s.start_time, 'DD/MM/YYYY HH24:MI') ILIKE ${likePattern}
+          AND (
+            s.title ILIKE ${likePattern}
+            OR st.name ILIKE ${likePattern}
+            OR to_char(s.start_time, 'DD/MM/YYYY HH24:MI') ILIKE ${likePattern}
+          )
         ORDER BY s.start_time ASC
         LIMIT 5
       `,
+      prisma.activities.findMany({
+        where: {
+          school_id: schoolId,
+          status: 1,
+          name: {
+            contains: normalizedQuery,
+            mode: "insensitive",
+          },
+        },
+        orderBy: {
+          name: "asc",
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+        take: 5,
+      }),
     ]);
 
     const results: LiveSearchResult[] = [];
@@ -111,10 +135,20 @@ export async function liveSearch(
 
           return {
             id: `schedule:${agenda.id}`,
-            name: `Aula com ${agenda.student_name} no dia ${formattedDay} às ${formattedTime}`,
+            name: `Aula com ${agenda.student_name} - ${formattedDay} às ${formattedTime}`,
             type: "calendar",
           };
         })
+      );
+    }
+
+    if (activities.length) {
+      results.push(
+        ...activities.map((activity) => ({
+          id: `activity:${activity.id}`,
+          name: activity.name,
+          type: "activity",
+        }))
       );
     }
 

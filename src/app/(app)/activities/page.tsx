@@ -39,7 +39,7 @@ export default function ActivitiesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-2">
         <div className="col-span-12">
           <PageHeader
             title="Atividades"
@@ -70,7 +70,7 @@ export default function ActivitiesPage() {
             onToggleTag={handleTagClick}
           />
         </div>
-        <div className="col-span-12">
+        <div className="col-span-12 mt-2">
           {hasError ? (
             <EmptyList
               title="Erro ao carregar atividades"
@@ -92,7 +92,12 @@ export default function ActivitiesPage() {
                   key={activity.id}
                   className="col-span-12 h-full md:col-span-6 lg:col-span-4"
                 >
-                  <ActivityCell activity={activity} />
+                  <ActivityCell
+                    activity={activity}
+                    onClick={() =>
+                      router.push(`/activities/editor/${activity.id}`)
+                    }
+                  />
                 </div>
               ))}
             </div>

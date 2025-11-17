@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import CanvasEditor from "@/components/canvas-editor";
 import { ActivitiesTags } from "@/components/activities_tags";
 
-import type { IActivity } from "../_models";
+import type { IActivity, IActivityContent } from "../_models";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
@@ -26,10 +26,15 @@ interface ActivityCellProps {
 export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const router = useRouter();
-  const canvasInitialState = React.useMemo(() => {
-    const content: any = activity?.content as any;
-    if (content && content.type === "canvas" && content.data) {
-      return content.data;
+  const canvasInitialState = React.useMemo<IActivityContent["data"]>(() => {
+    const content = activity?.content;
+    if (
+      content &&
+      typeof content === "object" &&
+      (content as { type?: string }).type === "canvas" &&
+      (content as { data?: IActivityContent["data"] }).data
+    ) {
+      return (content as { data: IActivityContent["data"] }).data;
     }
     return {
       version: "6.9.0",
@@ -53,7 +58,7 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   };
   return (
     <Card
-      className="overflow-hidden bg-muted outline h-full outline-border hover:shadow-sm transition-shadow"
+      className="overflow-hidden bg-background outline h-full outline-border hover:shadow-sm transition-shadow"
       onClick={onClick}
     >
       <div className="w-full p-4">
@@ -95,7 +100,10 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
               className="h-10 w-10 p-0 text-red-600 hover:text-red-700"
               aria-label="Excluir atividade"
               title="Excluir atividade"
-              onClick={() => setOpenDeleteDialog(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenDeleteDialog(true);
+              }}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

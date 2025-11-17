@@ -7,13 +7,7 @@ export const AuthParticles = () => {
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
-      // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
-      // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-      // starting from v2 you can add only the features you need reducing the bundle size
-      //await loadAll(engine);
-      //await loadFull(engine);
       await loadFull(engine);
-      //await loadBasic(engine);
     }).then(() => {
       setInit(true);
     });
@@ -75,7 +69,7 @@ const config: ParticlesOptions = {
         type: "circle",
       },
       onHover: {
-        enable: true,
+        enable: false,
         mode: "grab",
         parallax: {
           enable: true,
@@ -304,7 +298,7 @@ const config: ParticlesOptions = {
       },
       random: false,
       size: false,
-      speed: 2,
+      speed: 0.2,
       spin: {
         acceleration: 0,
         enable: false,
@@ -338,7 +332,7 @@ const config: ParticlesOptions = {
       animation: {
         count: 0,
         enable: true,
-        speed: 3,
+        speed: 1,
         decay: 0,
         delay: 0,
         sync: false,
@@ -420,7 +414,7 @@ const config: ParticlesOptions = {
         value: 0,
       },
       mode: "vertical",
-      speed: 25,
+      speed: 5,
     },
     tilt: {
       value: 0,

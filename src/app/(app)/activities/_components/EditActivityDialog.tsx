@@ -79,7 +79,10 @@ export function EditActivityDialog({
       toast.success("Sucesso", "Atividade atualizada.");
       onOpenChange(false);
     } catch (e) {
-      toast.error("Erro", "Falha ao atualizar a atividade.");
+      toast.error(
+        "Erro",
+        `Falha ao atualizar a atividade. ${JSON.stringify(e)}`
+      );
     }
   };
 
@@ -102,11 +105,7 @@ export function EditActivityDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
           <Button size="sm" disabled={!formName?.trim()} onClick={handleSave}>

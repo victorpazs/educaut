@@ -1,6 +1,6 @@
 "use client";
 
-import { liveSearch, type LiveSearchResult } from "@/app/_search/actions";
+import { liveSearch, type LiveSearchResult } from "@/app/(app)/_search/actions";
 import { useSession } from "./useSession";
 import { useEffect, useState } from "react";
 

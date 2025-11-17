@@ -6,6 +6,7 @@ import { toast } from "@/lib/toast";
 
 import type { IActivity } from "../_models";
 import { getActivities, GetActivitiesParams } from "../actions";
+import { useSession } from "@/hooks/useSession";
 
 interface UseActivitiesResult {
   activities: IActivity[];
@@ -16,12 +17,20 @@ interface UseActivitiesResult {
 export function useActivities(
   params: GetActivitiesParams
 ): UseActivitiesResult {
+  const { school } = useSession();
   const [activities, setActivities] = useState<IActivity[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
   const requestCounter = useRef(0);
 
   useEffect(() => {
+    if (!school?.id) {
+      setActivities([]);
+      setIsLoading(false);
+      setHasError(false);
+      return;
+    }
+
     let isMounted = true;
     const currentRequest = requestCounter.current + 1;
     requestCounter.current = currentRequest;
@@ -48,7 +57,10 @@ export function useActivities(
         }
       } catch (err) {
         if (isMounted && requestCounter.current === currentRequest) {
-          toast.error("Não foi possível carregar as atividades.");
+          toast.error(
+            "Não foi possível carregar as atividades.",
+            `Falha ao carregar as atividades. ${JSON.stringify(err)}`
+          );
           setHasError(true);
           setActivities([]);
         }
@@ -64,7 +76,7 @@ export function useActivities(
     return () => {
       isMounted = false;
     };
-  }, [params]);
+  }, [params, school?.id]);
 
   return {
     activities,

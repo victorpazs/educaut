@@ -10,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Button } from "@/components/ui/button";
 import { StudentComboboxClient } from "@/components/students-combobox.client";
 import {
@@ -135,13 +134,13 @@ export function NewScheduleDialog({
                 setScheduleData((prev) => ({ ...prev, studentId: v }))
               }
               buttonClassName="w-full"
-              className="w-full"
+              className="w-full min-w-[320px]"
             />
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
           <Button onClick={handleSave} disabled={!canSave}>

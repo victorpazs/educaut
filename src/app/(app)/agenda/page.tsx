@@ -11,7 +11,7 @@ export default function AgendaPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const editIdParam = searchParams.get("edit_id");
+  const editIdParam = searchParams.get("scheduleId");
   const { refetch } = useAgenda();
   const editId = useMemo(() => {
     const parsed = Number(editIdParam);
@@ -20,7 +20,7 @@ export default function AgendaPage() {
 
   const handleCloseEdit = () => {
     const params = new URLSearchParams(searchParams.toString());
-    params.delete("edit_id");
+    params.delete("scheduleId");
     const query = params.toString();
     router.replace(`${pathname}${query ? `?${query}` : ""}`);
   };

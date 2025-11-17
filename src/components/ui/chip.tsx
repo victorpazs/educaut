@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 export interface ChipProps {
   label: string;
   onClick?: () => void;
-  startIcon?: React.ComponentType<{ className?: string }>;
-  endIcon?: React.ComponentType<{ className?: string }>;
+  startIcon?: React.ComponentType<{ className?: string }> | React.ReactNode;
+  endIcon?: React.ComponentType<{ className?: string }> | React.ReactNode;
   variant?: "standard" | "outlined";
   color?: "primary" | "default";
   size?: "sm" | "md" | "lg";
@@ -22,6 +22,29 @@ export function Chip({
   color = "default",
   size = "md",
 }: ChipProps) {
+  const renderIcon = (
+    Icon: ChipProps["startIcon"] | ChipProps["endIcon"],
+    classNames: string
+  ) => {
+    if (!Icon) return null;
+    const classes = cn(classNames, "shrink-0");
+    if (React.isValidElement(Icon)) {
+      const element = Icon as React.ReactElement<{ className?: string }>;
+      return React.cloneElement(element, {
+        className: cn(element.props.className, classes),
+      });
+    }
+    if (typeof Icon === "function") {
+      const C = Icon as React.ComponentType<{ className?: string }>;
+      return <C className={classes} />;
+    }
+    if (typeof Icon === "object" && Icon !== null) {
+      const C = Icon as unknown as React.ComponentType<{ className?: string }>;
+      return React.createElement(C, { className: classes });
+    }
+    return <span className={classes}>{Icon}</span>;
+  };
+
   const baseClasses =
     "inline-flex max-w-full items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
@@ -77,11 +100,11 @@ export function Chip({
       )}
       onClick={onClick}
     >
-      {StartIcon && <StartIcon className={cn(sizes[size].icon, "shrink-0")} />}
-      <span className="truncate min-w-0 max-w-[240px]" title={label}>
+      {renderIcon(StartIcon, sizes[size].icon)}
+      <span className="truncate min-w-0 max-w-[360px]" title={label}>
         {label}
       </span>
-      {EndIcon && <EndIcon className={cn(sizes[size].icon, "shrink-0")} />}
+      {renderIcon(EndIcon, sizes[size].icon)}
     </Component>
   );
 }

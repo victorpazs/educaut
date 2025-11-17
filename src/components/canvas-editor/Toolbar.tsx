@@ -16,13 +16,13 @@ export default function Toolbar({
   actionsClassName,
 }: ToolbarProps) {
   return (
-    <div
-      className={`flex items-center px-2 justify-between gap-3 ${
-        className ?? ""
-      }`}
-    >
-      <Options className={optionsClassName} />
-      <Actions className={actionsClassName} />
+    <div className={`grid grid-cols-12 px-2 py-1 gap-1 ${className ?? ""}`}>
+      <div className="col-span-12">
+        <Actions className={actionsClassName} />
+      </div>
+      <div className="col-span-12">
+        <Options className={optionsClassName} />
+      </div>
     </div>
   );
 }
