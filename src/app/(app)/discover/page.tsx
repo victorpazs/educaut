@@ -44,7 +44,7 @@ export default function DiscoverPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-2">
         <div className="col-span-12">
           <PageHeader
             title="Discover"
@@ -59,12 +59,15 @@ export default function DiscoverPage() {
           />
         </div>
         <div className="col-span-12">
-          <div className="w-full mb-2  ">
+          <div className="w-full">
             <ActivitiesTags
               selectedTags={filters.tags}
               onToggleTag={handleTagClick}
             />
           </div>
+        </div>
+
+        <div className="col-span-12 mt-2">
           {!hasError ? (
             isLoading ? (
               <PageLoader />
@@ -75,9 +78,7 @@ export default function DiscoverPage() {
                 icon={Compass}
               />
             ) : (
-              <Card className="rounded-sm p-4">
-                <DiscoverList activities={activities} />
-              </Card>
+              <DiscoverList activities={activities} />
             )
           ) : (
             <EmptyList
