@@ -19,7 +19,7 @@ export default function SettingsLayout({
       case "schools":
         return "Gerencie as suas escolas cadastradas na plataforma.";
       case "attributes":
-        return "Gerencie os atributos da escola atual.";
+        return "Gerencie as características dos alunos da escola.";
       default:
         return "Gerencie as suas configurações na plataforma.";
     }

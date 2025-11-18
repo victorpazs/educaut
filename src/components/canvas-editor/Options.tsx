@@ -143,25 +143,27 @@ export default function Options({ className }: OptionsProps) {
             </Button>
           }
         />
-        <IconButton
-          aria-label="Alternar orientação"
-          title={`Orientação: ${
-            orientation === "horizontal" ? "Horizontal" : "Vertical"
-          }`}
-          disabled={preview}
-          onClick={() =>
-            setOrientation(
-              orientation === "horizontal" ? "vertical" : "horizontal"
-            )
-          }
-          icon={
-            orientation === "horizontal" ? (
-              <RectangleHorizontal className="h-4 w-4" />
-            ) : (
-              <RectangleVertical className="h-4 w-4" />
-            )
-          }
-        />
+        {false && (
+          <IconButton
+            aria-label="Alternar orientação"
+            title={`Orientação: ${
+              orientation === "horizontal" ? "Horizontal" : "Vertical"
+            }`}
+            disabled={preview}
+            onClick={() =>
+              setOrientation(
+                orientation === "horizontal" ? "vertical" : "horizontal"
+              )
+            }
+            icon={
+              orientation === "horizontal" ? (
+                <RectangleHorizontal className="h-4 w-4" />
+              ) : (
+                <RectangleVertical className="h-4 w-4" />
+              )
+            }
+          />
+        )}
       </div>
     </div>
   );

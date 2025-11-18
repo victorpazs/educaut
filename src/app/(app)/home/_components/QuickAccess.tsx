@@ -30,7 +30,7 @@ const quickAccessButtons: QuickAccessButtonProps[] = [
   },
   {
     icon: Tag,
-    label: "Atributos",
+    label: "Características de alunos",
     path: "/settings/attributes",
   },
 ];

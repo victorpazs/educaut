@@ -67,7 +67,7 @@ export function createErrorResponse(
   return {
     success: false,
     status,
-    message,
+    message: details?.[0]?.message || message,
     error: {
       code: errorCode,
       ...(details && { details }),

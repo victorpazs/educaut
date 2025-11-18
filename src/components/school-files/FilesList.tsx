@@ -7,8 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyList } from "@/components/empty-list";
 import { FileQuestion } from "lucide-react";
 import { FileCell } from "./FileCell";
+import UploadDropzone from "./Upload/Dropzone";
 
-export function FilesList() {
+type FilesListProps = {
+  fileTypes?: string[];
+};
+
+export function FilesList({ fileTypes }: FilesListProps) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [files, setFiles] = React.useState<ISchoolFile[]>([]);
 
@@ -42,18 +47,11 @@ export function FilesList() {
     );
   }
 
-  if (!files.length) {
-    return (
-      <EmptyList
-        title="Nenhum arquivo encontrado"
-        description="Os arquivos da escola aparecerão aqui quando forem enviados."
-        icon={FileQuestion}
-      />
-    );
-  }
-
   return (
     <div className="divide-y">
+      <div className="space-y-4 px-6">
+        <UploadDropzone fileTypes={fileTypes} />
+      </div>
       {files.map((file) => (
         <FileCell key={file.id} file={file} />
       ))}

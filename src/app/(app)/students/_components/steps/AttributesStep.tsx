@@ -53,7 +53,7 @@ export function AttributesStep({
         onRemove={handleRemove}
         selectedValues={formData.student_attributes ?? []}
         disabled={isCreating}
-        placeholder={`Selecionar ${getAttributeLabel(
+        placeholder={`Selecione um(a) ou mais ${getAttributeLabel(
           attributeType
         )?.toLowerCase()}...`}
         buttonClassName="w-full font-normal! justify-between!"
@@ -96,7 +96,7 @@ export function AttributesStep({
               label={attribute.label}
               variant={"outlined"}
               size="sm"
-              className="text-sm min-w-64 justify-start! text-muted-foreground"
+              className="text-sm justify-start! text-muted-foreground"
               endIcon={
                 <X
                   className="text-secondary cursor-pointer size-3 ml-auto"

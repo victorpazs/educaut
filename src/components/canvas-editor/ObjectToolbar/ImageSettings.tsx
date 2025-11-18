@@ -26,6 +26,7 @@ export default function ImageSettings({ object }: ImageSettingsProps) {
   return (
     <div className="flex items-center gap-2">
       <SchoolFilesDialog
+        fileTypes={["png", "jpg", "jpeg", "webp", "svg"]}
         trigger={
           <IconButton
             title="Trocar imagem"
