@@ -22,7 +22,7 @@ export default function AttributesSettingsPage() {
 
   return (
     <ContentCard
-      title="Características de alunos"
+      title="Atributos de alunos"
       actions={
         <CreateAttributeDialog
           attributeTypes={attributeTypes ?? []}

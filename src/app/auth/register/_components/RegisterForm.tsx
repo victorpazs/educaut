@@ -60,9 +60,9 @@ export default function RegisterForm() {
   );
 
   return (
-    <div className="w-full space-y-6">
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div className="space-y-2">
+    <div className="w-full space-y-4">
+      <form className="space-y-3" onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="space-y-1">
           <label
             htmlFor="name"
             className="block text-sm font-medium text-foreground"
@@ -75,7 +75,6 @@ export default function RegisterForm() {
             type="text"
             autoComplete="name"
             placeholder="Seu nome completo"
-            className="h-12 bg-background border-border focus:border-primary focus:ring-primary"
             {...register("name")}
           />
           {errors.name?.message ? (
@@ -83,7 +82,7 @@ export default function RegisterForm() {
           ) : null}
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <label
             htmlFor="schoolName"
             className="block text-sm font-medium text-foreground"
@@ -96,7 +95,6 @@ export default function RegisterForm() {
             type="text"
             autoComplete="organization"
             placeholder="Nome da escola"
-            className="h-12 bg-background border-border focus:border-primary focus:ring-primary"
             {...register("schoolName")}
           />
           {errors.schoolName?.message ? (
@@ -104,14 +102,12 @@ export default function RegisterForm() {
           ) : null}
         </div>
 
-        {/* Email Field */}
         <EmailInput
           placeholder="seu.email@exemplo.com"
           error={errors.email?.message}
           {...register("email")}
         />
 
-        {/* Password Field */}
         <PasswordInput
           label="Senha"
           error={errors.password?.message}
@@ -126,17 +122,15 @@ export default function RegisterForm() {
           {...register("confirm")}
         />
 
-        {/* Register Button */}
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+          className="w-full py-6! bg-primary hover:opacity-80 text-lg text-primary-foreground mt-4 font-medium"
         >
           {isSubmitting ? "Criando conta..." : "Criar conta"}
         </Button>
       </form>
 
-      {/* Already have account */}
       <div className="text-center">
         <span className="text-sm text-secondary">Já tem uma conta? </span>
         <Link

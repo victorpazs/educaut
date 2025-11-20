@@ -51,7 +51,7 @@ export function UserMenu() {
       href: "/settings",
     },
     {
-      label: "Características de alunos",
+      label: "Atributos de alunos",
       icon: Tag,
       href: "/settings/attributes",
     },

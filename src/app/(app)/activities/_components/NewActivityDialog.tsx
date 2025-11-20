@@ -103,15 +103,10 @@ export function NewActivityDialog({
           />
         </div>
         <DialogFooter>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={handleClose}
-            disabled={creating}
-          >
+          <Button variant="ghost" onClick={handleClose} disabled={creating}>
             Cancelar
           </Button>
-          <Button size="sm" onClick={handleCreate} disabled={creating}>
+          <Button onClick={handleCreate} disabled={creating}>
             {creating ? "Criando..." : "Criar"}
           </Button>
         </DialogFooter>

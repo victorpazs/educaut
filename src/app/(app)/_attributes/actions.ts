@@ -67,7 +67,7 @@ export const getAttributesByType = cache(
           attributesByType: groupedAttributes,
           attributeTypes: normalizedAttributeTypes,
         },
-        "Características de alunos carregados com sucesso."
+        "Atributos de alunos carregados com sucesso."
       );
     } catch (error) {
       return handleServerError(error);

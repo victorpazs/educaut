@@ -105,10 +105,10 @@ export function EditActivityDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button size="sm" disabled={!formName?.trim()} onClick={handleSave}>
+          <Button disabled={!formName?.trim()} onClick={handleSave}>
             Salvar
           </Button>
         </DialogFooter>

@@ -49,10 +49,9 @@ export default function LoginForm() {
     }
   });
 
-
   return (
     <div className="w-full space-y-6">
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form className="space-y-3" onSubmit={handleSubmit(onSubmit)} noValidate>
         <EmailInput error={errors.email?.message} {...register("email")} />
 
         <PasswordInput
@@ -63,7 +62,7 @@ export default function LoginForm() {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+          className="w-full py-6! bg-primary hover:opacity-80 text-lg mt-4 text-primary-foreground font-medium"
         >
           {isSubmitting ? "Entrando..." : "Entrar"}
         </Button>

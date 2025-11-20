@@ -16,7 +16,7 @@ export function TabsWrapper() {
       icon: School,
     },
     {
-      label: "Características de alunos",
+      label: "Atributos de alunos",
       href: "/settings/attributes",
       icon: Tags,
     },

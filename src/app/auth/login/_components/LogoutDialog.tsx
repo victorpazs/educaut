@@ -44,16 +44,10 @@ export function LogoutDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onClose}
-              disabled={isLoggingOut}
-            >
+            <Button variant="outline" onClick={onClose} disabled={isLoggingOut}>
               Não
             </Button>
             <Button
-              size="sm"
               variant="default"
               onClick={handleConfirmLogout}
               disabled={isLoggingOut}

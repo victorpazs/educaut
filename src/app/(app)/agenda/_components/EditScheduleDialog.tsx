@@ -159,7 +159,6 @@ export function EditScheduleDialog({
 
           <DialogFooter>
             <Button
-              size="sm"
               variant="destructive"
               onClick={() => setOpenDelete(true)}
               disabled={loading || saving}
@@ -168,7 +167,6 @@ export function EditScheduleDialog({
               Excluir aula
             </Button>
             <Button
-              size="sm"
               onClick={handleSave}
               disabled={!canSave || loading || saving}
             >

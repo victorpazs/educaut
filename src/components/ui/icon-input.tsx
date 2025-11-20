@@ -66,7 +66,7 @@ export const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
     const sizeConfig = sizes[size];
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-1">
         {label && (
           <label
             htmlFor={inputId}

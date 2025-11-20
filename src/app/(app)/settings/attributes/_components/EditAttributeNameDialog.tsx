@@ -90,7 +90,6 @@ export function EditAttributeNameDialog({
           </div>
           <DialogFooter>
             <Button
-              size="sm"
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
@@ -98,11 +97,7 @@ export function EditAttributeNameDialog({
             >
               Cancelar
             </Button>
-            <Button
-              size="sm"
-              type="submit"
-              disabled={isSubmitting || !name.trim()}
-            >
+            <Button type="submit" disabled={isSubmitting || !name.trim()}>
               Salvar
             </Button>
           </DialogFooter>

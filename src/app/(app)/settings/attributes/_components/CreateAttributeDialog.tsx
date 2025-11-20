@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -126,7 +132,6 @@ export function CreateAttributeDialog({
           </div>
           <DialogFooter>
             <Button
-              size="sm"
               type="button"
               variant="ghost"
               onClick={() => setOpen(false)}
@@ -135,7 +140,6 @@ export function CreateAttributeDialog({
               Cancelar
             </Button>
             <Button
-              size="sm"
               type="submit"
               disabled={
                 isSubmitting ||
