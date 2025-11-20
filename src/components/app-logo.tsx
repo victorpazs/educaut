@@ -12,6 +12,7 @@ export function AppLogo({ className }: { className?: string }) {
       src="/app-logo.png"
       width={52}
       height={52}
+      unoptimized
       alt="App Logo"
     />
   );
