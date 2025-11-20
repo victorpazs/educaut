@@ -8,6 +8,7 @@ import { EmptyList } from "@/components/empty-list";
 import { FileQuestion } from "lucide-react";
 import { FileCell } from "./FileCell";
 import UploadDropzone from "./Upload/Dropzone";
+import { PageLoader } from "../page-loader";
 
 type FilesListProps = {
   fileTypes?: string[];
@@ -37,21 +38,16 @@ export function FilesList({ fileTypes }: FilesListProps) {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    );
-  }
-
   return (
     <div className="divide-y">
       <div className="space-y-4 px-6">
         <UploadDropzone fileTypes={fileTypes} />
       </div>
+      {isLoading ? (
+        <div className="space-y-3">
+          <PageLoader />
+        </div>
+      ) : null}
       {files.map((file) => (
         <FileCell key={file.id} file={file} />
       ))}

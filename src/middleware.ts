@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/jwt";
 import { homeRoute, loginRoute } from "./lib/contraints";
 
-const publicPaths = [loginRoute, "/auth/register"];
+const publicPaths = [loginRoute, "/auth/register", "/auth/logout"];
+const publicPathsRedirectingAuthenticated = [loginRoute, "/auth/register"];
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
@@ -13,18 +14,30 @@ export async function middleware(req: NextRequest) {
   );
 
   if (isPublic) {
-    if (!!token) {
+    const shouldRedirectHome = publicPathsRedirectingAuthenticated.some(
+      (path) => req.nextUrl.pathname.startsWith(path)
+    );
+
+    if (shouldRedirectHome && !!token) {
       return NextResponse.redirect(new URL(homeRoute, req.url));
-    } else return NextResponse.next();
+    }
+
+    return NextResponse.next();
   }
   if (!token) {
-    return NextResponse.redirect(new URL(loginRoute, req.url));
+    const response = NextResponse.redirect(new URL(loginRoute, req.url));
+    response.cookies.delete("token");
+    response.cookies.delete("selected_school");
+    return response;
   }
 
   const payload = await verifyJwt(token);
 
   if (!payload || !payload.success || !payload.data) {
-    return NextResponse.redirect(new URL(loginRoute, req.url));
+    const response = NextResponse.redirect(new URL(loginRoute, req.url));
+    response.cookies.delete("token");
+    response.cookies.delete("selected_school");
+    return response;
   }
 
   return NextResponse.next();

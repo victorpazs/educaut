@@ -10,7 +10,6 @@ import FontSizeInput from "./Components/FontSizeInput";
 import FontStyleButtons from "./Components/FontStyleButtons";
 import TextAlignTabs from "./Components/TextAlignTabs";
 import IconButton from "../../ui/icon-button";
-import { Separator } from "@/components/ui/separator";
 
 type TextSettingsProps = {
   object: any;

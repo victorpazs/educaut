@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/app/auth/actions";
+import { loginRoute } from "@/lib/contraints";
 
 export function LogoutDialog({
   onClose,
@@ -21,13 +23,15 @@ export function LogoutDialog({
   open: boolean;
 }) {
   const [isLoggingOut, startLogoutTransition] = useTransition();
+  const router = useRouter();
 
   const handleConfirmLogout = useCallback(() => {
     startLogoutTransition(async () => {
       await logoutAction();
+      router.replace(loginRoute);
       onClose();
     });
-  }, []);
+  }, [router, onClose]);
 
   return (
     <>

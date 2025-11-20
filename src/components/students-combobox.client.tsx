@@ -42,19 +42,21 @@ export function StudentComboboxClient({
         buttonClassName
       )}
       className={className}
-      renderEmpty={(query) => (
-        <Button
-          size="sm"
-          className="w-full px-2! font-normal! justify-between! "
-          variant="ghost"
-          onClick={() => {
-            router.push("/students/create");
-          }}
-        >
-          Criar aluno &quot;{query}&quot;
-          <ExternalLink className="h-4 w-4" />{" "}
-        </Button>
-      )}
+      renderEmpty={(query) =>
+        query ? (
+          <Button
+            size="sm"
+            className="w-full px-2! font-normal! justify-between! "
+            variant="ghost"
+            onClick={() => {
+              router.push("/students/create");
+            }}
+          >
+            Criar aluno &quot;{query}&quot;
+            <ExternalLink className="h-4 w-4" />{" "}
+          </Button>
+        ) : null
+      }
     />
   );
 }

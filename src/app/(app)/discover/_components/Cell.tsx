@@ -19,7 +19,7 @@ export function DiscoverCell({ activity }: { activity: IPublicActivity }) {
   const [openImportDialog, setOpenImportDialog] = React.useState(false);
 
   const canvasInitialState = React.useMemo<IActivityContent["data"]>(() => {
-    const content = activity?.content as any;
+    const content = activity?.content as unknown;
     if (
       content &&
       typeof content === "object" &&

@@ -4,7 +4,7 @@ import { Sidebar } from "./nav/sidebar";
 import { BottomNav } from "./nav/bottom-nav";
 import { Suspense } from "react";
 import { PageLoader } from "@/components/page-loader";
-import { SearchModal } from "./nav/search/search-modal";
+import { SearchModal } from "./search/search-modal";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (

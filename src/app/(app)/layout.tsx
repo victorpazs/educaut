@@ -1,21 +1,18 @@
 import * as React from "react";
 import { AppShell } from "@/components/app-shell";
-import { getAuthContext } from "@/lib/session";
-import { SessionProvider } from "@/providers/session-provider";
 import { AppProviders } from "@/providers/app-providers";
+import { AuthProvider } from "@/providers/auth";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, school } = await getAuthContext();
-
   return (
-    <SessionProvider value={{ user, school }}>
+    <AuthProvider>
       <AppProviders>
         <AppShell>{children}</AppShell>
       </AppProviders>
-    </SessionProvider>
+    </AuthProvider>
   );
 }

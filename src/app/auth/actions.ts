@@ -9,7 +9,6 @@ import {
   setAuthCookie,
   setSchoolCookie,
 } from "@/lib/cookies";
-import { redirect } from "next/navigation";
 import {
   createErrorResponse,
   createAuthError,
@@ -237,5 +236,5 @@ export async function logoutAction() {
     );
   }
 
-  redirect("/auth/login");
+  return createSuccessResponse("Logout realizado com sucesso.");
 }

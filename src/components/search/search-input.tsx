@@ -20,17 +20,16 @@ const SearchInput = ({
   onClose,
 }: SearchInputProps) => {
   return (
-    <div className="flex mt-1 flex-col">
-      <SearchInputComponent
-        autoFocus
-        showClearButton={true}
-        value={searchText}
-        className="grow bg-transparent text-sm placeholder:text-gray-500 border-primary! shadow-none! outline-none"
-        placeholder="Busca inteligente"
-        onChange={(e) => setSearchText(e.target.value)}
-        onClear={onClose}
-      />
-    </div>
+    <SearchInputComponent
+      autoFocus
+      showClearButton={true}
+      size="lg"
+      value={searchText}
+      className="grow bg-transparent text-lg! placeholder:text-gray-500 border-primary! shadow-none! outline-none! ring-0! border-none! rounded-3xl"
+      placeholder="Busca inteligente"
+      onChange={(e) => setSearchText(e.target.value)}
+      onClear={onClose}
+    />
   );
 };
 

@@ -19,7 +19,7 @@ model attributes {
   type_id            Int
   name               String               @db.VarChar(150)
   school_id          Int?                 @default(0)
-  attribute_types    attribute_types      @relation(fields: [type_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  attribute_types    attribute_types      @relation(fields: [type_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_attributes_type")
   student_attributes student_attributes[]
 
   @@unique([type_id, name, school_id], map: "attributes_type_id_name_school_key")
@@ -31,8 +31,8 @@ model school_users {
   user_id    Int
   role       String    @db.VarChar(50)
   created_at DateTime? @default(now()) @db.Timestamp(6)
-  schools    schools   @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  schools    schools   @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_school_users_school")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_school_users_user")
 
   @@unique([school_id, user_id])
 }
@@ -41,23 +41,23 @@ model schools {
   id           Int            @id @default(autoincrement())
   created_by   Int
   name         String         @db.VarChar(150)
-  created_at   DateTime?      @default(now()) @db.Timestamp(6)
+  created_at   DateTime?      @default(now()) @db.Timestamptz(6)
   status       Int?           @default(1)
   activities   activities[]
   files        files[]
   schedules    schedules[]
   school_users school_users[]
-  users        users          @relation(fields: [created_by], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users        users          @relation(fields: [created_by], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_schools_user")
   students     students[]
 }
 
 model student_attributes {
   student_id   Int
   attribute_id Int
-  attributes   attributes @relation(fields: [attribute_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  students     students   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  attributes   attributes @relation(fields: [attribute_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_student_attributes_attribute")
+  students     students   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_student_attributes_student")
 
-  @@id([student_id, attribute_id])
+  @@id([student_id, attribute_id], map: "pk_student_attributes")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -67,7 +67,7 @@ model students {
   name               String               @db.VarChar(100)
   school_segment     String?              @db.VarChar(50)
   description        String?
-  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
   status             Int?                 @default(1)
   school_year        Int?
   tea_support_level  Int?
@@ -75,7 +75,7 @@ model students {
   birthday           DateTime?            @db.Timestamptz(6)
   schedules          schedules[]
   student_attributes student_attributes[]
-  schools            schools              @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  schools            schools              @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_students_school")
 }
 
 model users {
@@ -99,8 +99,8 @@ model schedules {
   end_time             DateTime               @db.Timestamptz(6)
   created_at           DateTime?              @default(now()) @db.Timestamptz(6)
   status               Int?                   @default(1)
-  schools              schools                @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  students             students               @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  schools              schools                @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_schedules_school")
+  students             students               @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_schedules_student")
   schedules_activities schedules_activities[]
 }
 
@@ -127,7 +127,7 @@ model schedules_activities {
   activities  activities @relation(fields: [activity_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_activity")
   schedules   schedules  @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_schedule")
 
-  @@id([schedule_id, activity_id])
+  @@id([schedule_id, activity_id], map: "pk_schedules_activities")
 }
 
 model files {
@@ -139,4 +139,9 @@ model files {
   status     Int?      @default(1)
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   schools    schools   @relation(fields: [school_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_files_school")
+}
+
+model activity_tags {
+  tag   String @unique @db.VarChar(50)
+  label String @unique @db.VarChar(100)
 }

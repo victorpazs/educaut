@@ -65,7 +65,14 @@ export function UploadDropzone({
   );
 
   return (
-    <Upload accept={accept} {...props}>
+    <Upload
+      accept={accept}
+      {...props}
+      multiple={false}
+      maxFiles={1}
+      noClick
+      noKeyboard
+    >
       {(state) => {
         if (typeof children === "function") {
           return children(state);
@@ -111,18 +118,6 @@ export function UploadDropzone({
               ) : (
                 ""
               )}
-            </div>
-            <div className="mt-2">
-              <Button
-                size="sm"
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  state.open();
-                }}
-              >
-                Selecionar arquivo
-              </Button>
             </div>
           </div>
         );
