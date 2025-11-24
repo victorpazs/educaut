@@ -2,7 +2,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
-  variant?: "default" | "secondary" | "outline" | "success" | "warning";
+  variant?:
+    | "default"
+    | "secondary"
+    | "outline"
+    | "success"
+    | "warning"
+    | "danger";
 };
 
 export function Badge({
@@ -16,6 +22,7 @@ export function Badge({
     outline: "border border-border",
     success: "bg-emerald-600 text-white",
     warning: "bg-amber-500 text-white",
+    danger: "bg-red-600 text-white",
   };
   return (
     <span

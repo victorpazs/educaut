@@ -44,7 +44,7 @@ export function BirthdayPicker({
             id={id}
             className={
               buttonClassName ||
-              "text-start flex w-full justify-between font-normal! h-9"
+              "text-start flex w-full justify-between font-normal! h-9!"
             }
           >
             {value ? value.toLocaleDateString() : "Selecionar data"}

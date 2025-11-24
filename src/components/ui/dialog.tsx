@@ -15,6 +15,7 @@ export interface DialogContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
   onClose?: () => void;
   hideCloseButton?: boolean;
+  mobileTop?: boolean;
 }
 
 export interface DialogTriggerProps
@@ -75,6 +76,7 @@ export function DialogContent({
   children,
   onClose,
   hideCloseButton = false,
+  mobileTop = false,
   ...props
 }: DialogContentProps) {
   const { open, onOpenChange } = React.useContext(DialogContext);
@@ -132,7 +134,10 @@ export function DialogContent({
   return createPortal(
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center",
+        "fixed inset-0 z-50 flex",
+        mobileTop
+          ? "items-start justify-center pt-4 md:items-center md:pt-0"
+          : "items-center justify-center",
         "transition-opacity duration-200 ease-out",
         isClosing ? "opacity-0" : "opacity-100"
       )}

@@ -181,6 +181,7 @@ type CreateScheduleInput = {
   start: Date | string;
   end: Date | string;
   studentId: number;
+  activityIds?: number[];
 };
 
 export async function createScheduleAction(
@@ -251,7 +252,6 @@ export async function createScheduleAction(
       );
     }
 
-    // Idempotência básica por payload: se já existir um agendamento idêntico ativo, retorna o existente
     const existingSame = await prisma.schedules.findFirst({
       where: {
         school_id: schoolId,
@@ -275,28 +275,42 @@ export async function createScheduleAction(
       return createSuccessResponse(existingSame, "Aula criada com sucesso.");
     }
 
-    const created = await prisma.schedules.create({
-      data: {
-        school_id: schoolId,
-        student_id: input.studentId,
-        title,
-        description: input.description ?? null,
-        start_time: startDate,
-        end_time: endDate,
-        status: 1,
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        start_time: true,
-        end_time: true,
-        status: true,
-        student_id: true,
-        students: {
-          select: { id: true, name: true, status: true },
+    const created = await prisma.$transaction(async (tx) => {
+      const schedule = await tx.schedules.create({
+        data: {
+          school_id: schoolId,
+          student_id: input.studentId,
+          title,
+          description: input.description ?? null,
+          start_time: startDate,
+          end_time: endDate,
+          status: 1,
         },
-      },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          start_time: true,
+          end_time: true,
+          status: true,
+          student_id: true,
+          students: {
+            select: { id: true, name: true, status: true },
+          },
+        },
+      });
+
+      if (input.activityIds && input.activityIds.length > 0) {
+        await tx.schedules_activities.createMany({
+          data: input.activityIds.map((activity_id) => ({
+            schedule_id: schedule.id,
+            activity_id,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      return schedule;
     });
 
     return createSuccessResponse(created, "Aula criada com sucesso.");
@@ -311,6 +325,8 @@ type UpdateScheduleInput = {
   description?: string;
   start: Date | string;
   end: Date | string;
+  studentId: number;
+  activityIds?: number[];
 };
 
 export async function updateScheduleAction(
@@ -381,29 +397,114 @@ export async function updateScheduleAction(
       );
     }
 
-    const updated = await prisma.schedules.update({
-      where: { id: input.id },
-      data: {
-        title,
-        description: input.description ?? null,
-        start_time: startDate,
-        end_time: endDate,
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        start_time: true,
-        end_time: true,
-        status: true,
-        student_id: true,
-        students: {
-          select: { id: true, name: true, status: true },
+    if (!input.studentId || isNaN(Number(input.studentId))) {
+      return createErrorResponse(
+        "Selecione um aluno válido.",
+        "VALIDATION_ERROR",
+        400
+      );
+    }
+
+    const student = await prisma.students.findFirst({
+      where: { id: input.studentId, school_id: schoolId, status: 1 },
+      select: { id: true },
+    });
+    if (!student) {
+      return createErrorResponse(
+        "Aluno inválido para a escola selecionada.",
+        "VALIDATION_ERROR",
+        400
+      );
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const schedule = await tx.schedules.update({
+        where: { id: input.id },
+        data: {
+          student_id: input.studentId,
+          title,
+          description: input.description ?? null,
+          start_time: startDate,
+          end_time: endDate,
         },
-      },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          start_time: true,
+          end_time: true,
+          status: true,
+          student_id: true,
+          students: {
+            select: { id: true, name: true, status: true },
+          },
+        },
+      });
+
+      // Remove existing activities
+      await tx.schedules_activities.deleteMany({
+        where: { schedule_id: input.id },
+      });
+
+      // Add new activities
+      if (input.activityIds && input.activityIds.length > 0) {
+        await tx.schedules_activities.createMany({
+          data: input.activityIds.map((activity_id) => ({
+            schedule_id: input.id,
+            activity_id,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
+      return schedule;
     });
 
     return createSuccessResponse(updated, "Aula atualizada com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export async function getScheduleActivities(
+  scheduleId: number
+): Promise<ApiResponse<number[] | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const schedule = await prisma.schedules.findFirst({
+      where: {
+        id: scheduleId,
+        school_id: schoolId,
+        status: 1,
+      },
+      select: { id: true },
+    });
+
+    if (!schedule) {
+      return createErrorResponse("Aula não encontrada.", "NOT_FOUND", 404);
+    }
+
+    const activities = await prisma.schedules_activities.findMany({
+      where: { schedule_id: scheduleId },
+      select: { activity_id: true },
+    });
+
+    const activityIds = activities.map((a) => a.activity_id);
+
+    return createSuccessResponse(
+      activityIds,
+      "Atividades carregadas com sucesso."
+    );
   } catch (error) {
     return handleServerError(error);
   }

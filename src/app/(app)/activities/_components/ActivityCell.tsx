@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import CanvasEditor from "@/components/canvas-editor";
+import { CanvasPreview } from "@/components/canvas-preview";
 import { ActivitiesTags } from "@/components/activities_tags";
 
 import type { IActivity, IActivityContent } from "../_models";
@@ -26,7 +26,7 @@ interface ActivityCellProps {
 export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const router = useRouter();
-  const canvasInitialState = React.useMemo<IActivityContent["data"]>(() => {
+  const canvasData = React.useMemo<IActivityContent["data"] | null>(() => {
     const content = activity?.content;
     if (
       content &&
@@ -36,15 +36,8 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
     ) {
       return (content as { data: IActivityContent["data"] }).data;
     }
-    return {
-      version: "6.9.0",
-      objects: [],
-      background: "#ffffff",
-    };
+    return null;
   }, [activity?.content]);
-
-  const backgroundColor: string =
-    (canvasInitialState?.background as string) || "#ffffff";
 
   const handleDelete = async (id: number) => {
     setOpenDeleteDialog(false);
@@ -58,21 +51,15 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   };
   return (
     <Card
-      className="overflow-hidden bg-background outline h-full outline-border hover:shadow-sm transition-shadow"
+      className="bg-background outline h-full outline-border hover:shadow-sm transition-shadow flex flex-col"
       onClick={onClick}
     >
-      <div className="w-full p-4">
-        <CanvasEditor
-          initialState={canvasInitialState}
-          height={180}
-          fullWidth
-          backgroundColor={backgroundColor}
-          preview
-        >
-          <CanvasEditor.Canvas />
-        </CanvasEditor>
+      <div className="w-full p-4 shrink-0">
+        <div className="w-full h-[180px] rounded-lg overflow-hidden bg-muted">
+          {canvasData ? <CanvasPreview data={canvasData} /> : null}
+        </div>
       </div>
-      <CardContent className="pt-4">
+      <CardContent className="pt-4 shrink-0">
         <div className="space-y-2 flex items-center justify-between gap-2">
           <div className="flex flex-col gap-2 items-start">
             <div className="text-sm font-medium truncate" title={activity.name}>

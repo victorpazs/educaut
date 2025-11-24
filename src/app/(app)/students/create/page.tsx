@@ -21,7 +21,7 @@ export default function CreateStudentPage() {
     name: "",
     birthday: new Date(),
     school_year: 1,
-    school_segment: "",
+    school_segment: "Educação Infantil",
     tea_support_level: null,
     non_verbal: null,
     description: "",

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getAuthContext } from "@/lib/session";
+import { revalidatePath } from "next/cache";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -203,6 +204,8 @@ export async function deleteStudentAction(
       where: { id: Number(studentId), school_id: schoolId, status: { not: 3 } },
       data: { status: 3 },
     });
+
+    revalidatePath("/students");
 
     return createSuccessResponse(
       { id: Number(studentId) },

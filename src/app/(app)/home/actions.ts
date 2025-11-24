@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getAuthContext } from "@/lib/session";
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -8,7 +9,7 @@ import {
   type ApiResponse,
 } from "@/lib/server-responses";
 
-import type { IInsights } from "./_models";
+import type { IInsights, ICurrentClass } from "./_models";
 
 interface GetInsightsParams {
   schoolId?: number | null;
@@ -71,6 +72,75 @@ export async function getInsights({
     };
 
     return createSuccessResponse(insights, "Insights carregados com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export async function getCurrentClass(): Promise<
+  ApiResponse<ICurrentClass | null>
+> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "No school selected.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const now = new Date();
+
+    const currentSchedule = await prisma.schedules.findFirst({
+      where: {
+        school_id: schoolId,
+        status: 1,
+        start_time: {
+          lte: now,
+        },
+        end_time: {
+          gte: now,
+        },
+        students: {
+          status: 1,
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        start_time: true,
+        end_time: true,
+        students: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        start_time: "asc",
+      },
+    });
+
+    if (!currentSchedule) {
+      return createSuccessResponse(null, "No ongoing class found.");
+    }
+
+    return createSuccessResponse(
+      {
+        id: currentSchedule.id,
+        title: currentSchedule.title ?? "Untitled class",
+        description: currentSchedule.description,
+        startTime: currentSchedule.start_time,
+        endTime: currentSchedule.end_time,
+        student: currentSchedule.students,
+      },
+      "Current class found."
+    );
   } catch (error) {
     return handleServerError(error);
   }

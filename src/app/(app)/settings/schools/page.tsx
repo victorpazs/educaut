@@ -25,7 +25,7 @@ export default function SettingsSchoolsPage() {
   return (
     <ContentCard
       actions={
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end flex-wrap gap-3">
           <SearchInput
             size="sm"
             placeholder="Buscar escolas..."

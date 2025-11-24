@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { QuickAccess } from "./_components/QuickAccess";
 import { HomeTotalizers } from "./_components/HomeTotalizers";
 import { HomeAgenda } from "./_components/HomeAgenda";
+import { CurrentClass } from "./_components/CurrentClass";
 
 export default function DashboardPage() {
   return (
@@ -19,7 +20,8 @@ export default function DashboardPage() {
         <div className="col-span-12 md:col-span-8 lg:col-span-9">
           <div className="grid grid-cols-12 gap-4">
             <HomeTotalizers />
-            <div className="col-span-12 md:hidden">
+            <div className="col-span-12 md:hidden flex flex-col gap-3">
+              <CurrentClass />
               <QuickAccess />
             </div>
 
@@ -27,7 +29,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="hidden md:block col-span-12 md:col-span-4 lg:col-span-3">
+        <div className="hidden md:flex col-span-12 md:col-span-4 lg:col-span-3 flex-col gap-3">
+          <CurrentClass />
           <QuickAccess />
         </div>
       </div>

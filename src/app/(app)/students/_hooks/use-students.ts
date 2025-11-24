@@ -1,83 +1,64 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useSession } from "@/hooks/useSession";
+import { useServerList } from "@/hooks/useServerList";
 import { toast } from "@/lib/toast";
 
 import type { IStudent } from "../_models";
-import { getStudents } from "../actions";
+import { getStudents, deleteStudentAction } from "../actions";
 
 interface UseStudentsResult {
   students: IStudent[];
   isLoading: boolean;
   hasError: boolean;
   hasSchool: boolean;
+  removeLocal: (id: number) => void;
+  refetch: () => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
 }
 
 export function useStudents(search: string): UseStudentsResult {
   const { school } = useSession();
 
-  const [students, setStudents] = useState<IStudent[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [hasError, setHasError] = useState<boolean>(false);
-  const requestCounter = useRef(0);
+  const { data, isLoading, errorMsg, fetch, onRemove } = useServerList<
+    IStudent,
+    { search: string }
+  >({
+    fetcher: getStudents,
+    params: useMemo(() => ({ search }), [search]),
+    deps: [school?.id, search],
+    enabled: Boolean(school?.id),
+    errorMessage: "Não foi possível carregar os alunos.",
+  });
 
-  useEffect(() => {
-    if (!school?.id) {
-      setStudents([]);
-      setIsLoading(false);
-      setHasError(false);
-      return;
-    }
-
-    let isMounted = true;
-    const currentRequest = requestCounter.current + 1;
-    requestCounter.current = currentRequest;
-
-    const loadStudents = async () => {
-      setIsLoading(true);
-      setHasError(false);
+  const onDelete = useCallback(
+    async (id: number) => {
+      onRemove(id);
 
       try {
-        const response = await getStudents({
-          search,
-        });
+        const response = await deleteStudentAction(id);
 
-        if (isMounted && requestCounter.current === currentRequest) {
-          if (response.success) {
-            setStudents(response.data ?? []);
-            setHasError(false);
-          } else {
-            setStudents([]);
-            setHasError(true);
-            toast.error(response.message);
-          }
+        if (response.success) {
+          toast.success("Aluno excluído com sucesso.");
+        } else {
+          toast.error(response.message || "Não foi possível excluir o aluno.");
         }
       } catch (err) {
-        if (isMounted && requestCounter.current === currentRequest) {
-          toast.error("Não foi possível carregar os alunos.");
-          setHasError(true);
-          setStudents([]);
-        }
-      } finally {
-        if (isMounted && requestCounter.current === currentRequest) {
-          setIsLoading(false);
-        }
+        toast.error("Não foi possível excluir o aluno.");
       }
-    };
-
-    loadStudents();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [school?.id, search]);
+    },
+    [onRemove]
+  );
 
   return {
-    students,
+    students: data,
     isLoading,
-    hasError,
+    hasError: errorMsg !== null,
     hasSchool: Boolean(school?.id),
+    removeLocal: (id: number) => onRemove(id),
+    refetch: fetch,
+    onDelete,
   };
 }

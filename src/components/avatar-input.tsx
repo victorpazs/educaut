@@ -111,7 +111,7 @@ export function AvatarInput({
 
   return (
     <div
-      className={cn("flex items-center justify-center h-full gap-4", className)}
+      className={cn("flex flex-col items-center justify-center h-full gap-4", className)}
     >
       <input
         ref={fileInputRef}
@@ -153,21 +153,17 @@ export function AvatarInput({
           </span>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
-          {preview ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={handleRemove}
-              disabled={disabled || isLoading}
-            >
-              Remover
-            </Button>
-          ) : null}
-        </div>
-      </div>
+      {preview ? (
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={handleRemove}
+          disabled={disabled || isLoading}
+        >
+          Remover
+        </Button>
+      ) : null}
     </div>
   );
 }

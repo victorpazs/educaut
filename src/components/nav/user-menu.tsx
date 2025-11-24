@@ -6,7 +6,7 @@ import {
   Settings,
   Tag,
 } from "lucide-react";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { Avatar } from "../ui/avatar";
 import {
   DropdownMenu,
@@ -16,10 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useSession } from "@/hooks/useSession";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogoutDialog } from "@/app/auth/login/_components/LogoutDialog";
-import { Button } from "../ui/button";
 import { SchoolsSelector } from "./schools-selector";
 
 export function UserMenu() {
@@ -46,14 +44,14 @@ export function UserMenu() {
       href: "/settings/schools",
     },
     {
-      label: "Configurações",
-      icon: Settings,
-      href: "/settings",
-    },
-    {
       label: "Atributos de alunos",
       icon: Tag,
       href: "/settings/attributes",
+    },
+    {
+      label: "Configurações",
+      icon: Settings,
+      href: "/settings",
     },
   ];
 
@@ -66,7 +64,7 @@ export function UserMenu() {
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <Avatar className="h-8 w-8" fallback="VP" />
+            <Avatar src={user?.avatar} className="h-8 w-8" fallback="VP" />
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
         </DropdownMenuTrigger>

@@ -7,8 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { PageLoader } from "@/components/page-loader";
-// removed select-based view switcher
-import { toast } from "@/lib/toast";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -24,8 +22,6 @@ import type {
 } from "@fullcalendar/core";
 
 import { useAgenda } from "../_hooks/use-agenda";
-import { NewScheduleDialog } from "./NewScheduleDialog";
-import { createScheduleAction } from "../actions";
 
 import "./calendar-styles.css";
 import { cn } from "@/lib/utils";
@@ -52,11 +48,6 @@ export function SchoolAgenda({
   const [currentView, setCurrentView] =
     useState<FullCalendarView>("dayGridMonth");
   const [calendarTitle, setCalendarTitle] = useState<string>("");
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date;
-    end: Date;
-  } | null>(null);
   const fcEvents: EventSourceInput = useMemo(() => {
     return events.map((e) => ({
       id: String(e.id),
@@ -184,8 +175,10 @@ export function SchoolAgenda({
                   nowIndicator={true}
                   events={fcEvents ?? []}
                   select={(info: DateSelectArg) => {
-                    setSelectedRange({ start: info.start, end: info.end });
-                    setDialogOpen(true);
+                    const params = new URLSearchParams();
+                    params.set("start", info.start.toISOString());
+                    params.set("end", info.end.toISOString());
+                    router.push(`/agenda/create?${params.toString()}`);
                   }}
                   eventClick={(clickInfo: EventClickArg) => {
                     const params = new URLSearchParams(searchParams.toString());
@@ -226,28 +219,6 @@ export function SchoolAgenda({
           </div>
         )}
       </Card>
-      <NewScheduleDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onSave={async (data) => {
-          const result = await createScheduleAction({
-            title: data.title,
-            description: data.description,
-            start: data.start,
-            end: data.end,
-            studentId: data.studentId,
-          });
-          if (!result.success) {
-            toast.error(result.message || "Não foi possível criar a aula.");
-            return;
-          }
-          toast.success("Aula criada com sucesso.");
-          setDialogOpen(false);
-          refetch();
-        }}
-        start={selectedRange?.start ?? new Date()}
-        end={selectedRange?.end ?? new Date()}
-      />
     </>
   );
 }

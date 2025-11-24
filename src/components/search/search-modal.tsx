@@ -23,6 +23,7 @@ export function SearchModal() {
             : ""
         )}
         hideCloseButton={true}
+        mobileTop={true}
       >
         <div className="w-full flex flex-col">
           <div className="w-full">

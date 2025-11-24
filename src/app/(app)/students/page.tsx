@@ -17,7 +17,8 @@ import { StudentsList } from "./_components/List";
 
 export default function StudentsPage() {
   const [search, setSearch] = React.useState("");
-  const { students, isLoading, hasError, hasSchool } = useStudents(search);
+  const { students, isLoading, hasError, hasSchool, onDelete } =
+    useStudents(search);
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -70,7 +71,7 @@ export default function StudentsPage() {
             />
           ) : (
             <Card className="rounded-sm">
-              <StudentsList students={students} />
+              <StudentsList students={students} onDelete={onDelete} />
             </Card>
           )}
         </div>

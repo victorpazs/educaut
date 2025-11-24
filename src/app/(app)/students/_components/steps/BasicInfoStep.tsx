@@ -105,7 +105,6 @@ export function BasicInfoStep({
             value={formData.description}
             onChange={(e) => onInputChange("description", e.target.value)}
             placeholder="Informações adicionais sobre o aluno"
-            rows={4}
           />
         </div>
       </div>

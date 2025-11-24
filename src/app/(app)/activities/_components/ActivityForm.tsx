@@ -33,13 +33,14 @@ export function ActivityForm({
       <div className="space-y-2">
         <label className="text-sm">Descrição</label>
         <Textarea
-          placeholder="Descreva brevemente a atividade"
+          placeholder="Ex.: Atividade de completar as palavras com vogais."
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={4}
         />
       </div>
       <div className="space-y-2">
+        <label className="text-sm mb-1">Categorias</label>
         <ActivitiesTags selectedTags={selectedTags} onToggleTag={onToggleTag} />
       </div>
     </div>

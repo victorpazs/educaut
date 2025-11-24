@@ -12,6 +12,18 @@ export default function AuthLayout({
 }) {
   const pathname = usePathname();
   const isLoginPage = pathname === "/auth/login";
+  const isLogoutPage = pathname === "/auth/logout";
+
+  if (isLogoutPage) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="w-full max-w-md flex flex-col items-center gap-6">
+          <AppLogo className="md:w-24 md:h-24 w-16 h-16" />
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">

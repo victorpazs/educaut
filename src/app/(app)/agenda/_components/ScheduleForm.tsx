@@ -87,7 +87,7 @@ export function ScheduleForm({
               description: e.target.value,
             })
           }
-          placeholder="Detalhes da aula (opcional)"
+          placeholder="Descreva o que será abordado nesta aula."
           disabled={disabled}
         />
       </div>

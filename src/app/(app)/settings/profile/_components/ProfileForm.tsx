@@ -11,6 +11,7 @@ import { updateProfile } from "../actions";
 import { withValidation } from "@/lib/validation";
 import { PasswordChangeForm } from "./PasswordChangeForm";
 import { profileSchema, ProfileData } from "../_models";
+import { Lock } from "lucide-react";
 
 interface ProfileFormProps {
   initialName: string;
@@ -116,6 +117,7 @@ export function ProfileForm({
             variant="secondary"
             onClick={() => setPasswordModalOpen(true)}
           >
+            <Lock className="h-4 w-4 mr-2" />
             Alterar senha
           </Button>
           <Button size="sm" type="submit" disabled={submitting}>

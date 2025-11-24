@@ -56,7 +56,6 @@ export function SchoolList({
       <TableHeader>
         <TableRow>
           <TableHead>Nome</TableHead>
-          <TableHead>Criada em</TableHead>
           <TableHead className="text-right" />
         </TableRow>
       </TableHeader>

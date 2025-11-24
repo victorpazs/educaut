@@ -69,7 +69,7 @@ export function Chip({
     { container: string; icon: string; text: string }
   > = {
     sm: {
-      container: "h-6 px-2 gap-1",
+      container: "h-5 px-1.5 gap-1 rounded-xm",
       icon: "h-3 w-3",
       text: "text-xs",
     },

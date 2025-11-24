@@ -7,33 +7,35 @@ import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { getSchoolYearLabel } from "@/lib/school_year.utils";
 import { formatDate, getAge } from "@/lib/utils";
-import { deleteStudentAction } from "../actions";
-import { useRouter } from "next/navigation";
-import { toast } from "@/lib/toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export function StudentCell({ student }: { student: IStudent }) {
-  const router = useRouter();
-
+export function StudentCell({
+  student,
+  onDelete,
+}: {
+  student: IStudent;
+  onDelete?: (id: number) => Promise<void>;
+}) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const age = getAge(student.birthday);
   const nextStart = student.schedules?.[0]?.start_time ?? null;
   const nextStartFormatted = nextStart != null ? formatDate(nextStart) : "--";
   const schoolYearLabel = getSchoolYearLabel(student.school_year);
-
+  const router = useRouter();
   const handleDelete = async (id: number) => {
     setOpenDeleteDialog(false);
-    const res = await deleteStudentAction(id);
-    if (!res.success) {
-      toast.error("Erro", res.message || "Não foi possível excluir o aluno.");
-      return;
+    if (onDelete) {
+      await onDelete(id);
     }
-    toast.success("Sucesso", "Aluno excluído com sucesso.");
-    router.refresh();
   };
 
   return (
-    <TableRow key={student.id}>
+    <TableRow
+      className="hover:opacity-80 transition-opacity duration-200 cursor-pointer"
+      onClick={() => router.push(`/students/edit/${student.id}`)}
+      key={student.id}
+    >
       <TableCell>{student.name}</TableCell>
       <TableCell>{age ?? "-"}</TableCell>
       <TableCell>{schoolYearLabel ?? "-"}</TableCell>
@@ -52,7 +54,10 @@ export function StudentCell({ student }: { student: IStudent }) {
           className="h-10 w-10 p-0 text-red-600 hover:text-red-700"
           aria-label="Excluir aluno"
           title="Excluir aluno"
-          onClick={() => setOpenDeleteDialog(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenDeleteDialog(true);
+          }}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -63,7 +68,9 @@ export function StudentCell({ student }: { student: IStudent }) {
           description={`Tem certeza que deseja excluir "${student.name}"? Esta ação não poderá ser desfeita.`}
           labelAccept="Excluir"
           labelDeny="Cancelar"
-          onAccept={() => handleDelete(student.id)}
+          onAccept={() => {
+            handleDelete(student.id);
+          }}
         />
       </TableCell>
     </TableRow>

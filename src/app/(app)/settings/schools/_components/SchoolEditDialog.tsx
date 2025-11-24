@@ -16,6 +16,11 @@ import { toast } from "@/lib/toast";
 import { useSession } from "@/hooks/useSession";
 import { SchoolForm, type SchoolFormValues } from "@/components/school-form";
 import type { ISchool } from "@/types/db";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface SchoolEditDialogProps {
   school: ISchool;
@@ -49,16 +54,21 @@ export function SchoolEditDialog({ school, onUpdated }: SchoolEditDialogProps) {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-10 w-10 p-0"
-        onClick={() => setOpen(true)}
-        aria-label="Editar escola"
-        title="Editar escola"
-      >
-        <Edit className="h-4 w-4" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 p-0"
+            onClick={() => setOpen(true)}
+            aria-label="Editar escola"
+            title="Editar escola"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Editar escola</TooltipContent>
+      </Tooltip>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

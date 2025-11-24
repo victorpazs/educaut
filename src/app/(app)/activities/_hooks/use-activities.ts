@@ -1,86 +1,63 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
-import { toast } from "@/lib/toast";
+import { useCallback, useMemo } from "react";
 
 import type { IActivity } from "../_models";
-import { getActivities, GetActivitiesParams } from "../actions";
+import { getActivities, GetActivitiesParams, deleteActivity } from "../actions";
 import { useSession } from "@/hooks/useSession";
+import { useServerList } from "@/hooks/useServerList";
+import { toast } from "@/lib/toast";
 
 interface UseActivitiesResult {
   activities: IActivity[];
   isLoading: boolean;
   hasError: boolean;
+  onDelete: (id: number) => Promise<void>;
 }
 
 export function useActivities(
   params: GetActivitiesParams
 ): UseActivitiesResult {
   const { school } = useSession();
-  const [activities, setActivities] = useState<IActivity[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [hasError, setHasError] = useState<boolean>(false);
-  const requestCounter = useRef(0);
+  const { data, isLoading, errorMsg, onRemove } = useServerList<
+    IActivity,
+    GetActivitiesParams
+  >({
+    fetcher: getActivities,
+    params: useMemo(
+      () => ({ search: params.search, tags: params.tags ?? [] }),
+      [params]
+    ),
+    deps: [school?.id, params],
+    enabled: Boolean(school?.id),
+    errorMessage: "Não foi possível carregar as atividades.",
+  });
 
-  useEffect(() => {
-    if (!school?.id) {
-      setActivities([]);
-      setIsLoading(false);
-      setHasError(false);
-      return;
-    }
-
-    let isMounted = true;
-    const currentRequest = requestCounter.current + 1;
-    requestCounter.current = currentRequest;
-
-    const loadActivities = async () => {
-      setIsLoading(true);
-      setHasError(false);
+  const onDelete = useCallback(
+    async (id: number) => {
+      onRemove(id);
 
       try {
-        const response = await getActivities({
-          search: params.search,
-          tags: params.tags ?? [],
-        });
+        const response = await deleteActivity(id);
 
-        if (isMounted && requestCounter.current === currentRequest) {
-          if (response.success) {
-            setActivities(response.data ?? []);
-            setHasError(false);
-          } else {
-            setActivities([]);
-            setHasError(true);
-            toast.error(response.message);
-          }
+        if (response.success) {
+          toast.success("Atividade excluída com sucesso.");
+        } else {
+          toast.error(
+            response.message || "Não foi possível excluir a atividade."
+          );
         }
       } catch (err) {
-        if (isMounted && requestCounter.current === currentRequest) {
-          toast.error(
-            "Não foi possível carregar as atividades.",
-            `Falha ao carregar as atividades. ${JSON.stringify(err)}`
-          );
-          setHasError(true);
-          setActivities([]);
-        }
-      } finally {
-        if (isMounted && requestCounter.current === currentRequest) {
-          setIsLoading(false);
-        }
+        toast.error("Não foi possível excluir a atividade.");
       }
-    };
-
-    loadActivities();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [params, school?.id]);
+    },
+    [onRemove]
+  );
 
   return {
-    activities,
+    activities: data,
     isLoading,
-    hasError,
+    hasError: errorMsg !== null,
+    onDelete,
   };
 }

@@ -27,8 +27,8 @@ const Search = ({ disabled, onClick }: SearchProps) => {
           disabled && "pointer-events-none opacity-70"
         )}
       >
-        <SearchIcon className="text-gray-500 w-4 h-4" />
-        <span className="truncate text-gray-500 text-sm">Pesquisa...</span>
+        <SearchIcon className="text-gray-400 w-4 h-4" />
+        <span className="truncate text-gray-400 text-xs">Pesquisa...</span>
       </button>
     </>
   );

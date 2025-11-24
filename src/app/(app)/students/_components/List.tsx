@@ -11,7 +11,12 @@ import type { IStudent } from "../_models";
 
 import { StudentCell } from "./Cell";
 
-export function StudentsList({ students }: { students: IStudent[] }) {
+type Props = {
+  students: IStudent[];
+  onDelete?: (id: number) => Promise<void>;
+};
+
+export function StudentsList({ students, onDelete }: Props) {
   return (
     <Table>
       <TableHeader>
@@ -26,7 +31,13 @@ export function StudentsList({ students }: { students: IStudent[] }) {
       </TableHeader>
       <TableBody>
         {students.map((student) => {
-          return <StudentCell key={student.id} student={student} />;
+          return (
+            <StudentCell
+              key={student.id}
+              student={student}
+              onDelete={onDelete}
+            />
+          );
         })}
       </TableBody>
     </Table>
