@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { BasicInfoStep, AttributesStep } from "./steps";
+import { WorkedActivitiesStep } from "./steps/WorkedActivitiesStep";
 import { StudentFormData } from "../create/_models";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -16,12 +17,14 @@ interface StudentTabContentProps {
   activeTab: string;
   formData: StudentFormData;
   setFormData: React.Dispatch<React.SetStateAction<StudentFormData>>;
+  studentId?: number | null;
 }
 
 export function StudentTabContent({
   activeTab,
   formData,
   setFormData,
+  studentId,
 }: StudentTabContentProps) {
   const { attributesByType } = useAttributes();
 
@@ -100,6 +103,10 @@ export function StudentTabContent({
             onAttributeChange={onAttributeChange}
           />
         );
+
+      case "worked-activities":
+        if (!studentId) return null;
+        return <WorkedActivitiesStep studentId={studentId} />;
 
       default:
         return null;

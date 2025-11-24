@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Calendar, FileText } from "lucide-react";
+import { Calendar, FileText, Settings } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import {
   ScheduleCreateSteps,
@@ -77,7 +77,7 @@ export default function EditSchedulePage() {
       {
         label: "Informações da aula",
         identifier: ScheduleCreateSteps.BASIC_INFO,
-        icon: Calendar,
+        icon: Settings,
       },
       {
         label: "Horário",
@@ -85,7 +85,7 @@ export default function EditSchedulePage() {
         icon: Calendar,
       },
       {
-        label: "Atividades trabalhadas",
+        label: "Atividades",
         identifier: ScheduleCreateSteps.ACTIVITIES,
         icon: FileText,
       },

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useSession } from "@/hooks/useSession";
 import { useSchoolChange } from "@/hooks/useSchoolChange";
+import { DeleteButton } from "@/components/delete-button";
 
 export function SchoolCell({
   school,
@@ -57,7 +58,7 @@ export function SchoolCell({
         onAccept={() => handleDelete(school.id)}
       />
       <TableRow key={school.id}>
-        <TableCell className="font-medium">
+        <TableCell>
           <div className="flex items-center gap-2">{school.name}</div>
         </TableCell>
         <TableCell className="text-right">
@@ -94,26 +95,16 @@ export function SchoolCell({
               </Tooltip>
             )}
             <SchoolEditDialog school={school} onUpdated={() => onReload()} />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-10 w-10 p-0 text-red-600 hover:text-red-700 disabled:opacity-50"
-                  aria-label="Excluir escola"
-                  title="Excluir escola"
-                  onClick={() => setOpenDeleteDialog(true)}
-                  disabled={isCurrentSchool}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {isCurrentSchool
+
+            <DeleteButton
+              onClick={() => setOpenDeleteDialog(true)}
+              disabled={isCurrentSchool}
+              title={
+                isCurrentSchool
                   ? "Mude para outra escola antes de excluir esta"
-                  : "Excluir escola"}
-              </TooltipContent>
-            </Tooltip>
+                  : "Excluir escola"
+              }
+            />
           </div>
         </TableCell>
       </TableRow>

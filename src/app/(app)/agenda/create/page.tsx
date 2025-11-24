@@ -16,15 +16,17 @@ export default function CreateSchedulePage() {
     ScheduleCreateSteps.BASIC_INFO
   );
 
+  const startParamValue = searchParams.get("start");
+  const endParamValue = searchParams.get("end");
+
+  const startParamRef = React.useRef(startParamValue);
+  const endParamRef = React.useRef(endParamValue);
+
   const getInitialDates = React.useCallback(() => {
-    const startParam = searchParams.get("start");
-    const endParam = searchParams.get("end");
-
-    const start = startParam ? new Date(startParam) : new Date();
-    const end = endParam ? new Date(endParam) : new Date();
-
+    const start = startParamValue ? new Date(startParamValue) : new Date();
+    const end = endParamValue ? new Date(endParamValue) : new Date();
     return { start, end };
-  }, [searchParams]);
+  }, [startParamValue, endParamValue]);
 
   const [formData, setFormData] = React.useState<ScheduleFormData>(() => {
     const { start, end } = getInitialDates();
@@ -39,13 +41,41 @@ export default function CreateSchedulePage() {
   });
 
   React.useEffect(() => {
-    const { start, end } = getInitialDates();
-    setFormData((prev) => ({
-      ...prev,
-      start,
-      end,
-    }));
-  }, [getInitialDates]);
+    // Only update if the actual values changed
+    if (
+      startParamRef.current === startParamValue &&
+      endParamRef.current === endParamValue
+    ) {
+      return;
+    }
+
+    startParamRef.current = startParamValue;
+    endParamRef.current = endParamValue;
+
+    if (!startParamValue && !endParamValue) return;
+
+    const start = startParamValue ? new Date(startParamValue) : null;
+    const end = endParamValue ? new Date(endParamValue) : null;
+
+    if (start && end) {
+      setFormData((prev) => {
+        // Only update if dates actually changed
+        const prevStartTime = prev.start.getTime();
+        const prevEndTime = prev.end.getTime();
+        const newStartTime = start.getTime();
+        const newEndTime = end.getTime();
+
+        if (prevStartTime !== newStartTime || prevEndTime !== newEndTime) {
+          return {
+            ...prev,
+            start,
+            end,
+          };
+        }
+        return prev;
+      });
+    }
+  }, [startParamValue, endParamValue]);
 
   const handleBack = React.useCallback(() => {
     router.push("/agenda");
@@ -64,7 +94,7 @@ export default function CreateSchedulePage() {
         icon: Calendar,
       },
       {
-        label: "Atividades trabalhadas",
+        label: "Atividades",
         identifier: ScheduleCreateSteps.ACTIVITIES,
         icon: FileText,
       },

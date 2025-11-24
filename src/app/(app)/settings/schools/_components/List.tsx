@@ -55,7 +55,7 @@ export function SchoolList({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Nome</TableHead>
+          <TableHead className="font-semibold!">Nome</TableHead>
           <TableHead className="text-right" />
         </TableRow>
       </TableHeader>

@@ -6,6 +6,7 @@ import {
   HeartPulse,
   Target,
   User,
+  BookOpen,
 } from "lucide-react";
 
 export function getAttributeIcon(attribute: string) {
@@ -16,6 +17,7 @@ export function getAttributeIcon(attribute: string) {
     potential: BicepsFlexed,
     comorbidities: HeartPulse,
     "basic-info": User,
+    "worked-activities": BookOpen,
   };
   return attributeMap[attribute as keyof typeof attributeMap];
 }
@@ -28,6 +30,7 @@ export function getAttributeLabel(attribute: string) {
     potential: "Potencialidades",
     comorbidities: "Comorbidades",
     "basic-info": "Informações básicas",
+    "worked-activities": "Atividades trabalhadas",
   };
 
   return attributeMap[attribute as keyof typeof attributeMap] || attribute;
@@ -41,6 +44,8 @@ export function getAttributeSubtitle(attribute: string) {
     potential: "Selecione as potencialidades do aluno",
     comorbidities: "Selecione as comorbidades do aluno",
     "basic-info": "Dados de registro do aluno",
+    "worked-activities":
+      "Visualize e gerencie as atividades trabalhadas com o aluno",
   };
   return attributeMap[attribute as keyof typeof attributeMap] || attribute;
 }

@@ -111,7 +111,10 @@ export function AvatarInput({
 
   return (
     <div
-      className={cn("flex flex-col items-center justify-center h-full gap-4", className)}
+      className={cn(
+        "flex flex-col items-center justify-center h-full gap-4",
+        className
+      )}
     >
       <input
         ref={fileInputRef}

@@ -215,3 +215,133 @@ export async function deleteStudentAction(
     return handleServerError(error);
   }
 }
+
+export interface IWorkedActivity {
+  schedule_id: number;
+  activity_id: number;
+  activity_name: string;
+  activity_content: unknown;
+  activity_tags: string[];
+  schedule_start: Date;
+  schedule_end: Date;
+  note: string | null;
+}
+
+export async function getWorkedActivitiesByStudent(
+  studentId: number
+): Promise<ApiResponse<IWorkedActivity[] | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    if (!studentId || isNaN(Number(studentId))) {
+      return createErrorResponse(
+        "ID do aluno inválido.",
+        "INVALID_STUDENT_ID",
+        400
+      );
+    }
+
+    const workedActivities = await prisma.schedules_activities.findMany({
+      where: {
+        schedules: {
+          student_id: Number(studentId),
+          school_id: schoolId,
+          status: {
+            not: 3,
+          },
+        },
+        activities: {
+          status: {
+            not: 3,
+          },
+        },
+      },
+      include: {
+        schedules: {
+          select: {
+            start_time: true,
+            end_time: true,
+          },
+        },
+        activities: {
+          select: {
+            name: true,
+            content: true,
+            tags: true,
+          },
+        },
+      },
+    });
+
+    const result: IWorkedActivity[] = workedActivities
+      .map((sa) => ({
+        schedule_id: sa.schedule_id,
+        activity_id: sa.activity_id,
+        activity_name: sa.activities.name,
+        activity_content: sa.activities.content,
+        activity_tags: sa.activities.tags,
+        schedule_start: sa.schedules.start_time,
+        schedule_end: sa.schedules.end_time,
+        note: sa.note,
+      }))
+      .sort((a, b) => {
+        const dateA =
+          a.schedule_start instanceof Date
+            ? a.schedule_start
+            : new Date(a.schedule_start);
+        const dateB =
+          b.schedule_start instanceof Date
+            ? b.schedule_start
+            : new Date(b.schedule_start);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+    return createSuccessResponse(result, "Atividades trabalhadas encontradas.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}
+
+export async function updateScheduleActivityNote(
+  scheduleId: number,
+  activityId: number,
+  note: string
+): Promise<ApiResponse<null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    await prisma.schedules_activities.update({
+      where: {
+        schedule_id_activity_id: {
+          schedule_id: scheduleId,
+          activity_id: activityId,
+        },
+      },
+      data: {
+        note: note.trim() || null,
+      },
+    });
+
+    return createSuccessResponse(null, "Anotação atualizada com sucesso.");
+  } catch (error) {
+    return handleServerError(error);
+  }
+}

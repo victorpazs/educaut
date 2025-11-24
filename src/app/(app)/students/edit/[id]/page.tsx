@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { User } from "lucide-react";
+import { User, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import {
   StudentCreateSteps,
@@ -13,7 +13,13 @@ import { useAttributes } from "@/hooks/useAttributes";
 import { getAttributeIcon, getAttributeLabel } from "@/lib/attributes.utils";
 import { StudentTabContent } from "@/app/(app)/students/_components/StudentTabContent";
 import { SubmitActions } from "@/app/(app)/students/edit/_components/SubmitActions";
-import { getStudentById } from "@/app/(app)/students/actions";
+import {
+  getStudentById,
+  deleteStudentAction,
+} from "@/app/(app)/students/actions";
+import { Button } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import { toast } from "@/lib/toast";
 
 export default function EditStudentPage() {
   const params = useParams<{ id: string }>();
@@ -34,6 +40,7 @@ export default function EditStudentPage() {
   });
   const [studentId, setStudentId] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
 
   const handleBack = React.useCallback(() => {
     router.push("/students");
@@ -83,6 +90,11 @@ export default function EditStudentPage() {
         identifier: type as StudentCreateSteps,
         icon: getAttributeIcon(type),
       })),
+      {
+        label: "Atividades trabalhadas",
+        identifier: StudentCreateSteps.WORKED_ACTIVITIES,
+        icon: getAttributeIcon("worked-activities"),
+      },
     ],
     [attributeTypes]
   );
@@ -90,6 +102,18 @@ export default function EditStudentPage() {
   const handleTabClick = React.useCallback((identifier: string) => {
     setActiveTab(identifier as StudentCreateSteps);
   }, []);
+
+  const handleDelete = React.useCallback(async () => {
+    if (!studentId) return;
+    setOpenDeleteDialog(false);
+    const res = await deleteStudentAction(studentId);
+    if (!res.success) {
+      toast.error("Erro", res.message || "Não foi possível excluir o aluno.");
+      return;
+    }
+    toast.success("Sucesso", "Aluno excluído com sucesso.");
+    router.push("/students");
+  }, [studentId, router]);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">
@@ -98,6 +122,18 @@ export default function EditStudentPage() {
             title="Editar aluno"
             subtitle="Atualize os dados do aluno."
             goBack={handleBack}
+            actions={
+              !loading && studentId ? (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setOpenDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Excluir aluno
+                </Button>
+              ) : null
+            }
           />
         </div>
         <div className="col-span-12 md:col-span-4 lg:col-span-3">
@@ -115,6 +151,7 @@ export default function EditStudentPage() {
               activeTab={activeTab}
               formData={formData}
               setFormData={setFormData}
+              studentId={studentId}
             />
           )}
 
@@ -128,6 +165,15 @@ export default function EditStudentPage() {
           )}
         </div>
       </div>
+      <ConfirmationDialog
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        title="Excluir aluno"
+        description={`Tem certeza que deseja excluir este aluno? Esta ação não poderá ser desfeita.`}
+        labelAccept="Excluir"
+        labelDeny="Cancelar"
+        onAccept={handleDelete}
+      />
     </div>
   );
 }

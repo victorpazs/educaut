@@ -15,6 +15,8 @@ import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { toast } from "@/lib/toast";
 import { useRouter } from "next/navigation";
 import { deleteActivity } from "../actions";
+import { EditButton } from "@/components/edit-button";
+import { DeleteButton } from "@/components/delete-button";
 
 type ActivityWithTags = IActivity & { tags?: string[] | null };
 
@@ -76,24 +78,10 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/activities/editor/${activity.id}`}>
-              <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
-                <Edit className="h-4 w-4" />
-              </Button>
+              <EditButton />
             </Link>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-10 w-10 p-0 text-red-600 hover:text-red-700"
-              aria-label="Excluir atividade"
-              title="Excluir atividade"
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpenDeleteDialog(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <DeleteButton onClick={() => setOpenDeleteDialog(true)} />
             <ConfirmationDialog
               open={openDeleteDialog}
               onOpenChange={setOpenDeleteDialog}

@@ -11,6 +11,7 @@ interface ActivityCardProps {
   actions?: React.ReactNode;
   onClick?: () => void;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export function ActivityCard({
@@ -20,6 +21,7 @@ export function ActivityCard({
   actions,
   onClick,
   className,
+  children,
 }: ActivityCardProps) {
   return (
     <Card
@@ -35,19 +37,22 @@ export function ActivityCard({
         </div>
       </div>
       <CardContent className="pt-4 shrink-0">
-        <div className="space-y-2 flex items-center justify-between gap-2">
-          <div className="flex flex-col gap-2 items-start">
-            <div className="text-sm font-medium truncate" title={name}>
-              {name}
+        <div className="flex flex-col gap-2">
+          <div className="space-y-2 flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-2 items-start">
+              <div className="text-sm font-medium truncate" title={name}>
+                {name}
+              </div>
+              {(tags?.length ?? 0) > 0 ? (
+                <ActivitiesTags
+                  selectedTags={tags ?? []}
+                  parentTags={tags?.map((t) => ({ label: t, tag: t })) ?? []}
+                />
+              ) : null}
             </div>
-            {(tags?.length ?? 0) > 0 ? (
-              <ActivitiesTags
-                selectedTags={tags ?? []}
-                parentTags={tags?.map((t) => ({ label: t, tag: t })) ?? []}
-              />
-            ) : null}
+            <div className="flex items-center gap-2">{actions}</div>
           </div>
-          <div className="flex items-center gap-2">{actions}</div>
+          {children}
         </div>
       </CardContent>
     </Card>

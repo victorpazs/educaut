@@ -18,6 +18,7 @@ export enum StudentCreateSteps {
   DIFFICULTY = "difficulty",
   PREFERENCE = "preference",
   POTENTIAL = "potential",
+  WORKED_ACTIVITIES = "worked-activities",
 }
 
 export type CheckboxField = {

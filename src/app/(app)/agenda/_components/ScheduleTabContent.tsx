@@ -62,11 +62,11 @@ export function ScheduleTabContent({
   const getStepTitle = (step: string) => {
     switch (step) {
       case ScheduleCreateSteps.BASIC_INFO:
-        return "Informações básicas";
+        return "Informações da aula";
       case ScheduleCreateSteps.TIME_INFO:
         return "Horário";
       case ScheduleCreateSteps.ACTIVITIES:
-        return "Atividades trabalhadas";
+        return "Atividades";
       default:
         return "";
     }

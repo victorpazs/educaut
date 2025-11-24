@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import type { IActivity } from "../_models";
 import { getActivities, GetActivitiesParams, deleteActivity } from "../actions";
 import { useSession } from "@/hooks/useSession";
 import { useServerList } from "@/hooks/useServerList";
 import { toast } from "@/lib/toast";
+
+const EMPTY_TAGS: string[] = [];
 
 interface UseActivitiesResult {
   activities: IActivity[];
@@ -19,16 +21,30 @@ export function useActivities(
   params: GetActivitiesParams
 ): UseActivitiesResult {
   const { school } = useSession();
+
+  const searchValue = params.search ?? "";
+  // Use constant for empty array to avoid reference changes
+  const tagsValue =
+    params.tags && params.tags.length > 0 ? params.tags : EMPTY_TAGS;
+
+  // Create a stable string representation of tags for dependency comparison
+  const tagsKey = useMemo(() => {
+    if (tagsValue.length === 0) return "";
+    return [...tagsValue].sort().join(",");
+  }, [tagsValue]);
+
+  const memoizedParams = useMemo(
+    () => ({ search: searchValue, tags: tagsValue }),
+    [searchValue, tagsKey]
+  );
+
   const { data, isLoading, errorMsg, onRemove } = useServerList<
     IActivity,
     GetActivitiesParams
   >({
     fetcher: getActivities,
-    params: useMemo(
-      () => ({ search: params.search, tags: params.tags ?? [] }),
-      [params]
-    ),
-    deps: [school?.id, params],
+    params: memoizedParams,
+    deps: [school?.id, searchValue, tagsKey],
     enabled: Boolean(school?.id),
     errorMessage: "Não foi possível carregar as atividades.",
   });

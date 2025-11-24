@@ -90,22 +90,20 @@ export function AttributesStep({
         {(formData.student_attributes ?? []).map((id) => {
           const attribute = attributeFields.find((a) => a.id === id);
           if (!attribute) return null;
+
           return (
-            <Chip
+            <div
               key={id}
-              label={attribute.label}
-              variant={"outlined"}
-              size="sm"
-              className="text-sm justify-start! text-muted-foreground"
-              endIcon={
-                <X
-                  className="text-secondary cursor-pointer size-3 ml-auto"
-                  onClick={() =>
-                    handleRemove({ value: id, label: attribute.label })
-                  }
-                />
-              }
-            />
+              className="flex items-center justify-between min-w-48 gap-2"
+            >
+              <span>{attribute.label}</span>
+              <X
+                className="text-secondary cursor-pointer size-3 ml-auto"
+                onClick={() =>
+                  handleRemove({ value: id, label: attribute.label })
+                }
+              />
+            </div>
           );
         })}
       </div>

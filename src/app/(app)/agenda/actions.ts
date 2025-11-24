@@ -441,12 +441,10 @@ export async function updateScheduleAction(
         },
       });
 
-      // Remove existing activities
       await tx.schedules_activities.deleteMany({
         where: { schedule_id: input.id },
       });
 
-      // Add new activities
       if (input.activityIds && input.activityIds.length > 0) {
         await tx.schedules_activities.createMany({
           data: input.activityIds.map((activity_id) => ({

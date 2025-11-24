@@ -9,6 +9,8 @@ import { getSchoolYearLabel } from "@/lib/school_year.utils";
 import { formatDate, getAge } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { EditButton } from "@/components/edit-button";
+import { DeleteButton } from "@/components/delete-button";
 
 export function StudentCell({
   student,
@@ -43,29 +45,18 @@ export function StudentCell({
       <TableCell>{nextStartFormatted}</TableCell>
       <TableCell className="text-right">
         <Link href={`/students/edit/${student.id}`}>
-          <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
-            <Edit className="h-4 w-4" />
-          </Button>
+          <EditButton title="Editar aluno" />
         </Link>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-10 w-10 p-0 text-red-600 hover:text-red-700"
-          aria-label="Excluir aluno"
+        <DeleteButton
+          onClick={() => setOpenDeleteDialog(true)}
           title="Excluir aluno"
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpenDeleteDialog(true);
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        />
         <ConfirmationDialog
           open={openDeleteDialog}
           onOpenChange={setOpenDeleteDialog}
           title="Excluir aluno"
-          description={`Tem certeza que deseja excluir "${student.name}"? Esta ação não poderá ser desfeita.`}
+          description={`Tem certeza que deseja excluir o aluno "${student.name}"? Esta ação não poderá ser desfeita.`}
           labelAccept="Excluir"
           labelDeny="Cancelar"
           onAccept={() => {

@@ -72,7 +72,11 @@ export function UserMenu() {
           <div className="px-3 py-3 ">
             <div className="flex items-center w-full justify-between">
               <div className="flex items-center w-full gap-3">
-                <Avatar className="h-12 w-12" fallback="VP" />
+                <Avatar
+                  src={user?.avatar}
+                  className="h-12 w-12"
+                  fallback="VP"
+                />
                 <div className="flex flex-col">
                   <span className="font-bold text-foreground text-sm">
                     {user?.name}

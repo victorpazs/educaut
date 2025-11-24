@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,8 +42,6 @@ export function SchoolAgenda({
   const { events, isLoading, refetch } = useAgenda();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const calendarRef = useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] =
     useState<FullCalendarView>("dayGridMonth");
@@ -181,10 +179,7 @@ export function SchoolAgenda({
                     router.push(`/agenda/create?${params.toString()}`);
                   }}
                   eventClick={(clickInfo: EventClickArg) => {
-                    const params = new URLSearchParams(searchParams.toString());
-                    params.set("scheduleId", String(clickInfo.event.id));
-                    const query = params.toString();
-                    router.push(`${pathname}${query ? `?${query}` : ""}`);
+                    router.push(`/agenda/edit/${clickInfo.event.id}`);
                   }}
                   datesSet={(info: DatesSetArg) => {
                     setCurrentView(info.view.type as FullCalendarView);

@@ -7,6 +7,7 @@ import { toast } from "@/lib/toast";
 import { Pencil, Trash } from "lucide-react";
 import { deleteAttribute } from "../actions";
 import { EditAttributeNameDialog } from "./EditAttributeNameDialog";
+import { DeleteButton } from "@/components/delete-button";
 
 export function AttributeCell({
   option,
@@ -45,13 +46,11 @@ export function AttributeCell({
           <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}>
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
+
+          <DeleteButton
             onClick={() => setConfirmOpen(true)}
-          >
-            <Trash className="h-4 w-4 text-red-600 hover:text-red-700" />
-          </Button>
+            title="Remover atributo"
+          />
           <ConfirmationDialog
             title="Remover atributo"
             description="Tem certeza que deseja remover este atributo? Essa ação não pode ser desfeita."

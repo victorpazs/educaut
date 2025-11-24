@@ -242,7 +242,8 @@ export function CanvasPreview({
       if (!canvas || !parentEl) return;
       const canvasWidth = width || parentEl.clientWidth || 800;
       // Use provided height, or parent height, or default
-      const canvasHeight = height !== undefined ? height : (parentEl.clientHeight || 180);
+      const canvasHeight =
+        height !== undefined ? height : parentEl.clientHeight || 180;
       canvas.setHeight(canvasHeight);
       canvas.setWidth(canvasWidth);
       canvas.requestRenderAll?.();
@@ -256,7 +257,7 @@ export function CanvasPreview({
     const resizeObserver = new ResizeObserver(() => {
       updateDimensions();
     });
-    
+
     if (parentEl) {
       resizeObserver.observe(parentEl);
     }

@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import { EditButton } from "@/components/edit-button";
 
 interface SchoolEditDialogProps {
   school: ISchool;
@@ -54,21 +55,7 @@ export function SchoolEditDialog({ school, onUpdated }: SchoolEditDialogProps) {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-10 w-10 p-0"
-            onClick={() => setOpen(true)}
-            aria-label="Editar escola"
-            title="Editar escola"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>Editar escola</TooltipContent>
-      </Tooltip>
+      <EditButton onClick={() => setOpen(true)} title="Editar escola" />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
