@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -68,13 +69,10 @@ export function ActivityNoteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Editar Anotação</DialogTitle>
+          <DialogTitle>Anotações de aula</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-2 px-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Anotações:
-            </label>
             <Textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -83,19 +81,19 @@ export function ActivityNoteDialog({
               disabled={isSaving}
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              disabled={isSaving}
-            >
-              Cancelar
-            </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving ? "Salvando..." : "Salvar"}
-            </Button>
-          </div>
         </div>
+        <DialogFooter>
+          <Button
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            disabled={isSaving}
+          >
+            Cancelar
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            Salvar
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -9,6 +9,11 @@ import { getAttributeLabel } from "@/lib/attributes.utils";
 import { Chip } from "@/components/ui/chip";
 import { createAttribute } from "@/app/(app)/settings/attributes/actions";
 import { toast } from "@/lib/toast";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AttributesStepProps {
   formData: StudentFormData;
@@ -86,27 +91,32 @@ export function AttributesStep({
           </Button>
         )}
       />
-      <div className="flex flex-wrap items-start flex-col gap-2">
+      <ul className="flex flex-wrap items-start flex-col gap-2">
         {(formData.student_attributes ?? []).map((id) => {
           const attribute = attributeFields.find((a) => a.id === id);
           if (!attribute) return null;
 
           return (
-            <div
+            <li
               key={id}
               className="flex items-center justify-between min-w-48 gap-2"
             >
-              <span>{attribute.label}</span>
-              <X
-                className="text-secondary cursor-pointer size-3 ml-auto"
-                onClick={() =>
-                  handleRemove({ value: id, label: attribute.label })
-                }
-              />
-            </div>
+              <span className="text-sm">{attribute.label}</span>
+              <Tooltip>
+                <TooltipTrigger>
+                  <X
+                    className="text-secondary cursor-pointer size-3 ml-auto"
+                    onClick={() =>
+                      handleRemove({ value: id, label: attribute.label })
+                    }
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Remover atributo</TooltipContent>
+              </Tooltip>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

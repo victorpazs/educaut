@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import { CloudUpload } from "lucide-react";
+import axios from "axios";
 import { Upload, type UploadProps, type UploadRenderState } from "./index";
-import { Button } from "@/components/ui/button";
+import { generateUploadLink, confirmUpload } from "@/app/(app)/_files/actions";
+import { toast } from "@/lib/toast";
 
 function buildAcceptFromFileTypes(fileTypes?: string[]): UploadProps["accept"] {
   if (!fileTypes || fileTypes.length === 0) return undefined;
@@ -47,21 +49,88 @@ function buildAcceptFromFileTypes(fileTypes?: string[]): UploadProps["accept"] {
   return Object.keys(accept).length ? accept : undefined;
 }
 
-type UploadDropzoneProps = Omit<UploadProps, "accept" | "children"> & {
+type UploadDropzoneProps = Omit<
+  UploadProps,
+  "accept" | "children" | "onFiles"
+> & {
   fileTypes?: string[];
   children?: React.ReactNode | ((state: UploadRenderState) => React.ReactNode);
   className?: string;
+  onUploadSuccess?: () => void;
 };
 
 export function UploadDropzone({
   fileTypes,
   children,
   className,
+  onUploadSuccess,
   ...props
 }: UploadDropzoneProps) {
+  const [isUploading, setIsUploading] = React.useState(false);
   const accept = React.useMemo(
     () => buildAcceptFromFileTypes(fileTypes),
     [fileTypes]
+  );
+
+  const handleFiles = React.useCallback(
+    async (files: File[]) => {
+      if (files.length === 0) return;
+
+      const file = files[0];
+      setIsUploading(true);
+
+      try {
+        const linkResponse = await generateUploadLink(
+          file.name,
+          file.size,
+          file.type || "application/octet-stream"
+        );
+
+        if (!linkResponse.success || !linkResponse.data) {
+          toast.error("Erro ao gerar link de upload", linkResponse.message);
+          setIsUploading(false);
+          return;
+        }
+
+        const { uploadUrl, fileId, url } = linkResponse.data;
+        console.log("Upload URL:", uploadUrl);
+        console.log("File type:", typeof file);
+
+        // Usar axios.put diretamente para garantir que o File seja enviado corretamente
+        await axios.put(uploadUrl, file, {
+          headers: {
+            "Content-Type": file.type || "application/octet-stream",
+          },
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        });
+
+        const confirmResponse = await confirmUpload(fileId);
+
+        if (confirmResponse.success) {
+          toast.success("Arquivo enviado com sucesso.");
+          onUploadSuccess?.();
+        } else {
+          toast.error("Erro ao confirmar upload", confirmResponse.message);
+        }
+      } catch (error: any) {
+        console.error("Erro ao fazer upload:", error);
+        if (error.response) {
+          toast.error(
+            "Erro ao fazer upload",
+            error.response.data?.message || "Erro desconhecido"
+          );
+        } else {
+          toast.error(
+            "Erro",
+            "Não foi possível enviar o arquivo. Verifique sua conexão."
+          );
+        }
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [onUploadSuccess]
   );
 
   return (
@@ -72,6 +141,8 @@ export function UploadDropzone({
       maxFiles={1}
       noClick
       noKeyboard
+      onFiles={handleFiles}
+      disabled={isUploading}
     >
       {(state) => {
         if (typeof children === "function") {
@@ -101,7 +172,9 @@ export function UploadDropzone({
           >
             <CloudUpload className="h-6 w-6 text-muted-foreground" />
             <div className="text-sm">
-              {isActive
+              {isUploading
+                ? "Enviando arquivo..."
+                : isActive
                 ? "Solte os arquivos aqui"
                 : "Arraste e solte arquivos, ou clique para selecionar"}
             </div>

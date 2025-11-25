@@ -40,7 +40,7 @@ export function SearchOption({ id, title, type, onClose }: SearchOptionProps) {
         onClose();
         break;
       case "calendar":
-        router.push(`/agenda?scheduleId=${id?.split(":")[1]}`);
+        router.push(`/agenda/edit/${id?.split(":")[1]}`);
         onClose();
         break;
       case "activity":

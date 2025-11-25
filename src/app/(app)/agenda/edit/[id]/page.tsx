@@ -15,8 +15,10 @@ import {
   getScheduleById,
   getScheduleActivities,
 } from "@/app/(app)/agenda/actions";
+import { useAgenda } from "../../_hooks/use-agenda";
 
 export default function EditSchedulePage() {
+  const { refetch } = useAgenda();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = React.useState<ScheduleCreateSteps>(
@@ -35,7 +37,7 @@ export default function EditSchedulePage() {
 
   const handleBack = React.useCallback(() => {
     router.push("/agenda");
-  }, [router]);
+  }, [router, refetch]);
 
   React.useEffect(() => {
     const load = async () => {
@@ -122,6 +124,7 @@ export default function EditSchedulePage() {
               activeTab={activeTab}
               formData={formData}
               setFormData={setFormData}
+              scheduleId={scheduleId}
             />
           )}
 

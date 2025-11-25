@@ -113,7 +113,7 @@ export function TabsSidebar({
         </Tabs>
       )}
 
-      <nav className="sticky top-20 hidden flex-col gap-2 rounded-2xl bg-card p-3 shadow-xs md:flex">
+      <nav className="sticky top-10 hidden flex-col gap-2 rounded-2xl bg-card p-3 shadow-xs md:flex">
         {options.map(
           (
             { href, label, icon: Icon, identifier, onClick, disabled },

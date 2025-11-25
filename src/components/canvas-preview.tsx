@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { loadInitialState, changeBackgroundColor } from "@/lib/fabrics.utils";
+import { changeBackgroundColor } from "@/lib/fabrics.utils";
 import type { IActivityContent } from "@/app/(app)/activities/_models";
 
 interface CanvasPreviewProps {
@@ -180,56 +180,6 @@ export function CanvasPreview({
       }
     };
   }, []);
-
-  // Update when data changes
-  React.useEffect(() => {
-    if (!canvasInstanceRef.current || !fabricNSRef.current || !data) return;
-
-    (async () => {
-      const canvas = canvasInstanceRef.current;
-
-      // Load JSON with callback to ensure objects are loaded
-      await new Promise<void>((resolve) => {
-        canvas.loadFromJSON(data, () => {
-          canvas.requestRenderAll();
-          resolve();
-        });
-      });
-
-      changeBackgroundColor(canvas, data.background || "#ffffff");
-
-      // Disable interactions on all objects
-      const objects = canvas.getObjects?.() ?? [];
-      for (const obj of objects) {
-        if (!obj) continue;
-        obj.selectable = false;
-        obj.evented = false;
-        obj.hasControls = false;
-        obj.lockMovementX = true;
-        obj.lockMovementY = true;
-        obj.lockRotation = true;
-        obj.lockScalingX = true;
-        obj.lockScalingY = true;
-        obj.hoverCursor = "default";
-      }
-
-      canvas.discardActiveObject?.();
-      canvas.requestRenderAll?.();
-
-      // Fit content after objects are rendered
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          fitContentToCanvas();
-        });
-      });
-    })();
-  }, [data, fitContentToCanvas]);
-
-  // Update background color
-  React.useEffect(() => {
-    if (!canvasInstanceRef.current || !data?.background) return;
-    changeBackgroundColor(canvasInstanceRef.current, data.background);
-  }, [data?.background]);
 
   // Update dimensions and handle resize
   React.useEffect(() => {

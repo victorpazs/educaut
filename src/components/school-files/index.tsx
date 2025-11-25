@@ -19,6 +19,7 @@ type SchoolFilesDialogProps = {
   onOpenChange?: (open: boolean) => void;
   title?: string;
   fileTypes?: string[];
+  onSelectFile?: (url: string) => void;
 };
 
 export function SchoolFilesDialog({
@@ -27,6 +28,7 @@ export function SchoolFilesDialog({
   onOpenChange,
   title = "Seus arquivos",
   fileTypes = [],
+  onSelectFile = () => {},
 }: SchoolFilesDialogProps) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = typeof open === "boolean";
@@ -37,15 +39,25 @@ export function SchoolFilesDialog({
     onOpenChange?.(next);
   };
 
+  const handleSelectFile = React.useCallback(
+    (url: string) => {
+      onSelectFile?.(url);
+      setOpen(false);
+    },
+    [onSelectFile]
+  );
+
   return (
     <Dialog open={actualOpen} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-w-3xl! pb-6 w-full">
-        <DialogHeader>
+      <DialogContent className="max-w-5xl! max-h-[calc(100vh-4rem)]! w-full! flex flex-col p-0 gap-0">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="mt-2">
-          {actualOpen ? <FilesList fileTypes={fileTypes} /> : null}
+        <div className="flex-1 overflow-y-auto px-6 pb-6 min-h-0">
+          {actualOpen ? (
+            <FilesList onSelectFile={handleSelectFile} fileTypes={fileTypes} />
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>

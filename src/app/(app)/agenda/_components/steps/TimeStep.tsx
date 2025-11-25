@@ -13,7 +13,7 @@ interface TimeStepProps {
 export function TimeStep({ formData, onDateChange }: TimeStepProps) {
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-12">
+      <div className="col-span-12 xl:col-span-6">
         <DateTimePicker
           id="start"
           label="Data de início *"
@@ -28,7 +28,7 @@ export function TimeStep({ formData, onDateChange }: TimeStepProps) {
         />
       </div>
 
-      <div className="col-span-12">
+      <div className="col-span-12 xl:col-span-6">
         <DateTimePicker
           id="end"
           label="Data de fim *"

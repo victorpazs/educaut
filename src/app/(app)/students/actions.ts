@@ -222,6 +222,7 @@ export interface IWorkedActivity {
   activity_name: string;
   activity_content: unknown;
   activity_tags: string[];
+  schedule_title: string;
   schedule_start: Date;
   schedule_end: Date;
   note: string | null;
@@ -270,6 +271,7 @@ export async function getWorkedActivitiesByStudent(
           select: {
             start_time: true,
             end_time: true,
+            title: true,
           },
         },
         activities: {
@@ -289,6 +291,7 @@ export async function getWorkedActivitiesByStudent(
         activity_name: sa.activities.name,
         activity_content: sa.activities.content,
         activity_tags: sa.activities.tags,
+        schedule_title: sa.schedules.title ?? "",
         schedule_start: sa.schedules.start_time,
         schedule_end: sa.schedules.end_time,
         note: sa.note,

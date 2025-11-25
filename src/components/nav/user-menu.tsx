@@ -5,6 +5,7 @@ import {
   LogOut,
   Settings,
   Tag,
+  UserIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Avatar } from "../ui/avatar";
@@ -33,7 +34,12 @@ export function UserMenu() {
 
   const menuOptions = [
     {
-      label: "Minha agenda",
+      label: "Meu perfil",
+      icon: UserIcon,
+      href: "/settings/profile",
+    },
+    {
+      label: "Agenda",
       icon: Calendar,
       href: "/agenda",
     },

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Combobox } from "@/components/ui/combobox";
 import { ScheduleFormData } from "../../create/_models";
 import { useActivities } from "@/app/(app)/activities/_hooks/use-activities";
 import { Eye, Check, CirclePlus } from "lucide-react";
@@ -15,15 +14,20 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ActivityNote } from "@/app/(app)/students/_components/steps/ActivityNote";
+import { ActivityNoteDialog } from "@/app/(app)/students/_components/steps/ActivityNoteDialog";
+import { getScheduleActivityNotes } from "../../actions";
 
 interface ActivitiesStepProps {
   formData: ScheduleFormData;
   onActivityChange: (activityId: number, value: boolean) => void;
+  scheduleId?: number | null;
 }
 
 export function ActivitiesStep({
   formData,
   onActivityChange,
+  scheduleId,
 }: ActivitiesStepProps) {
   const activitiesParams = React.useMemo(() => ({ search: "", tags: [] }), []);
   const { activities, isLoading } = useActivities(activitiesParams);
@@ -34,50 +38,17 @@ export function ActivitiesStep({
     tags?: string[];
     content: unknown;
   } | null>(null);
-
-  const options = React.useMemo(
-    () =>
-      activities.map((activity) => ({
-        value: activity.id,
-        label: activity.name,
-      })),
-    [activities]
-  );
-
-  const handleAdd = (option: { value: number; label: string }) => {
-    const alreadySelected =
-      formData.activityIds?.includes(option.value) ?? false;
-    if (!alreadySelected) {
-      onActivityChange(option.value, true);
-    }
-  };
-
-  const handleRemove = (option: { value: number; label: string }) => {
-    const alreadySelected =
-      formData.activityIds?.includes(option.value) ?? false;
-    if (alreadySelected) {
-      onActivityChange(option.value, false);
-    }
-  };
+  const [activityNotes, setActivityNotes] = React.useState<
+    Record<number, string | null>
+  >({});
+  const [openNoteDialog, setOpenNoteDialog] = React.useState(false);
+  const [editingActivityId, setEditingActivityId] = React.useState<
+    number | null
+  >(null);
 
   const handleToggleSelection = (activityId: number) => {
     const isSelected = formData.activityIds?.includes(activityId) ?? false;
     onActivityChange(activityId, !isSelected);
-  };
-
-  const handlePreview = (activity: {
-    id: number;
-    name: string;
-    tags?: string[] | null;
-    content: unknown;
-  }) => {
-    setSelectedActivity({
-      id: activity.id,
-      name: activity.name,
-      tags: activity.tags ?? undefined,
-      content: activity.content,
-    });
-    setOpenPreviewDialog(true);
   };
 
   const getCanvasData = (
@@ -94,13 +65,43 @@ export function ActivitiesStep({
     return undefined;
   };
 
+  React.useEffect(() => {
+    const loadNotes = async () => {
+      if (!scheduleId) {
+        setActivityNotes({});
+        return;
+      }
+
+      const res = await getScheduleActivityNotes(scheduleId);
+      if (res.success && res.data) {
+        setActivityNotes(res.data);
+      }
+    };
+
+    loadNotes();
+  }, [scheduleId]);
+
+  const handleEditNote = (activityId: number) => {
+    setEditingActivityId(activityId);
+    setOpenNoteDialog(true);
+  };
+
+  const handleSaveNote = async () => {
+    if (scheduleId && editingActivityId !== null) {
+      const res = await getScheduleActivityNotes(scheduleId);
+      if (res.success && res.data) {
+        setActivityNotes(res.data);
+      }
+    }
+  };
+
   if (isLoading) {
     return <PageLoader />;
   }
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {activities.map((activity) => {
           const isSelected =
             formData.activityIds?.includes(activity.id) ?? false;
@@ -111,7 +112,18 @@ export function ActivitiesStep({
               key={activity.id}
               name={activity.name}
               canvasData={canvasData}
-              className={isSelected ? "ring-2 ring-primary" : ""}
+              onClick={() => {
+                if (!scheduleId) {
+                  handleToggleSelection(activity.id);
+                }
+              }}
+              className={
+                isSelected && !scheduleId
+                  ? "ring-2 ring-primary"
+                  : !scheduleId
+                  ? "cursor-pointer"
+                  : ""
+              }
               actions={
                 <>
                   <Tooltip>
@@ -120,40 +132,34 @@ export function ActivitiesStep({
                         variant="ghost"
                         size="sm"
                         className="h-10 w-10 p-0"
+                        onClick={() => {
+                          setSelectedActivity({
+                            id: activity.id,
+                            name: activity.name,
+                            tags: activity.tags,
+                            content: activity.content,
+                          });
+                          setOpenPreviewDialog(true);
+                        }}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Visualizar atividade</TooltipContent>
                   </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-10 w-10 p-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleSelection(activity.id);
-                        }}
-                      >
-                        {isSelected ? (
-                          <Check className="h-4 w-4" />
-                        ) : (
-                          <CirclePlus className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {isSelected
-                        ? "Atividade selecionada"
-                        : "Selecionar atividade"}
-                    </TooltipContent>
-                  </Tooltip>
                 </>
               }
-            />
+            >
+              {scheduleId && (
+                <div className="mt-2 w-full">
+                  <ActivityNote
+                    className="w-full"
+                    note={activityNotes[activity.id] || null}
+                    onEdit={() => handleEditNote(activity.id)}
+                  />
+                </div>
+              )}
+            </ActivityCard>
           );
         })}
       </div>
@@ -165,6 +171,17 @@ export function ActivitiesStep({
           name={selectedActivity.name}
           tags={selectedActivity.tags}
           canvasData={getCanvasData(selectedActivity.content)}
+        />
+      )}
+
+      {scheduleId && editingActivityId !== null && (
+        <ActivityNoteDialog
+          open={openNoteDialog}
+          onOpenChange={setOpenNoteDialog}
+          scheduleId={scheduleId}
+          activityId={editingActivityId}
+          initialValue={activityNotes[editingActivityId] || ""}
+          onSave={handleSaveNote}
         />
       )}
     </div>

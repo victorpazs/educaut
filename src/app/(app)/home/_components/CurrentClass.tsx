@@ -50,7 +50,7 @@ export const CurrentClass = () => {
   }
 
   const handleClick = () => {
-    router.push(`/agenda?scheduleId=${currentClass.id}`);
+    router.push(`/agenda/edit/${currentClass.id}`);
   };
 
   return (

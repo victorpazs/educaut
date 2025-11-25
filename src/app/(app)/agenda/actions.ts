@@ -507,3 +507,50 @@ export async function getScheduleActivities(
     return handleServerError(error);
   }
 }
+
+export async function getScheduleActivityNotes(
+  scheduleId: number
+): Promise<ApiResponse<Record<number, string | null> | null>> {
+  try {
+    const { school } = await getAuthContext();
+    const schoolId = school?.id;
+
+    if (!schoolId) {
+      return createErrorResponse(
+        "Nenhuma escola selecionada.",
+        "SCHOOL_NOT_SELECTED",
+        400
+      );
+    }
+
+    const schedule = await prisma.schedules.findFirst({
+      where: {
+        id: scheduleId,
+        school_id: schoolId,
+        status: 1,
+      },
+      select: { id: true },
+    });
+
+    if (!schedule) {
+      return createErrorResponse("Aula não encontrada.", "NOT_FOUND", 404);
+    }
+
+    const activities = await prisma.schedules_activities.findMany({
+      where: { schedule_id: scheduleId },
+      select: { activity_id: true, note: true },
+    });
+
+    const notesMap: Record<number, string | null> = {};
+    activities.forEach((a) => {
+      notesMap[a.activity_id] = a.note;
+    });
+
+    return createSuccessResponse(
+      notesMap,
+      "Notas das atividades carregadas com sucesso."
+    );
+  } catch (error) {
+    return handleServerError(error);
+  }
+}

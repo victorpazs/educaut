@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import { Camera } from "lucide-react";
+import { uploadImageToS3 } from "@/app/(app)/_files/actions";
+import axios from "axios";
 
 export interface AvatarInputProps {
   value?: string | null;
@@ -58,6 +60,7 @@ export function AvatarInput({
         return;
       }
 
+      // Criar preview local imediatamente
       const toDataUrl = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
@@ -65,9 +68,43 @@ export function AvatarInput({
         reader.readAsDataURL(file);
       });
       setPreview(toDataUrl);
-      onChange?.(toDataUrl);
-    } catch {
-      toast.error("Falha ao carregar a imagem.");
+
+      // Gerar link de upload no S3
+      const linkResponse = await uploadImageToS3(
+        file.name,
+        file.size,
+        file.type || "image/jpeg"
+      );
+
+      if (!linkResponse.success || !linkResponse.data) {
+        toast.error(
+          "Erro ao gerar link de upload",
+          linkResponse.message || "Tente novamente."
+        );
+        return;
+      }
+
+      const { uploadUrl, url } = linkResponse.data;
+
+      // Upload direto para S3 usando axios
+      await axios.put(uploadUrl, file, {
+        headers: {
+          "Content-Type": file.type || "image/jpeg",
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      });
+
+      // Atualizar com URL do S3
+      setPreview(url);
+      onChange?.(url);
+      toast.success("Imagem enviada com sucesso.");
+    } catch (error: any) {
+      console.error("Erro ao processar arquivo:", error);
+      toast.error(
+        "Erro ao enviar imagem.",
+        error.response?.data?.message || error.message || "Tente novamente."
+      );
     } finally {
       setIsLoading(false);
     }

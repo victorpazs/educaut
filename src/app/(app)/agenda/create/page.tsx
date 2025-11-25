@@ -8,8 +8,11 @@ import { ScheduleCreateSteps, ScheduleFormData } from "./_models";
 import { ScheduleTabContent } from "../_components/ScheduleTabContent";
 import { TabsSidebar } from "@/components/tabs-sidebar";
 import { SubmitActions } from "./_components/SubmitActions";
+import { useAgenda } from "../_hooks/use-agenda";
 
 export default function CreateSchedulePage() {
+  const { refetch } = useAgenda();
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = React.useState<ScheduleCreateSteps>(

@@ -12,6 +12,7 @@ interface ActivityCardProps {
   onClick?: () => void;
   className?: string;
   children?: React.ReactNode;
+  height?: number;
 }
 
 export function ActivityCard({
@@ -22,6 +23,7 @@ export function ActivityCard({
   onClick,
   className,
   children,
+  height,
 }: ActivityCardProps) {
   return (
     <Card
@@ -32,7 +34,11 @@ export function ActivityCard({
       onClick={onClick}
     >
       <div className="w-full p-4 shrink-0">
-        <div className="w-full h-[180px] rounded-lg overflow-hidden bg-muted">
+        <div
+          className={`w-full ${
+            height ? `h-[${height}px]` : "h-[180px]"
+          } rounded-lg overflow-hidden bg-muted`}
+        >
           {canvasData ? <CanvasPreview data={canvasData} /> : null}
         </div>
       </div>

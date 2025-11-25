@@ -9,12 +9,14 @@ interface ScheduleTabContentProps {
   activeTab: string;
   formData: ScheduleFormData;
   setFormData: React.Dispatch<React.SetStateAction<ScheduleFormData>>;
+  scheduleId?: number | null;
 }
 
 export function ScheduleTabContent({
   activeTab,
   formData,
   setFormData,
+  scheduleId,
 }: ScheduleTabContentProps) {
   function onInputChange<T>(
     field: keyof ScheduleFormData | (keyof ScheduleFormData)[],
@@ -99,6 +101,7 @@ export function ScheduleTabContent({
           <ActivitiesStep
             formData={formData}
             onActivityChange={onActivityChange}
+            scheduleId={scheduleId}
           />
         );
 

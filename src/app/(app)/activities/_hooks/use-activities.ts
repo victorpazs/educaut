@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { IActivity } from "../_models";
 import { getActivities, GetActivitiesParams, deleteActivity } from "../actions";
@@ -35,7 +35,7 @@ export function useActivities(
 
   const memoizedParams = useMemo(
     () => ({ search: searchValue, tags: tagsValue }),
-    [searchValue, tagsKey]
+    [searchValue, tagsValue]
   );
 
   const { data, isLoading, errorMsg, onRemove } = useServerList<
@@ -63,7 +63,7 @@ export function useActivities(
             response.message || "Não foi possível excluir a atividade."
           );
         }
-      } catch (err) {
+      } catch {
         toast.error("Não foi possível excluir a atividade.");
       }
     },
