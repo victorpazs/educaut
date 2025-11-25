@@ -113,12 +113,15 @@ export function UploadDropzone({
         } else {
           toast.error("Erro ao confirmar upload", confirmResponse.message);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Erro ao fazer upload:", error);
-        if (error.response) {
+        const err = error as {
+          response?: { data?: { message?: string } };
+        };
+        if (err.response) {
           toast.error(
             "Erro ao fazer upload",
-            error.response.data?.message || "Erro desconhecido"
+            err.response.data?.message || "Erro desconhecido"
           );
         } else {
           toast.error(

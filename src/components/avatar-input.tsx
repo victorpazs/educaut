@@ -99,11 +99,15 @@ export function AvatarInput({
       setPreview(url);
       onChange?.(url);
       toast.success("Imagem enviada com sucesso.");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao processar arquivo:", error);
+      const err = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       toast.error(
         "Erro ao enviar imagem.",
-        error.response?.data?.message || error.message || "Tente novamente."
+        err.response?.data?.message || err.message || "Tente novamente."
       );
     } finally {
       setIsLoading(false);

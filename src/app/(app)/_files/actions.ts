@@ -11,10 +11,9 @@ import {
 } from "@/lib/server-responses";
 
 import type { ISchoolFile } from "./_models";
+import https from "https";
 
-const https = require("https");
 const spacesEndpoint = new AWS.Endpoint("s3.1app.com.br");
-const S3_PUBLIC_URL = "https://s3.victorpazs.com";
 
 const s3 = new AWS.S3({
   accessKeyId: "ATICAS3S3RVER2023",
@@ -134,10 +133,11 @@ export async function uploadImageToS3(
       },
       "Link de upload gerado com sucesso."
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erro ao gerar link de upload:", error);
 
-    if (error.code === "XMLParserError" || error.statusCode === 502) {
+    const err = error as { code?: string; statusCode?: number };
+    if (err.code === "XMLParserError" || err.statusCode === 502) {
       return createErrorResponse(
         `Erro ao conectar com o servidor S3. Endpoint: s3.1app.com.br`,
         "S3_CONNECTION_ERROR",
@@ -145,7 +145,7 @@ export async function uploadImageToS3(
       );
     }
 
-    if (error.code === "ENOTFOUND" || error.code === "ECONNREFUSED") {
+    if (err.code === "ENOTFOUND" || err.code === "ECONNREFUSED") {
       return createErrorResponse(
         `Não foi possível conectar ao servidor S3 em s3.1app.com.br`,
         "S3_ENDPOINT_UNREACHABLE",
@@ -260,10 +260,11 @@ export async function generateUploadLink(
       },
       "Link de upload gerado com sucesso."
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Erro ao gerar link de upload:", error);
 
-    if (error.code === "XMLParserError" || error.statusCode === 502) {
+    const err = error as { code?: string; statusCode?: number };
+    if (err.code === "XMLParserError" || err.statusCode === 502) {
       return createErrorResponse(
         `Erro ao conectar com o servidor S3. Endpoint: s3.1app.com.br`,
         "S3_CONNECTION_ERROR",
