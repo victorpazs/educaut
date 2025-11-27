@@ -104,8 +104,12 @@ export async function getCurrentClass(): Promise<
         end_time: {
           gte: now,
         },
-        students: {
-          status: 1,
+        schedules_students: {
+          some: {
+            students: {
+              status: 1,
+            },
+          },
         },
       },
       select: {
@@ -114,10 +118,14 @@ export async function getCurrentClass(): Promise<
         description: true,
         start_time: true,
         end_time: true,
-        students: {
+        schedules_students: {
           select: {
-            id: true,
-            name: true,
+            students: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -130,6 +138,10 @@ export async function getCurrentClass(): Promise<
       return createSuccessResponse(null, "No ongoing class found.");
     }
 
+    const students = currentSchedule.schedules_students.map(
+      (ss) => ss.students
+    );
+
     return createSuccessResponse(
       {
         id: currentSchedule.id,
@@ -137,7 +149,7 @@ export async function getCurrentClass(): Promise<
         description: currentSchedule.description,
         startTime: currentSchedule.start_time,
         endTime: currentSchedule.end_time,
-        student: currentSchedule.students,
+        students,
       },
       "Current class found."
     );

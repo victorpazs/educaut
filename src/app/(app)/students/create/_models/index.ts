@@ -8,6 +8,8 @@ export interface StudentFormData {
   tea_support_level: number | null;
   non_verbal: boolean | null;
   description: string;
+  diagnosis: string;
+  responsible: string[];
   student_attributes: number[];
 }
 

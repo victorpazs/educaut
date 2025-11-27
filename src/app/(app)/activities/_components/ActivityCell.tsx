@@ -6,11 +6,12 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CanvasPreview } from "@/components/canvas-preview";
 import { ActivitiesTags } from "@/components/activities_tags";
+import { FilePreview } from "@/components/school-files/FilePreview";
 
 import type { IActivity, IActivityContent } from "../_models";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { toast } from "@/lib/toast";
 import { useRouter } from "next/navigation";
@@ -28,17 +29,48 @@ interface ActivityCellProps {
 export function ActivityCell({ activity, onClick }: ActivityCellProps) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const router = useRouter();
-  const canvasData = React.useMemo<IActivityContent["data"] | null>(() => {
+
+  const contentInfo = React.useMemo<{
+    type: "canvas" | "upload" | null;
+    canvasData: IActivityContent["data"] | null;
+    uploadData: { url: string; fileType: string } | null;
+  }>(() => {
     const content = activity?.content;
-    if (
-      content &&
-      typeof content === "object" &&
-      (content as { type?: string }).type === "canvas" &&
-      (content as { data?: IActivityContent["data"] }).data
-    ) {
-      return (content as { data: IActivityContent["data"] }).data;
+    if (!content || typeof content !== "object") {
+      return { type: null, canvasData: null, uploadData: null };
     }
-    return null;
+
+    const contentObj = content as { type?: string; data?: unknown };
+    const type = contentObj.type;
+
+    if (type === "canvas" && contentObj.data) {
+      const data = contentObj.data as IActivityContent["data"];
+      return {
+        type: "canvas",
+        canvasData: data,
+        uploadData: null,
+      };
+    }
+
+    if (type === "upload" && contentObj.data) {
+      const data = contentObj.data as {
+        url?: string;
+        fileType?: string;
+        file_type?: string;
+      };
+      if (data.url) {
+        return {
+          type: "upload",
+          canvasData: null,
+          uploadData: {
+            url: data.url,
+            fileType: data.fileType || data.file_type || "",
+          },
+        };
+      }
+    }
+
+    return { type: null, canvasData: null, uploadData: null };
   }, [activity?.content]);
 
   const handleDelete = async (id: number) => {
@@ -48,8 +80,15 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
       toast.error("Erro", res.message || "Não foi possível excluir o aluno.");
       return;
     }
-    toast.success("Sucesso", "Aluno excluído com sucesso.");
+    toast.success("Sucesso", "Atividade excluída com sucesso.");
     router.refresh();
+  };
+
+  const handlePreview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (contentInfo.uploadData?.url) {
+      window.open(contentInfo.uploadData.url, "_blank");
+    }
   };
   return (
     <Card
@@ -58,7 +97,14 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
     >
       <div className="w-full p-4 shrink-0">
         <div className="w-full h-[180px] rounded-lg overflow-hidden bg-muted">
-          {canvasData ? <CanvasPreview data={canvasData} /> : null}
+          {contentInfo.type === "canvas" && contentInfo.canvasData ? (
+            <CanvasPreview data={contentInfo.canvasData} />
+          ) : contentInfo.type === "upload" && contentInfo.uploadData ? (
+            <FilePreview
+              url={contentInfo.uploadData.url}
+              type={contentInfo.uploadData.fileType}
+            />
+          ) : null}
         </div>
       </div>
       <CardContent className="pt-4 shrink-0">
@@ -77,9 +123,22 @@ export function ActivityCell({ activity, onClick }: ActivityCellProps) {
             ) : null}
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/activities/editor/${activity.id}`}>
-              <EditButton />
-            </Link>
+            {contentInfo.type === "canvas" && (
+              <Link href={`/activities/editor/${activity.id}`}>
+                <EditButton />
+              </Link>
+            )}
+            {contentInfo.type === "upload" && contentInfo.uploadData && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9"
+                onClick={handlePreview}
+                aria-label="Visualizar arquivo"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            )}
 
             <DeleteButton onClick={() => setOpenDeleteDialog(true)} />
             <ConfirmationDialog

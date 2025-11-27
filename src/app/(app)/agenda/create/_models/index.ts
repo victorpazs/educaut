@@ -5,7 +5,7 @@ export interface ScheduleFormData {
   description: string;
   start: Date;
   end: Date;
-  studentId: number | null;
+  studentIds: number[];
   activityIds: number[];
 }
 
@@ -21,16 +21,14 @@ export const ScheduleCreateSchema = z
     description: z.string().optional(),
     start: z.date(),
     end: z.date(),
-    studentId: z.number().int().positive("Selecione um aluno").nullable(),
+    studentIds: z
+      .array(z.number().int().positive())
+      .min(1, "Selecione pelo menos um aluno"),
     activityIds: z.array(z.number()).optional(),
   })
   .refine((data) => data.start.getTime() < data.end.getTime(), {
     message: "A data de início deve ser antes da data de fim",
     path: ["start"],
-  })
-  .refine((data) => data.studentId !== null && data.studentId > 0, {
-    message: "Selecione um aluno",
-    path: ["studentId"],
   });
 
 export type ScheduleCreateValues = z.infer<typeof ScheduleCreateSchema>;

@@ -11,6 +11,7 @@ import {
 import { getAuthContext } from "@/lib/session";
 
 import type { IActivity, IActivityContent } from "./_models";
+import { getFileExtension } from "@/lib/utils";
 
 export interface GetActivitiesParams {
   search?: string;
@@ -84,6 +85,7 @@ export type CreateActivityInput = {
   name: string;
   description?: string | null;
   tags: string[];
+  fileUrl?: string;
 };
 
 export async function createActivityAction(
@@ -109,19 +111,29 @@ export async function createActivityAction(
       );
     }
 
-    const created = await prisma.activities.create({
-      data: {
-        school_id: schoolId,
-        name: input.name.trim(),
-        description: input.description?.trim() || undefined,
-        content: {
+    const content = input.fileUrl
+      ? {
+          type: "upload",
+          data: {
+            fileType: getFileExtension(input.fileUrl),
+            url: input.fileUrl,
+          },
+        }
+      : {
           type: "canvas",
           data: {
             version: "6.9.0",
             objects: [],
             background: "#ffffff",
           },
-        },
+        };
+
+    const created = await prisma.activities.create({
+      data: {
+        school_id: schoolId,
+        name: input.name.trim(),
+        description: input.description?.trim() || undefined,
+        content: content as Prisma.InputJsonValue,
         is_public: false,
         tags: Array.isArray(input.tags) ? input.tags : [],
       },

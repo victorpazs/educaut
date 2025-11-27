@@ -9,9 +9,13 @@ export type IStudent = Prisma.studentsGetPayload<{
     created_at: true;
     status: true;
     school_segment: true;
-    schedules: {
+    schedules_students: {
       select: {
-        start_time: true;
+        schedules: {
+          select: {
+            start_time: true;
+          };
+        };
       };
     };
   };
@@ -27,6 +31,8 @@ export type IStudentDetail = Prisma.studentsGetPayload<{
     school_segment: true;
     tea_support_level: true;
     description: true;
+    diagnosis: true;
+    responsible: true;
     created_at: true;
     status: true;
     school_id: true;

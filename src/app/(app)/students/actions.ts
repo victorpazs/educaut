@@ -60,20 +60,28 @@ export async function getStudents({
         created_at: true,
         status: true,
         school_segment: true,
-        schedules: {
+        schedules_students: {
           where: {
-            status: 1,
-            start_time: {
-              gt: new Date(),
+            schedules: {
+              status: 1,
+              start_time: {
+                gt: new Date(),
+              },
+            },
+          },
+          select: {
+            schedules: {
+              select: {
+                start_time: true,
+              },
             },
           },
           orderBy: {
-            start_time: "asc",
+            schedules: {
+              start_time: "asc",
+            },
           },
           take: 1,
-          select: {
-            start_time: true,
-          },
         },
       },
     });
@@ -124,6 +132,8 @@ export async function getStudentById(
         tea_support_level: true,
         non_verbal: true,
         description: true,
+        diagnosis: true,
+        responsible: true,
         created_at: true,
         status: true,
         school_id: true,
@@ -254,10 +264,14 @@ export async function getWorkedActivitiesByStudent(
     const workedActivities = await prisma.schedules_activities.findMany({
       where: {
         schedules: {
-          student_id: Number(studentId),
           school_id: schoolId,
           status: {
             not: 3,
+          },
+          schedules_students: {
+            some: {
+              student_id: Number(studentId),
+            },
           },
         },
         activities: {
@@ -331,14 +345,51 @@ export async function updateScheduleActivityNote(
       );
     }
 
-    await prisma.schedules_activities.update({
+    // Verificar se o schedule existe e pertence à escola
+    const schedule = await prisma.schedules.findFirst({
+      where: {
+        id: scheduleId,
+        school_id: schoolId,
+        status: 1,
+      },
+      select: { id: true },
+    });
+
+    if (!schedule) {
+      return createErrorResponse("Aula não encontrada.", "NOT_FOUND", 404);
+    }
+
+    // Verificar se a atividade existe e pertence à escola
+    const activity = await prisma.activities.findFirst({
+      where: {
+        id: activityId,
+        school_id: schoolId,
+        status: 1,
+      },
+      select: { id: true },
+    });
+
+    if (!activity) {
+      return createErrorResponse(
+        "Atividade não encontrada.",
+        "ACTIVITY_NOT_FOUND",
+        404
+      );
+    }
+
+    await prisma.schedules_activities.upsert({
       where: {
         schedule_id_activity_id: {
           schedule_id: scheduleId,
           activity_id: activityId,
         },
       },
-      data: {
+      create: {
+        schedule_id: scheduleId,
+        activity_id: activityId,
+        note: note.trim() || null,
+      },
+      update: {
         note: note.trim() || null,
       },
     });

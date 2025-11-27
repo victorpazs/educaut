@@ -24,18 +24,44 @@ export function WorkedActivitiesStep({ studentId }: WorkedActivitiesStepProps) {
   const [editingActivity, setEditingActivity] =
     React.useState<IWorkedActivity | null>(null);
 
-  const getCanvasData = (
-    content: unknown
-  ): IActivityContent["data"] | undefined => {
-    if (
-      content &&
-      typeof content === "object" &&
-      (content as { type?: string }).type === "canvas" &&
-      (content as { data?: IActivityContent["data"] }).data
-    ) {
-      return (content as { data: IActivityContent["data"] }).data;
+  const getContentInfo = (content: unknown): {
+    type: "canvas" | "upload" | null;
+    canvasData?: IActivityContent["data"];
+    uploadData?: { url: string; fileType: string };
+  } => {
+    if (!content || typeof content !== "object") {
+      return { type: null };
     }
-    return undefined;
+
+    const contentObj = content as { type?: string; data?: unknown };
+    const type = contentObj.type;
+
+    if (type === "canvas" && contentObj.data) {
+      const data = contentObj.data as IActivityContent["data"];
+      return {
+        type: "canvas",
+        canvasData: data,
+      };
+    }
+
+    if (type === "upload" && contentObj.data) {
+      const data = contentObj.data as {
+        url?: string;
+        fileType?: string;
+        file_type?: string;
+      };
+      if (data.url) {
+        return {
+          type: "upload",
+          uploadData: {
+            url: data.url,
+            fileType: data.fileType || data.file_type || "",
+          },
+        };
+      }
+    }
+
+    return { type: null };
   };
 
   const handleEditNote = (activity: IWorkedActivity) => {
@@ -80,13 +106,14 @@ export function WorkedActivitiesStep({ studentId }: WorkedActivitiesStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
         {activities.map((activity) => {
           const key = `${activity.schedule_id}-${activity.activity_id}`;
-          const canvasData = getCanvasData(activity.activity_content);
+          const contentInfo = getContentInfo(activity.activity_content);
 
           return (
             <ActivityCard
               key={key}
               name={activity.activity_name}
-              canvasData={canvasData}
+              canvasData={contentInfo.canvasData}
+              uploadData={contentInfo.uploadData}
               actions={
                 <ActivityNote
                   note={activity.note}

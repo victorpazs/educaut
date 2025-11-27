@@ -25,6 +25,8 @@ export default function CreateStudentPage() {
     tea_support_level: null,
     non_verbal: null,
     description: "",
+    diagnosis: "",
+    responsible: [],
     student_attributes: [],
   });
 

@@ -4,6 +4,9 @@ import * as React from "react";
 import { BasicInfoStep, ActivitiesStep, TimeStep } from "./steps";
 import { ScheduleFormData, ScheduleCreateSteps } from "../create/_models";
 import { ContentCard } from "@/components/content-card";
+import { Button } from "@/components/ui/button";
+import { CirclePlus } from "lucide-react";
+import { AddActivityDialog } from "./steps/AddActivityDialog";
 
 interface ScheduleTabContentProps {
   activeTab: string;
@@ -18,6 +21,9 @@ export function ScheduleTabContent({
   setFormData,
   scheduleId,
 }: ScheduleTabContentProps) {
+  const [openAddActivityDialog, setOpenAddActivityDialog] =
+    React.useState(false);
+
   function onInputChange<T>(
     field: keyof ScheduleFormData | (keyof ScheduleFormData)[],
     value: T | T[]
@@ -60,6 +66,11 @@ export function ScheduleTabContent({
       activityIds: updatedActivities,
     }));
   }
+
+  const handleAddActivity = (activityId: number) => {
+    onActivityChange(activityId, true);
+    setOpenAddActivityDialog(false);
+  };
 
   const getStepTitle = (step: string) => {
     switch (step) {
@@ -110,12 +121,40 @@ export function ScheduleTabContent({
     }
   };
 
+  const getActions = () => {
+    if (activeTab === ScheduleCreateSteps.ACTIVITIES && scheduleId) {
+      return (
+        <Button
+          onClick={() => setOpenAddActivityDialog(true)}
+          variant="default"
+          size="sm"
+        >
+          <CirclePlus className="h-4 w-4 mr-2" />
+          Adicionar atividade
+        </Button>
+      );
+    }
+    return undefined;
+  };
+
   return (
-    <ContentCard
-      title={getStepTitle(activeTab)}
-      subtitle={getStepSubtitle(activeTab)}
-    >
-      {renderStepContent()}
-    </ContentCard>
+    <>
+      <ContentCard
+        title={getStepTitle(activeTab)}
+        subtitle={getStepSubtitle(activeTab)}
+        actions={getActions()}
+      >
+        {renderStepContent()}
+      </ContentCard>
+
+      {scheduleId && (
+        <AddActivityDialog
+          open={openAddActivityDialog}
+          onOpenChange={setOpenAddActivityDialog}
+          selectedActivityIds={formData.activityIds || []}
+          onAddActivity={handleAddActivity}
+        />
+      )}
+    </>
   );
 }

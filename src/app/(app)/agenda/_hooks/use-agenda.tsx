@@ -32,9 +32,16 @@ function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
       ? schedule.end_time
       : new Date(schedule.end_time);
 
-  const fallbackTitle = schedule.students?.name
-    ? `Aula com ${schedule.students.name}`
-    : "Aula";
+  const students = schedule.schedules_students?.map((ss) => ss.students) ?? [];
+  const studentIds = students.map((s) => s.id);
+  const studentNames = students.map((s) => s.name);
+
+  const fallbackTitle =
+    studentNames.length > 0
+      ? studentNames.length === 1
+        ? `Aula com ${studentNames[0]}`
+        : `Aula com ${studentNames.length} alunos`
+      : "Aula";
 
   return {
     id: schedule.id,
@@ -42,8 +49,8 @@ function mapScheduleToEvent(schedule: IAgendaSchedule): IAgendaCalendarEvent {
     start,
     end,
     description: schedule.description ?? null,
-    studentId: schedule.student_id,
-    studentName: schedule.students?.name ?? null,
+    studentIds,
+    studentNames,
   };
 }
 

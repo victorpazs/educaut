@@ -58,7 +58,13 @@ export default function ActivitiesPage() {
                 <NewActivityDialog
                   open={isCreateOpen}
                   onOpenChange={setIsCreateOpen}
-                  onCreated={(id) => router.push(`/activities/editor/${id}`)}
+                  onCreated={(id, type) => {
+                    if (type === "canvas") {
+                      router.push(`/activities/editor/${id}`);
+                    } else {
+                      router.refresh();
+                    }
+                  }}
                 />
               </div>
             }
@@ -87,19 +93,31 @@ export default function ActivitiesPage() {
             />
           ) : (
             <div className="grid grid-cols-12 gap-4">
-              {activities.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="col-span-12 h-full md:col-span-6 lg:col-span-4"
-                >
-                  <ActivityCell
-                    activity={activity}
-                    onClick={() =>
-                      router.push(`/activities/editor/${activity.id}`)
-                    }
-                  />
-                </div>
-              ))}
+              {activities.map((activity) => {
+                const content = activity?.content;
+                const contentType =
+                  content && typeof content === "object" && "type" in content
+                    ? (content as { type?: string }).type
+                    : null;
+                const isCanvas = contentType === "canvas";
+
+                return (
+                  <div
+                    key={activity.id}
+                    className="col-span-12 h-full md:col-span-6 lg:col-span-4"
+                  >
+                    <ActivityCell
+                      activity={activity}
+                      onClick={
+                        isCanvas
+                          ? () =>
+                              router.push(`/activities/editor/${activity.id}`)
+                          : undefined
+                      }
+                    />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

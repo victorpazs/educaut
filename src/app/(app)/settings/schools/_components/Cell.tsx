@@ -19,6 +19,7 @@ import {
 import { useSession } from "@/hooks/useSession";
 import { useSchoolChange } from "@/hooks/useSchoolChange";
 import { DeleteButton } from "@/components/delete-button";
+import { Chip } from "@/components/ui/chip";
 
 export function SchoolCell({
   school,
@@ -64,36 +65,13 @@ export function SchoolCell({
         <TableCell className="text-right">
           <div className="flex items-center gap-2 justify-end">
             {isCurrentSchool ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-10 w-10 p-0 cursor-default!"
-                    aria-label="Escola atual"
-                  >
-                    <BadgeCheck className="h-5 w-5 text-muted-foreground" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Escola atual</TooltipContent>
-              </Tooltip>
-            ) : (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-10 w-10 p-0"
-                    aria-label="Selecionar escola"
-                    onClick={handleSelectSchool}
-                    disabled={isPending}
-                  >
-                    <Badge className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Selecionar escola</TooltipContent>
-              </Tooltip>
-            )}
+              <Chip
+                label="Escola selecionada"
+                size="sm"
+                className="text-white"
+                color="primary"
+              />
+            ) : null}
             <SchoolEditDialog school={school} onUpdated={() => onReload()} />
 
             <DeleteButton

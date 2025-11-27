@@ -17,6 +17,7 @@ import {
 import { ActivityNote } from "@/app/(app)/students/_components/steps/ActivityNote";
 import { ActivityNoteDialog } from "@/app/(app)/students/_components/steps/ActivityNoteDialog";
 import { getScheduleActivityNotes } from "../../actions";
+import { cn } from "@/lib/utils";
 
 interface ActivitiesStepProps {
   formData: ScheduleFormData;
@@ -46,23 +47,61 @@ export function ActivitiesStep({
     number | null
   >(null);
 
+  // Quando for edição, filtrar apenas atividades selecionadas
+  const displayedActivities = React.useMemo(() => {
+    if (scheduleId && formData.activityIds && formData.activityIds.length > 0) {
+      return activities.filter((activity) =>
+        formData.activityIds?.includes(activity.id)
+      );
+    }
+    return activities;
+  }, [activities, formData.activityIds, scheduleId]);
+
   const handleToggleSelection = (activityId: number) => {
     const isSelected = formData.activityIds?.includes(activityId) ?? false;
     onActivityChange(activityId, !isSelected);
   };
 
-  const getCanvasData = (
+  const getContentInfo = (
     content: unknown
-  ): IActivityContent["data"] | undefined => {
-    if (
-      content &&
-      typeof content === "object" &&
-      (content as { type?: string }).type === "canvas" &&
-      (content as { data?: IActivityContent["data"] }).data
-    ) {
-      return (content as { data: IActivityContent["data"] }).data;
+  ): {
+    type: "canvas" | "upload" | null;
+    canvasData?: IActivityContent["data"];
+    uploadData?: { url: string; fileType: string };
+  } => {
+    if (!content || typeof content !== "object") {
+      return { type: null };
     }
-    return undefined;
+
+    const contentObj = content as { type?: string; data?: unknown };
+    const type = contentObj.type;
+
+    if (type === "canvas" && contentObj.data) {
+      const data = contentObj.data as IActivityContent["data"];
+      return {
+        type: "canvas",
+        canvasData: data,
+      };
+    }
+
+    if (type === "upload" && contentObj.data) {
+      const data = contentObj.data as {
+        url?: string;
+        fileType?: string;
+        file_type?: string;
+      };
+      if (data.url) {
+        return {
+          type: "upload",
+          uploadData: {
+            url: data.url,
+            fileType: data.fileType || data.file_type || "",
+          },
+        };
+      }
+    }
+
+    return { type: null };
   };
 
   React.useEffect(() => {
@@ -88,6 +127,12 @@ export function ActivitiesStep({
 
   const handleSaveNote = async () => {
     if (scheduleId && editingActivityId !== null) {
+      const isCurrentlyLinked =
+        formData.activityIds?.includes(editingActivityId) ?? false;
+      if (!isCurrentlyLinked) {
+        onActivityChange(editingActivityId, true);
+      }
+
       const res = await getScheduleActivityNotes(scheduleId);
       if (res.success && res.data) {
         setActivityNotes(res.data);
@@ -102,28 +147,24 @@ export function ActivitiesStep({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {activities.map((activity) => {
+        {displayedActivities.map((activity) => {
           const isSelected =
             formData.activityIds?.includes(activity.id) ?? false;
-          const canvasData = getCanvasData(activity.content);
+          const contentInfo = getContentInfo(activity.content);
 
           return (
             <ActivityCard
               key={activity.id}
               name={activity.name}
-              canvasData={canvasData}
+              canvasData={contentInfo.canvasData}
+              uploadData={contentInfo.uploadData}
               onClick={() => {
-                if (!scheduleId) {
-                  handleToggleSelection(activity.id);
-                }
+                handleToggleSelection(activity.id);
               }}
-              className={
-                isSelected && !scheduleId
-                  ? "ring-2 ring-primary"
-                  : !scheduleId
-                  ? "cursor-pointer"
-                  : ""
-              }
+              className={cn(
+                "cursor-pointer",
+                isSelected ? "ring-2 ring-primary" : ""
+              )}
               actions={
                 <>
                   <Tooltip>
@@ -132,7 +173,8 @@ export function ActivitiesStep({
                         variant="ghost"
                         size="sm"
                         className="h-10 w-10 p-0"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedActivity({
                             id: activity.id,
                             name: activity.name,
@@ -164,15 +206,20 @@ export function ActivitiesStep({
         })}
       </div>
 
-      {selectedActivity && (
-        <ActivityPreviewDialog
-          open={openPreviewDialog}
-          onOpenChange={setOpenPreviewDialog}
-          name={selectedActivity.name}
-          tags={selectedActivity.tags}
-          canvasData={getCanvasData(selectedActivity.content)}
-        />
-      )}
+      {selectedActivity &&
+        (() => {
+          const contentInfo = getContentInfo(selectedActivity.content);
+          return (
+            <ActivityPreviewDialog
+              open={openPreviewDialog}
+              onOpenChange={setOpenPreviewDialog}
+              name={selectedActivity.name}
+              tags={selectedActivity.tags}
+              canvasData={contentInfo.canvasData}
+              uploadData={contentInfo.uploadData}
+            />
+          );
+        })()}
 
       {scheduleId && editingActivityId !== null && (
         <ActivityNoteDialog

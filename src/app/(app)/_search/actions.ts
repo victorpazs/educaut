@@ -76,9 +76,10 @@ export async function liveSearch(
       prisma.$queryRaw<
         { id: number; start_time: Date; student_name: string }[]
       >`
-        SELECT s.id, s.start_time, st.name AS student_name
+        SELECT DISTINCT s.id, s.start_time, st.name AS student_name
         FROM schedules s
-        INNER JOIN students st ON st.id = s.student_id
+        INNER JOIN schedules_students ss ON ss.schedule_id = s.id
+        INNER JOIN students st ON st.id = ss.student_id
         WHERE s.school_id = ${schoolId}
           AND s.status = 1
           AND st.status = 1

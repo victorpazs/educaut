@@ -9,6 +9,7 @@ import {
   setObjectImageFromDataUrl,
 } from "./utils/image.utils";
 import { SchoolFilesDialog } from "@/components/school-files";
+import { ISchoolFile } from "@/app/(app)/_files/_models";
 
 type ImageSettingsProps = {
   object: any;
@@ -24,8 +25,9 @@ export default function ImageSettings({ object }: ImageSettingsProps) {
   }, [object, canvas]);
 
   const handleSelectFile = React.useCallback(
-    async (url: string) => {
-      if (!object || !url) return;
+    async (file: ISchoolFile) => {
+      if (!object || !file || !file.url) return;
+      const url = file.url;
       try {
         await setObjectImageFromDataUrl(object, url, canvas);
       } catch (error) {

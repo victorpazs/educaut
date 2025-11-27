@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Calendar, FileText, Settings } from "lucide-react";
+import { Calendar, FileText, Settings, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import {
   ScheduleCreateSteps,
@@ -14,8 +14,12 @@ import { SubmitActions } from "@/app/(app)/agenda/edit/_components/SubmitActions
 import {
   getScheduleById,
   getScheduleActivities,
+  deleteScheduleAction,
 } from "@/app/(app)/agenda/actions";
 import { useAgenda } from "../../_hooks/use-agenda";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/lib/toast";
 
 export default function EditSchedulePage() {
   const { refetch } = useAgenda();
@@ -29,11 +33,14 @@ export default function EditSchedulePage() {
     description: "",
     start: new Date(),
     end: new Date(),
-    studentId: null,
+    studentIds: [],
     activityIds: [],
   });
   const [scheduleId, setScheduleId] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] =
+    React.useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = React.useState<boolean>(false);
 
   const handleBack = React.useCallback(() => {
     router.push("/agenda");
@@ -59,13 +66,16 @@ export default function EditSchedulePage() {
       const activityIds =
         activitiesRes.success && activitiesRes.data ? activitiesRes.data : [];
 
+      const studentIds =
+        s.schedules_students?.map((ss) => ss.students.id) ?? [];
+
       setFormData({
         title: s.title ?? "",
         description: s.description ?? "",
         start:
           s.start_time instanceof Date ? s.start_time : new Date(s.start_time),
         end: s.end_time instanceof Date ? s.end_time : new Date(s.end_time),
-        studentId: s.student_id,
+        studentIds,
         activityIds,
       });
       setLoading(false);
@@ -99,15 +109,48 @@ export default function EditSchedulePage() {
     setActiveTab(identifier as ScheduleCreateSteps);
   }, []);
 
+  const handleDelete = React.useCallback(async () => {
+    if (!scheduleId) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await deleteScheduleAction(scheduleId);
+      if (!res.success) {
+        toast.error("Erro", res.message || "Não foi possível remover a aula.");
+        return;
+      }
+      toast.success("Sucesso", "Aula removida com sucesso.");
+      refetch();
+      handleBack();
+    } catch (error) {
+      toast.error("Erro", "Não foi possível remover a aula.");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  }, [scheduleId, refetch, handleBack]);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
-          <PageHeader
-            title="Editar aula"
-            subtitle={`Atualize os dados da aula ${formData.title || ""}`}
-            goBack={handleBack}
-          />
+          <div className="flex items-start justify-between gap-4">
+            <PageHeader
+              title="Editar aula"
+              subtitle={`Atualize os dados da aula ${formData.title || ""}`}
+              goBack={handleBack}
+            />
+            {!loading && scheduleId !== null && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setDeleteDialogOpen(true)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4 mr-2" /> Remover aula
+              </Button>
+            )}
+          </div>
         </div>
         <div className="col-span-12 md:col-span-4 lg:col-span-3">
           <TabsSidebar
@@ -138,6 +181,15 @@ export default function EditSchedulePage() {
           )}
         </div>
       </div>
+      <ConfirmationDialog
+        title="Remover aula"
+        description="Tem certeza que deseja remover esta aula? Essa ação não pode ser desfeita."
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onAccept={handleDelete}
+        labelAccept={isDeleting ? "Removendo..." : "Remover"}
+        labelDeny="Cancelar"
+      />
     </div>
   );
 }

@@ -28,7 +28,7 @@ export function SubmitActions({
       description: formData.description,
       start: formData.start,
       end: formData.end,
-      studentId: formData.studentId!,
+      studentIds: formData.studentIds,
       activityIds: formData.activityIds,
     });
     if (!res.success) {

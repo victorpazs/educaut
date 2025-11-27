@@ -21,7 +21,8 @@ export function StudentCell({
 }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const age = getAge(student.birthday);
-  const nextStart = student.schedules?.[0]?.start_time ?? null;
+  const nextStart =
+    student.schedules_students?.[0]?.schedules?.start_time ?? null;
   const nextStartFormatted = nextStart != null ? formatDate(nextStart) : "--";
   const schoolYearLabel = getSchoolYearLabel(student.school_year);
   const router = useRouter();

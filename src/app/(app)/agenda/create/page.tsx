@@ -36,9 +36,11 @@ export default function CreateSchedulePage() {
     return {
       title: "",
       description: "",
+      diagnosis: "",
+      responsible: [],
       start,
       end,
-      studentId: null,
+      studentIds: [],
       activityIds: [],
     };
   });

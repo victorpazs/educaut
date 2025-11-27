@@ -24,18 +24,23 @@ import { getAttributeLabel } from "@/lib/attributes.utils";
 
 interface CreateAttributeDialogProps {
   attributeTypes: string[];
+  open: boolean;
+  onClose: () => void;
   onSuccess?: () => void;
+  typeName: string;
 }
 
 export function CreateAttributeDialog({
+  open,
+  onClose,
   attributeTypes,
+  typeName,
   onSuccess,
 }: CreateAttributeDialogProps) {
-  const [open, setOpen] = React.useState(false);
   const [attributeData, setAttributeData] = React.useState<{
     name: string;
     typeName?: string;
-  }>({ name: "", typeName: undefined });
+  }>({ name: "", typeName: typeName });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleCreate = async (e?: React.FormEvent) => {
@@ -56,7 +61,7 @@ export function CreateAttributeDialog({
       });
       if (response.success) {
         toast.success("Atributo criado com sucesso.");
-        setOpen(false);
+        onClose?.();
         setAttributeData({ name: "", typeName: undefined });
         onSuccess?.();
       } else {
@@ -72,18 +77,12 @@ export function CreateAttributeDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (!next) {
-          setAttributeData({ name: "", typeName: undefined });
-          setIsSubmitting(false);
-        }
+      onOpenChange={() => {
+        onClose?.();
+        setAttributeData({ name: "", typeName: undefined });
+        setIsSubmitting(false);
       }}
     >
-      <Button size="sm" onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4 mr-2" />
-        Novo atributo
-      </Button>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Novo atributo</DialogTitle>
@@ -134,7 +133,7 @@ export function CreateAttributeDialog({
             <Button
               type="button"
               variant="ghost"
-              onClick={() => setOpen(false)}
+              onClick={() => onClose?.()}
               disabled={isSubmitting}
             >
               Cancelar

@@ -15,7 +15,6 @@ export function FilePreview({ url, type, className = "" }: FilePreviewProps) {
   const fileType = (type || "").toLowerCase();
   const Icon = getIconByType(type);
 
-  // Renderizar imagem
   if (
     !imageError &&
     (fileType === "png" ||
@@ -39,7 +38,6 @@ export function FilePreview({ url, type, className = "" }: FilePreviewProps) {
     );
   }
 
-  // Renderizar vídeo
   if (fileType === "mp4" || fileType === "webm" || fileType === "ogg") {
     return (
       <div
@@ -77,7 +75,11 @@ export function FilePreview({ url, type, className = "" }: FilePreviewProps) {
       <div
         className={`w-full h-full flex items-center justify-center bg-muted ${className}`}
       >
-        <iframe src={url} className="w-full h-full" title="PDF Preview" />
+        <iframe
+          src={url}
+          className="w-full h-full min-w-[220px] min-h-[200px]"
+          title="PDF Preview"
+        />
       </div>
     );
   }

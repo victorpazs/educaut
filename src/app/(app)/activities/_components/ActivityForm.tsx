@@ -39,8 +39,8 @@ export function ActivityForm({
           rows={4}
         />
       </div>
-      <div className="space-y-2">
-        <label className="text-sm mb-1">Categorias</label>
+      <div className="space-y-2 flex flex-col">
+        <label className="text-sm">Categorias</label>
         <ActivitiesTags selectedTags={selectedTags} onToggleTag={onToggleTag} />
       </div>
     </div>

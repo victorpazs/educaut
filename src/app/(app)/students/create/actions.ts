@@ -14,6 +14,8 @@ export type CreateStudentInput = {
   school_segment: string;
   school_year: number;
   description?: string | null;
+  diagnosis?: string | null;
+  responsible?: string[];
   tea_support_level?: number | null;
   non_verbal?: boolean | null;
   birthday?: Date | null;
@@ -41,6 +43,8 @@ export async function createStudentAction(
         school_segment: input.school_segment,
         school_year: input.school_year,
         description: input.description || undefined,
+        diagnosis: input.diagnosis?.trim() || undefined,
+        responsible: input.responsible || [],
         tea_support_level: input.tea_support_level ?? undefined,
         non_verbal: input.non_verbal ?? undefined,
         birthday: input.birthday ?? undefined,

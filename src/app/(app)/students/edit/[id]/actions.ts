@@ -14,6 +14,8 @@ export type UpdateStudentInput = {
   school_segment: string;
   school_year: number;
   description?: string | null;
+  diagnosis?: string | null;
+  responsible?: string[];
   tea_support_level?: number | null;
   non_verbal?: boolean | null;
   birthday?: Date | null;
@@ -65,6 +67,8 @@ export async function updateStudentAction(
           school_segment: input.school_segment,
           school_year: input.school_year,
           description: input.description ?? null,
+          diagnosis: input.diagnosis?.trim() || null,
+          responsible: input.responsible || [],
           tea_support_level: input.tea_support_level ?? null,
           non_verbal: input.non_verbal ?? null,
           birthday: input.birthday ?? null,

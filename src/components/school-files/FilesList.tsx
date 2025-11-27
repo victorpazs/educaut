@@ -1,55 +1,40 @@
 "use client";
 
 import * as React from "react";
-import { getSchoolFiles } from "@/app/(app)/_files/actions";
 import type { ISchoolFile } from "@/app/(app)/_files/_models";
-import { Skeleton } from "@/components/ui/skeleton";
-import { EmptyList } from "@/components/empty-list";
-import { FileQuestion } from "lucide-react";
 import { FileCell } from "./FileCell";
 import UploadDropzone from "./Upload/Dropzone";
 import { PageLoader } from "../page-loader";
+import { useSchoolFiles } from "@/app/(app)/_files/_hooks/use-school-files";
+import { PaginationControls } from "./pagination-utils";
 
 type FilesListProps = {
   fileTypes?: string[];
-  onSelectFile?: (url: string) => void;
+  onSelectFile?: (file: ISchoolFile) => void;
 };
 
 export function FilesList({ fileTypes, onSelectFile }: FilesListProps) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [files, setFiles] = React.useState<ISchoolFile[]>([]);
+  const { files, isLoading, filter, totalPages, setFilter, onDelete, refetch } =
+    useSchoolFiles({ fileTypes });
 
-  const loadFiles = React.useCallback(async () => {
-    try {
-      const response = await getSchoolFiles();
-      if (response.success && response.data) {
-        setFiles(response.data);
-      } else {
-        setFiles([]);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar arquivos:", error);
-      setFiles([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const handleDelete = React.useCallback(
+    async (id: number) => {
+      await onDelete(id);
+    },
+    [onDelete]
+  );
 
-  React.useEffect(() => {
-    let isCancelled = false;
-    setIsLoading(true);
-    loadFiles().then(() => {
-      if (isCancelled) return;
-    });
-    return () => {
-      isCancelled = true;
-    };
-  }, [loadFiles]);
+  const handlePageChange = React.useCallback(
+    (newPage: number) => {
+      setFilter({ page: newPage });
+    },
+    [setFilter]
+  );
 
   return (
     <div className="divide-y">
       <div className="space-y-4 px-6">
-        <UploadDropzone fileTypes={fileTypes} onUploadSuccess={loadFiles} />
+        <UploadDropzone fileTypes={fileTypes} onUploadSuccess={refetch} />
         {isLoading ? <PageLoader /> : null}
         <div className="grid grid-cols-12 gap-4">
           {files.map((file) => (
@@ -59,12 +44,17 @@ export function FilesList({ fileTypes, onSelectFile }: FilesListProps) {
             >
               <FileCell
                 file={file}
-                onClick={() => onSelectFile?.(file.url)}
-                onDeleted={loadFiles}
+                onClick={() => onSelectFile?.(file)}
+                onDeleted={() => handleDelete(file.id)}
               />
             </div>
           ))}
         </div>
+        <PaginationControls
+          page={filter.page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

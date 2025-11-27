@@ -36,6 +36,8 @@ export default function EditStudentPage() {
     tea_support_level: null,
     non_verbal: null,
     description: "",
+    diagnosis: "",
+    responsible: [],
     student_attributes: [],
   });
   const [studentId, setStudentId] = React.useState<number | null>(null);
@@ -69,6 +71,8 @@ export default function EditStudentPage() {
         tea_support_level: s.tea_support_level ?? null,
         non_verbal: s.non_verbal ?? null,
         description: s.description ?? "",
+        diagnosis: s.diagnosis ?? "",
+        responsible: s.responsible || [],
         student_attributes:
           s.student_attributes?.map((sa) => sa.attribute_id) ?? [],
       });

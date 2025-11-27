@@ -18,7 +18,10 @@ export function ActivityNote({ note, onEdit, className }: ActivityNoteProps) {
     <Button
       variant="ghost"
       size="sm"
-      onClick={onEdit}
+      onClick={(e) => {
+        e.stopPropagation();
+        onEdit();
+      }}
       className={cn("text-xs font-normal", className)}
     >
       <Pencil className="h-4 w-4 mr-2" />

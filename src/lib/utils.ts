@@ -68,3 +68,8 @@ export function parseDateTimeLocal(value: string): Date {
   const [hh, mm] = timePart.split(":").map((v) => Number(v));
   return new Date(y, m - 1, d, hh, mm, 0, 0);
 }
+
+export function getFileExtension(filename: string): string {
+  const ext = filename.split(".").pop()?.toLowerCase() || "";
+  return ext || "bin";
+}

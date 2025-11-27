@@ -58,9 +58,11 @@ export const CurrentClass = () => {
       <div>
         <p className="text-sm font-semibold opacity-90">Aula em andamento</p>
         <p className="text-lg font-bold mt-2">{currentClass.title}</p>
-        {currentClass.student && (
+        {currentClass.students && currentClass.students.length > 0 && (
           <p className="text-sm opacity-80 mt-1">
-            Aluno: {currentClass.student.name}
+            {currentClass.students.length === 1
+              ? `Aluno: ${currentClass.students[0].name}`
+              : `${currentClass.students.length} alunos`}
           </p>
         )}
       </div>

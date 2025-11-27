@@ -4,6 +4,7 @@ import * as React from "react";
 import { IActivityContent } from "@/app/(app)/activities/_models";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { CanvasPreview } from "./canvas-preview";
+import { FilePreview } from "./school-files/FilePreview";
 import { ActivitiesTags } from "./activities_tags";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,7 @@ interface ActivityPreviewDialogProps {
   name: string;
   tags?: string[];
   canvasData?: IActivityContent["data"];
+  uploadData?: { url: string; fileType: string };
 }
 
 export function ActivityPreviewDialog({
@@ -21,6 +23,7 @@ export function ActivityPreviewDialog({
   name,
   tags,
   canvasData,
+  uploadData,
 }: ActivityPreviewDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -50,6 +53,12 @@ export function ActivityPreviewDialog({
               <CanvasPreview
                 height={600}
                 data={canvasData}
+                className="w-full h-full"
+              />
+            ) : uploadData ? (
+              <FilePreview
+                url={uploadData.url}
+                type={uploadData.fileType}
                 className="w-full h-full"
               />
             ) : (

@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +13,9 @@ import { StudentFormData } from "../../create/_models";
 import { supportLevels } from "@/lib/tea_levels.utils";
 import { SchoolYearSelect } from "@/components/school-year-select";
 import { BirthdayPicker } from "@/components/birthday-picker";
+import { Chip } from "@/components/ui/chip";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BasicInfoStepProps {
   formData: StudentFormData;
@@ -29,6 +33,36 @@ export function BasicInfoStep({
   onCheckboxChange,
   onDateChange,
 }: BasicInfoStepProps) {
+  const [responsibleInput, setResponsibleInput] = React.useState("");
+
+  const handleAddResponsible = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+
+    const current = formData.responsible || [];
+    if (!current.includes(trimmed)) {
+      onInputChange<string[]>("responsible", [...current, trimmed]);
+      setResponsibleInput("");
+    }
+  };
+
+  const handleRemoveResponsible = (value: string) => {
+    const current = formData.responsible || [];
+    onInputChange<string[]>(
+      "responsible",
+      current.filter((item) => item !== value)
+    );
+  };
+
+  const handleResponsibleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddResponsible(responsibleInput);
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -106,6 +140,63 @@ export function BasicInfoStep({
             onChange={(e) => onInputChange("description", e.target.value)}
             placeholder="Informações adicionais sobre o aluno"
           />
+        </div>
+
+        <div className="col-span-12">
+          <label className="text-sm font-medium">Diagnóstico</label>
+          <Textarea
+            value={formData.diagnosis || ""}
+            onChange={(e) => onInputChange("diagnosis", e.target.value)}
+            placeholder="Descreva o diagnóstico do aluno"
+            rows={4}
+          />
+        </div>
+
+        <div className="col-span-12">
+          <label className="text-sm font-medium">Responsáveis</label>
+          <div className="relative">
+            <div
+              className={cn(
+                "flex min-h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+                "flex flex-wrap gap-2 items-center"
+              )}
+            >
+              {(formData.responsible || []).map((item) => (
+                <Chip
+                  key={item}
+                  label={item}
+                  size="sm"
+                  variant="standard"
+                  color="default"
+                  endIcon={
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveResponsible(item);
+                      }}
+                      className="ml-1 hover:opacity-70"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  }
+                />
+              ))}
+              <input
+                type="text"
+                value={responsibleInput}
+                onChange={(e) => setResponsibleInput(e.target.value)}
+                onKeyDown={handleResponsibleKeyDown}
+                placeholder={
+                  (formData.responsible || []).length === 0
+                    ? "Digite e pressione Enter para adicionar..."
+                    : ""
+                }
+                className="flex-1 min-w-[120px] outline-none bg-transparent"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

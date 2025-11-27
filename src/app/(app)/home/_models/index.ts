@@ -10,8 +10,8 @@ export interface ICurrentClass {
   description: string | null;
   startTime: Date;
   endTime: Date;
-  student: {
+  students: {
     id: number;
     name: string;
-  };
+  }[];
 }

@@ -30,8 +30,12 @@ export async function getAgenda(): Promise<
       where: {
         school_id: schoolId,
         status: 1,
-        students: {
-          status: 1,
+        schedules_students: {
+          some: {
+            students: {
+              status: 1,
+            },
+          },
         },
       },
       orderBy: {
@@ -44,12 +48,15 @@ export async function getAgenda(): Promise<
         start_time: true,
         end_time: true,
         status: true,
-        student_id: true,
-        students: {
+        schedules_students: {
           select: {
-            id: true,
-            name: true,
-            status: true,
+            students: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+              },
+            },
           },
         },
       },
@@ -136,8 +143,12 @@ export async function getScheduleById(
         id,
         school_id: schoolId,
         status: 1,
-        students: {
-          status: 1,
+        schedules_students: {
+          some: {
+            students: {
+              status: 1,
+            },
+          },
         },
       },
       select: {
@@ -147,12 +158,15 @@ export async function getScheduleById(
         start_time: true,
         end_time: true,
         status: true,
-        student_id: true,
-        students: {
+        schedules_students: {
           select: {
-            id: true,
-            name: true,
-            status: true,
+            students: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+              },
+            },
           },
         },
       },
@@ -180,7 +194,7 @@ type CreateScheduleInput = {
   description?: string;
   start: Date | string;
   end: Date | string;
-  studentId: number;
+  studentIds: number[];
   activityIds?: number[];
 };
 
@@ -208,9 +222,13 @@ export async function createScheduleAction(
       );
     }
 
-    if (!input.studentId || isNaN(Number(input.studentId))) {
+    if (
+      !input.studentIds ||
+      !Array.isArray(input.studentIds) ||
+      input.studentIds.length === 0
+    ) {
       return createErrorResponse(
-        "Selecione um aluno válido.",
+        "Selecione pelo menos um aluno.",
         "VALIDATION_ERROR",
         400
       );
@@ -240,48 +258,29 @@ export async function createScheduleAction(
       );
     }
 
-    const student = await prisma.students.findFirst({
-      where: { id: input.studentId, school_id: schoolId, status: 1 },
+    // Validar que todos os alunos existem e pertencem à escola
+    const students = await prisma.students.findMany({
+      where: {
+        id: { in: input.studentIds },
+        school_id: schoolId,
+        status: 1,
+      },
       select: { id: true },
     });
-    if (!student) {
+
+    if (students.length !== input.studentIds.length) {
       return createErrorResponse(
-        "Aluno inválido para a escola selecionada.",
+        "Um ou mais alunos são inválidos para a escola selecionada.",
         "VALIDATION_ERROR",
         400
       );
     }
 
-    const existingSame = await prisma.schedules.findFirst({
-      where: {
-        school_id: schoolId,
-        student_id: input.studentId,
-        start_time: startDate,
-        end_time: endDate,
-        status: 1,
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        start_time: true,
-        end_time: true,
-        status: true,
-        student_id: true,
-        students: { select: { id: true, name: true, status: true } },
-      },
-    });
-    if (existingSame) {
-      return createSuccessResponse(existingSame, "Aula criada com sucesso.");
-    }
-
     const created = await prisma.$transaction(async (tx) => {
-      const schedule = await tx.schedules.create({
-        data: {
+      // Verificar se já existe um schedule igual (mesmo horário e escola)
+      const existingSame = await tx.schedules.findFirst({
+        where: {
           school_id: schoolId,
-          student_id: input.studentId,
-          title,
-          description: input.description ?? null,
           start_time: startDate,
           end_time: endDate,
           status: 1,
@@ -293,14 +292,66 @@ export async function createScheduleAction(
           start_time: true,
           end_time: true,
           status: true,
-          student_id: true,
-          students: {
-            select: { id: true, name: true, status: true },
+          schedules_students: {
+            select: {
+              students: {
+                select: { id: true, name: true, status: true },
+              },
+            },
           },
         },
       });
 
+      let schedule;
+      if (existingSame) {
+        schedule = existingSame;
+      } else {
+        schedule = await tx.schedules.create({
+          data: {
+            school_id: schoolId,
+            title,
+            description: input.description ?? null,
+            start_time: startDate,
+            end_time: endDate,
+            status: 1,
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            start_time: true,
+            end_time: true,
+            status: true,
+            schedules_students: {
+              select: {
+                students: {
+                  select: { id: true, name: true, status: true },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Remover alunos existentes e adicionar os novos
+      await tx.schedules_students.deleteMany({
+        where: { schedule_id: schedule.id },
+      });
+
+      await tx.schedules_students.createMany({
+        data: input.studentIds.map((student_id) => ({
+          schedule_id: schedule.id,
+          student_id,
+        })),
+        skipDuplicates: true,
+      });
+
+      // Vincular atividades
       if (input.activityIds && input.activityIds.length > 0) {
+        await tx.schedules_activities.deleteMany({
+          where: { schedule_id: schedule.id },
+        });
+
         await tx.schedules_activities.createMany({
           data: input.activityIds.map((activity_id) => ({
             schedule_id: schedule.id,
@@ -310,7 +361,27 @@ export async function createScheduleAction(
         });
       }
 
-      return schedule;
+      // Recarregar schedule com alunos
+      const scheduleWithStudents = await tx.schedules.findUnique({
+        where: { id: schedule.id },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          start_time: true,
+          end_time: true,
+          status: true,
+          schedules_students: {
+            select: {
+              students: {
+                select: { id: true, name: true, status: true },
+              },
+            },
+          },
+        },
+      });
+
+      return scheduleWithStudents!;
     });
 
     return createSuccessResponse(created, "Aula criada com sucesso.");
@@ -325,7 +396,7 @@ type UpdateScheduleInput = {
   description?: string;
   start: Date | string;
   end: Date | string;
-  studentId: number;
+  studentIds: number[];
   activityIds?: number[];
 };
 
@@ -397,31 +468,41 @@ export async function updateScheduleAction(
       );
     }
 
-    if (!input.studentId || isNaN(Number(input.studentId))) {
+    if (
+      !input.studentIds ||
+      !Array.isArray(input.studentIds) ||
+      input.studentIds.length === 0
+    ) {
       return createErrorResponse(
-        "Selecione um aluno válido.",
+        "Selecione pelo menos um aluno.",
         "VALIDATION_ERROR",
         400
       );
     }
 
-    const student = await prisma.students.findFirst({
-      where: { id: input.studentId, school_id: schoolId, status: 1 },
+    // Validar que todos os alunos existem e pertencem à escola
+    const students = await prisma.students.findMany({
+      where: {
+        id: { in: input.studentIds },
+        school_id: schoolId,
+        status: 1,
+      },
       select: { id: true },
     });
-    if (!student) {
+
+    if (students.length !== input.studentIds.length) {
       return createErrorResponse(
-        "Aluno inválido para a escola selecionada.",
+        "Um ou mais alunos são inválidos para a escola selecionada.",
         "VALIDATION_ERROR",
         400
       );
     }
 
     const updated = await prisma.$transaction(async (tx) => {
+      // Atualizar dados do schedule
       const schedule = await tx.schedules.update({
         where: { id: input.id },
         data: {
-          student_id: input.studentId,
           title,
           description: input.description ?? null,
           start_time: startDate,
@@ -434,13 +515,23 @@ export async function updateScheduleAction(
           start_time: true,
           end_time: true,
           status: true,
-          student_id: true,
-          students: {
-            select: { id: true, name: true, status: true },
-          },
         },
       });
 
+      // Sincronizar alunos
+      await tx.schedules_students.deleteMany({
+        where: { schedule_id: input.id },
+      });
+
+      await tx.schedules_students.createMany({
+        data: input.studentIds.map((student_id) => ({
+          schedule_id: input.id,
+          student_id,
+        })),
+        skipDuplicates: true,
+      });
+
+      // Sincronizar atividades
       await tx.schedules_activities.deleteMany({
         where: { schedule_id: input.id },
       });
@@ -455,7 +546,27 @@ export async function updateScheduleAction(
         });
       }
 
-      return schedule;
+      // Recarregar schedule com alunos
+      const scheduleWithStudents = await tx.schedules.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          start_time: true,
+          end_time: true,
+          status: true,
+          schedules_students: {
+            select: {
+              students: {
+                select: { id: true, name: true, status: true },
+              },
+            },
+          },
+        },
+      });
+
+      return scheduleWithStudents!;
     });
 
     return createSuccessResponse(updated, "Aula atualizada com sucesso.");

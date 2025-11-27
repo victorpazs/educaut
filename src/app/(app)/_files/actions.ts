@@ -12,6 +12,7 @@ import {
 
 import type { ISchoolFile } from "./_models";
 import https from "https";
+import { getFileExtension } from "@/lib/utils";
 
 const spacesEndpoint = new AWS.Endpoint("s3.1app.com.br");
 
@@ -27,51 +28,6 @@ const s3 = new AWS.S3({
   region: "sa-east-1",
   signatureVersion: "v4",
 });
-
-function getContentType(filename: string): string {
-  const ext = filename.split(".").pop()?.toLowerCase() || "";
-  const contentTypes: Record<string, string> = {
-    png: "image/png",
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    webp: "image/webp",
-    gif: "image/gif",
-    svg: "image/svg+xml",
-    pdf: "application/pdf",
-    txt: "text/plain",
-    csv: "text/csv",
-    xls: "application/vnd.ms-excel",
-    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    doc: "application/msword",
-    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ppt: "application/vnd.ms-powerpoint",
-    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    mp4: "video/mp4",
-    mp3: "audio/mpeg",
-    wav: "audio/wav",
-    json: "application/json",
-  };
-  return contentTypes[ext] || "application/octet-stream";
-}
-
-function getFileExtension(filename: string): string {
-  const ext = filename.split(".").pop()?.toLowerCase() || "";
-  return ext || "bin";
-}
-
-function getFileNameWithoutExtension(filename: string): string {
-  const lastDotIndex = filename.lastIndexOf(".");
-  if (lastDotIndex === -1) return filename;
-  return filename.substring(0, lastDotIndex);
-}
-
-function sanitizeFileName(filename: string): string {
-  // Remove caracteres especiais e espaços, mantendo apenas letras, números, hífens e underscores
-  return filename
-    .replace(/[^a-zA-Z0-9_-]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "");
-}
 
 function generateRandomHash(): string {
   return (
@@ -157,9 +113,24 @@ export async function uploadImageToS3(
   }
 }
 
-export async function getSchoolFiles(): Promise<
-  ApiResponse<ISchoolFile[] | null>
-> {
+export interface GetSchoolFilesParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  fileTypes?: string[];
+}
+
+export interface GetSchoolFilesResponse {
+  files: ISchoolFile[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function getSchoolFiles(
+  params: GetSchoolFilesParams = {}
+): Promise<ApiResponse<GetSchoolFilesResponse | null>> {
   try {
     const { school } = await getAuthContext();
     const schoolId = school?.id;
@@ -172,25 +143,68 @@ export async function getSchoolFiles(): Promise<
       );
     }
 
-    const files = await prisma.files.findMany({
-      where: {
-        school_id: schoolId,
-        status: 1,
-      },
-      orderBy: {
-        created_at: "desc",
-      },
-      select: {
-        id: true,
-        type: true,
-        size: true,
-        url: true,
-        status: true,
-        created_at: true,
-      },
-    });
+    const page = params.page ?? 1;
+    const limit = params.limit ?? 12;
+    const skip = (page - 1) * limit;
+    const normalizedSearch = params.search?.trim();
+    const fileTypes = params.fileTypes?.filter(Boolean).map((type) =>
+      type.toLowerCase().replace(/^\./, "")
+    );
 
-    return createSuccessResponse(files, "Arquivos carregados com sucesso.");
+    const whereClause = {
+      school_id: schoolId,
+      status: 1,
+      ...(normalizedSearch
+        ? {
+            url: {
+              contains: normalizedSearch,
+              mode: "insensitive" as const,
+            },
+          }
+        : {}),
+      ...(fileTypes && fileTypes.length > 0
+        ? {
+            type: {
+              in: fileTypes,
+            },
+          }
+        : {}),
+    };
+
+    const [files, total] = await Promise.all([
+      prisma.files.findMany({
+        where: whereClause,
+        orderBy: {
+          created_at: "desc",
+        },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          type: true,
+          size: true,
+          url: true,
+          status: true,
+          created_at: true,
+        },
+      }),
+      prisma.files.count({
+        where: whereClause,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return createSuccessResponse(
+      {
+        files,
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+      "Arquivos carregados com sucesso."
+    );
   } catch (error) {
     return handleServerError(error);
   }

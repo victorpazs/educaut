@@ -66,14 +66,8 @@ export function useCurrentClass(): UseCurrentClassResult {
 
     loadCurrentClass();
 
-    // Refresh every minute to check for new classes
-    const interval = setInterval(() => {
-      loadCurrentClass();
-    }, 60000);
-
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
   }, [school?.id]);
 

@@ -1,6 +1,7 @@
 import { IActivityContent } from "@/app/(app)/activities/_models";
 import { Card, CardContent } from "./ui/card";
 import { CanvasPreview } from "./canvas-preview";
+import { FilePreview } from "./school-files/FilePreview";
 import { ActivitiesTags } from "./activities_tags";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ interface ActivityCardProps {
   name: string;
   tags?: string[];
   canvasData?: IActivityContent["data"];
+  uploadData?: { url: string; fileType: string };
   actions?: React.ReactNode;
   onClick?: () => void;
   className?: string;
@@ -19,6 +21,7 @@ export function ActivityCard({
   name,
   tags,
   canvasData,
+  uploadData,
   actions,
   onClick,
   className,
@@ -39,7 +42,11 @@ export function ActivityCard({
             height ? `h-[${height}px]` : "h-[180px]"
           } rounded-lg overflow-hidden bg-muted`}
         >
-          {canvasData ? <CanvasPreview data={canvasData} /> : null}
+          {canvasData ? (
+            <CanvasPreview data={canvasData} />
+          ) : uploadData ? (
+            <FilePreview url={uploadData.url} type={uploadData.fileType} />
+          ) : null}
         </div>
       </div>
       <CardContent className="pt-4 shrink-0">
