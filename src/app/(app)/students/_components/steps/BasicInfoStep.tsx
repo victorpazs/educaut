@@ -134,15 +134,6 @@ export function BasicInfoStep({
         )}
 
         <div className="col-span-12">
-          <label className="text-sm font-medium">Descrição</label>
-          <Textarea
-            value={formData.description}
-            onChange={(e) => onInputChange("description", e.target.value)}
-            placeholder="Informações adicionais sobre o aluno"
-          />
-        </div>
-
-        <div className="col-span-12">
           <label className="text-sm font-medium">Diagnóstico</label>
           <Textarea
             value={formData.diagnosis || ""}
@@ -157,7 +148,7 @@ export function BasicInfoStep({
           <div className="relative">
             <div
               className={cn(
-                "flex min-h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
+                "flex min-h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background",
                 "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
                 "flex flex-wrap gap-2 items-center"
               )}
@@ -197,6 +188,15 @@ export function BasicInfoStep({
               />
             </div>
           </div>
+        </div>
+
+        <div className="col-span-12">
+          <label className="text-sm font-medium">Descrição</label>
+          <Textarea
+            value={formData.description}
+            onChange={(e) => onInputChange("description", e.target.value)}
+            placeholder="Informações adicionais sobre o aluno"
+          />
         </div>
       </div>
     </>
