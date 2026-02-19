@@ -5,7 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import { uploadImageToS3 } from "@/app/(app)/_files/actions";
 
 export interface AvatarInputProps {
@@ -88,7 +88,6 @@ export function AvatarInput({
       // Atualizar com URL do S3
       setPreview(url);
       onChange?.(url);
-      toast.success("Imagem enviada com sucesso.");
     } catch (error: unknown) {
       console.error("Erro ao processar arquivo:", error);
       const err = error as { message?: string };
@@ -164,23 +163,33 @@ export function AvatarInput({
         aria-disabled={disabled || isLoading}
       >
         <Avatar
-          className="h-24 w-24 group-hover:blur-xs group-hover:opacity-60"
+          className={cn(
+            "h-24 w-24",
+            !isLoading && "group-hover:blur-xs group-hover:opacity-60",
+            isLoading && "opacity-40",
+          )}
           src={preview ?? undefined}
           alt="Avatar preview"
         />
-        <div
-          className={cn(
-            "pointer-events-none absolute inset-0 flex flex-col gap-1 items-center justify-center rounded-full opacity-0 transition-all duration-200 ease-out",
-            "bg-background/60",
-            "group-hover:opacity-100",
-            isDragOver ? "opacity-100" : "",
-          )}
-        >
-          <Camera className="h-5 w-5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground font-bold tracking-wide">
-            Upload
-          </span>
-        </div>
+        {isLoading ? (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full">
+            <Loader2 className="h-6 w-6 text-primary animate-spin" />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-0 flex flex-col gap-1 items-center justify-center rounded-full opacity-0 transition-all duration-200 ease-out",
+              "bg-background/60",
+              "group-hover:opacity-100",
+              isDragOver ? "opacity-100" : "",
+            )}
+          >
+            <Camera className="h-5 w-5 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground font-bold tracking-wide">
+              Upload
+            </span>
+          </div>
+        )}
       </div>
       {preview ? (
         <Button

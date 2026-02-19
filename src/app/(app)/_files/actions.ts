@@ -39,6 +39,19 @@ async function uploadToS3(
   const uniqueName = `${Date.now()}-${crypto.randomUUID()}.${fileExtension}`;
   const fileKey = `${BASE_FOLDER}/${subFolder}/${uniqueName}`;
 
+  console.log({
+    client: s3Client,
+    params: {
+      Bucket: process.env.AWS_BUCKET_NAME!,
+      Key: fileKey,
+      Body: file,
+      ContentType: file.type || "application/octet-stream",
+    },
+    queueSize: 4,
+    partSize: 1024 * 1024 * 5,
+    leavePartsOnError: false,
+  });
+
   const parallelUpload = new Upload({
     client: s3Client,
     params: {
