@@ -13,6 +13,10 @@ export default function AuthLayout({
   const pathname = usePathname();
   const isLoginPage = pathname === "/auth/login";
   const isLogoutPage = pathname === "/auth/logout";
+  const isVerifyEmailPage = pathname?.startsWith("/auth/verify-email");
+  const isPasswordRecoveryPage = pathname?.startsWith(
+    "/auth/password-recovery",
+  );
 
   if (isLogoutPage) {
     return (
@@ -33,19 +37,29 @@ export default function AuthLayout({
 
       <div className="flex-1 lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
-          <div className="text-center mb-4">
-            <div className="flex items-center justify-center space-x-2 mb-2">
-              <AppLogo className="md:w-24 md:h-24 w-16 h-16" />
+          {!isVerifyEmailPage && !isPasswordRecoveryPage && (
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <AppLogo className="md:w-24 md:h-24 w-16 h-16" />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-1">
+                {isLoginPage ? "Bem-vindo educador!" : "Registre-se!"}
+              </h2>
+              <p className="text-secondary font-medium text-lg">
+                {isLoginPage
+                  ? "Acesse seu painel de controle do educador."
+                  : "Gerencie os seus alunos, atividades e agenda de forma simples e prática."}
+              </p>
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-1">
-              {isLoginPage ? "Bem-vindo educador!" : "Registre-se!"}
-            </h2>
-            <p className="text-secondary font-medium text-lg">
-              {isLoginPage
-                ? "Acesse seu painel de controle do educador."
-                : "Gerencie os seus alunos, atividades e agenda de forma simples e prática."}
-            </p>
-          </div>
+          )}
+
+          {(isVerifyEmailPage || isPasswordRecoveryPage) && (
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <AppLogo className="md:w-24 md:h-24 w-16 h-16" />
+              </div>
+            </div>
+          )}
 
           {children}
         </div>

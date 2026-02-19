@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import { Camera } from "lucide-react";
 import { uploadImageToS3 } from "@/app/(app)/_files/actions";
-import axios from "axios";
 
 export interface AvatarInputProps {
   value?: string | null;
@@ -69,31 +68,22 @@ export function AvatarInput({
       });
       setPreview(toDataUrl);
 
-      // Gerar link de upload no S3
-      const linkResponse = await uploadImageToS3(
-        file.name,
-        file.size,
-        file.type || "image/jpeg"
-      );
+      // Upload via server action
+      const formData = new FormData();
+      formData.append("file", file);
 
-      if (!linkResponse.success || !linkResponse.data) {
+      const response = await uploadImageToS3(formData);
+
+      if (!response.success || !response.data) {
         toast.error(
-          "Erro ao gerar link de upload",
-          linkResponse.message || "Tente novamente."
+          "Erro ao enviar imagem",
+          response.message || "Tente novamente.",
         );
+        setPreview(value ?? null);
         return;
       }
 
-      const { uploadUrl, url } = linkResponse.data;
-
-      // Upload direto para S3 usando axios
-      await axios.put(uploadUrl, file, {
-        headers: {
-          "Content-Type": file.type || "image/jpeg",
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-      });
+      const { url } = response.data;
 
       // Atualizar com URL do S3
       setPreview(url);
@@ -101,21 +91,16 @@ export function AvatarInput({
       toast.success("Imagem enviada com sucesso.");
     } catch (error: unknown) {
       console.error("Erro ao processar arquivo:", error);
-      const err = error as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      toast.error(
-        "Erro ao enviar imagem.",
-        err.response?.data?.message || err.message || "Tente novamente."
-      );
+      const err = error as { message?: string };
+      toast.error("Erro ao enviar imagem.", err.message || "Tente novamente.");
+      setPreview(value ?? null);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -154,7 +139,7 @@ export function AvatarInput({
     <div
       className={cn(
         "flex flex-col items-center justify-center h-full gap-4",
-        className
+        className,
       )}
     >
       <input
@@ -169,7 +154,7 @@ export function AvatarInput({
         className={cn(
           "relative inline-block group",
           disabled ? "cursor-not-allowed" : "cursor-pointer",
-          isDragOver ? "ring-2 ring-primary ring-offset-2 rounded-full" : ""
+          isDragOver ? "ring-2 ring-primary ring-offset-2 rounded-full" : "",
         )}
         onClick={handlePick}
         onDragOver={handleDragOver}
@@ -188,7 +173,7 @@ export function AvatarInput({
             "pointer-events-none absolute inset-0 flex flex-col gap-1 items-center justify-center rounded-full opacity-0 transition-all duration-200 ease-out",
             "bg-background/60",
             "group-hover:opacity-100",
-            isDragOver ? "opacity-100" : ""
+            isDragOver ? "opacity-100" : "",
           )}
         >
           <Camera className="h-5 w-5 text-muted-foreground" />

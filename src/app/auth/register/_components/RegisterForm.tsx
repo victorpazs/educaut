@@ -11,7 +11,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { IconInput } from "../../../../components/ui/icon-input";
 import { withValidation } from "@/lib/validation";
 import { toast } from "@/lib/toast";
-import { homeRoute } from "@/lib/contraints";
+import { verifyEmailRoute } from "@/lib/contraints";
 import { registerAction } from "@/app/auth/actions";
 import { RegisterSchema, RegisterValues } from "../_models";
 
@@ -43,20 +43,29 @@ export default function RegisterForm() {
         if (!response.success) {
           toast.error(
             "Erro",
-            response.message || "Não foi possível criar a conta."
+            response.message || "Não foi possível criar a conta.",
           );
           return;
         }
 
-        router.push(homeRoute);
-        router.refresh();
+        const email =
+          response.data &&
+          typeof response.data === "object" &&
+          "email" in response.data
+            ? (response.data as { email: string }).email
+            : values.email;
+
+        toast.success("Código enviado!", "Verifique seu e-mail.");
+        router.push(
+          `${verifyEmailRoute}?email=${encodeURIComponent(email)}&type=registration_otp`,
+        );
       } catch (error) {
         toast.error(
           "Erro",
-          "Ocorreu um erro inesperado. Por favor, tente novamente."
+          "Ocorreu um erro inesperado. Por favor, tente novamente.",
         );
       }
-    }
+    },
   );
 
   return (

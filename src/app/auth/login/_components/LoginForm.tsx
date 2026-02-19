@@ -11,11 +11,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { withValidation } from "@/lib/validation";
 import { loginAction } from "@/app/auth/actions";
 import { toast } from "@/lib/toast";
-import { homeRoute } from "@/lib/contraints";
+import { homeRoute, verifyEmailRoute } from "@/lib/contraints";
 import { LoginSchema, LoginValues } from "../_models";
+import ForgotPasswordDialog from "./ForgotPasswordDialog";
 
 export default function LoginForm() {
   const router = useRouter();
+  const [forgotPasswordOpen, setForgotPasswordOpen] = React.useState(false);
   const {
     register,
     handleSubmit,
@@ -33,9 +35,18 @@ export default function LoginForm() {
       const loginResult = await loginAction(values);
 
       if (!loginResult.success) {
+        // Se requer 2FA, redirecionar para tela de OTP
+        if (loginResult.error?.code === "REQUIRES_2FA") {
+          toast.success("Verificação", loginResult.message);
+          router.push(
+            `${verifyEmailRoute}?email=${encodeURIComponent(values.email)}&type=login_otp`,
+          );
+          return;
+        }
+
         toast.error(
           "Erro",
-          loginResult.message || "Não foi possível fazer login."
+          loginResult.message || "Não foi possível fazer login.",
         );
       } else if (loginResult.success) {
         router.push(homeRoute);
@@ -44,7 +55,7 @@ export default function LoginForm() {
     } catch (error) {
       toast.error(
         "Erro",
-        "Ocorreu um erro inesperado. Por favor, tente novamente."
+        "Ocorreu um erro inesperado. Por favor, tente novamente.",
       );
     }
   });
@@ -58,6 +69,16 @@ export default function LoginForm() {
           error={errors.password?.message}
           {...register("password")}
         />
+
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setForgotPasswordOpen(true)}
+            className="text-sm text-primary hover:underline cursor-pointer font-medium"
+          >
+            Esqueci minha senha
+          </button>
+        </div>
 
         <Button
           type="submit"
@@ -79,6 +100,11 @@ export default function LoginForm() {
           Registre-se
         </Link>
       </div>
+
+      <ForgotPasswordDialog
+        open={forgotPasswordOpen}
+        onOpenChange={setForgotPasswordOpen}
+      />
     </div>
   );
 }

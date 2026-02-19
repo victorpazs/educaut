@@ -3,19 +3,25 @@ import type { NextRequest } from "next/server";
 import { verifyJwt } from "@/lib/jwt";
 import { homeRoute, loginRoute } from "./lib/contraints";
 
-const publicPaths = [loginRoute, "/auth/register", "/auth/logout"];
+const publicPaths = [
+  loginRoute,
+  "/auth/register",
+  "/auth/logout",
+  "/auth/verify-email",
+  "/auth/password-recovery",
+];
 const publicPathsRedirectingAuthenticated = [loginRoute, "/auth/register"];
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   const isPublic = publicPaths.some((path) =>
-    req.nextUrl.pathname.startsWith(path)
+    req.nextUrl.pathname.startsWith(path),
   );
 
   if (isPublic) {
     const shouldRedirectHome = publicPathsRedirectingAuthenticated.some(
-      (path) => req.nextUrl.pathname.startsWith(path)
+      (path) => req.nextUrl.pathname.startsWith(path),
     );
 
     if (shouldRedirectHome && !!token) {

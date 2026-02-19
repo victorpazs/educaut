@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import { CloudUpload } from "lucide-react";
-import axios from "axios";
 import { Upload, type UploadProps, type UploadRenderState } from "./index";
-import { generateUploadLink, confirmUpload } from "@/app/(app)/_files/actions";
+import { uploadSchoolFile } from "@/app/(app)/_files/actions";
 import { toast } from "@/lib/toast";
 
 function buildAcceptFromFileTypes(fileTypes?: string[]): UploadProps["accept"] {
@@ -69,7 +68,7 @@ export function UploadDropzone({
   const [isUploading, setIsUploading] = React.useState(false);
   const accept = React.useMemo(
     () => buildAcceptFromFileTypes(fileTypes),
-    [fileTypes]
+    [fileTypes],
   );
 
   const handleFiles = React.useCallback(
@@ -80,60 +79,28 @@ export function UploadDropzone({
       setIsUploading(true);
 
       try {
-        const linkResponse = await generateUploadLink(
-          file.name,
-          file.size,
-          file.type || "application/octet-stream"
-        );
+        const formData = new FormData();
+        formData.append("file", file);
 
-        if (!linkResponse.success || !linkResponse.data) {
-          toast.error("Erro ao gerar link de upload", linkResponse.message);
-          setIsUploading(false);
-          return;
-        }
+        const response = await uploadSchoolFile(formData);
 
-        const { uploadUrl, fileId, url } = linkResponse.data;
-        console.log("Upload URL:", uploadUrl);
-        console.log("File type:", typeof file);
-
-        // Usar axios.put diretamente para garantir que o File seja enviado corretamente
-        await axios.put(uploadUrl, file, {
-          headers: {
-            "Content-Type": file.type || "application/octet-stream",
-          },
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        });
-
-        const confirmResponse = await confirmUpload(fileId);
-
-        if (confirmResponse.success) {
+        if (response.success) {
           toast.success("Arquivo enviado com sucesso.");
           onUploadSuccess?.();
         } else {
-          toast.error("Erro ao confirmar upload", confirmResponse.message);
+          toast.error("Erro ao enviar arquivo", response.message);
         }
       } catch (error: unknown) {
         console.error("Erro ao fazer upload:", error);
-        const err = error as {
-          response?: { data?: { message?: string } };
-        };
-        if (err.response) {
-          toast.error(
-            "Erro ao fazer upload",
-            err.response.data?.message || "Erro desconhecido"
-          );
-        } else {
-          toast.error(
-            "Erro",
-            "Não foi possível enviar o arquivo. Verifique sua conexão."
-          );
-        }
+        toast.error(
+          "Erro",
+          "Não foi possível enviar o arquivo. Verifique sua conexão.",
+        );
       } finally {
         setIsUploading(false);
       }
     },
-    [onUploadSuccess]
+    [onUploadSuccess],
   );
 
   return (
@@ -178,8 +145,8 @@ export function UploadDropzone({
               {isUploading
                 ? "Enviando arquivo..."
                 : isActive
-                ? "Solte os arquivos aqui"
-                : "Arraste e solte arquivos, ou clique para selecionar"}
+                  ? "Solte os arquivos aqui"
+                  : "Arraste e solte arquivos, ou clique para selecionar"}
             </div>
             <div className="text-xs text-secondary">
               {fileTypes && fileTypes.length
