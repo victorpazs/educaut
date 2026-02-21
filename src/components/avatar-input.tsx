@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import { Camera, Loader2 } from "lucide-react";
 import { uploadImageToS3 } from "@/app/(app)/_files/actions";
+import { resizeImage } from "@/lib/image";
 
 export interface AvatarInputProps {
   value?: string | null;
@@ -45,17 +46,21 @@ export function AvatarInput({
     onChange?.(null);
   };
 
-  const processFile = async (file: File): Promise<void> => {
+  const processFile = async (originalFile: File): Promise<void> => {
     setIsLoading(true);
     try {
-      const sizeMb = file.size / (1024 * 1024);
-      if (sizeMb > maxSizeMb) {
-        toast.error(`Imagem muito grande. Máximo de ${maxSizeMb}MB.`);
+      if (!originalFile.type.startsWith("image/")) {
+        toast.error("Arquivo inválido. Selecione uma imagem.");
         return;
       }
 
-      if (!file.type.startsWith("image/")) {
-        toast.error("Arquivo inválido. Selecione uma imagem.");
+      // Redimensionar a imagem para não termos imagens gigantes no s3
+      // Max 512x512 mantendo a proporção da imagem original
+      const file = await resizeImage(originalFile, 512, 512);
+
+      const sizeMb = file.size / (1024 * 1024);
+      if (sizeMb > maxSizeMb) {
+        toast.error(`Imagem muito grande. Máximo de ${maxSizeMb}MB.`);
         return;
       }
 

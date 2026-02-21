@@ -10,7 +10,7 @@ export function getScaledSize(object: any): { width: number; height: number } {
 export function reapplyScaleToMatchSize(
   object: any,
   targetWidth: number,
-  targetHeight: number
+  targetHeight: number,
 ): void {
   const naturalW = Number(object?.width ?? 0) || 0;
   const naturalH = Number(object?.height ?? 0) || 0;
@@ -52,7 +52,7 @@ export function ensureImageAutoRender(object: any, canvas?: any): void {
 export async function setObjectImageFromDataUrl(
   object: any,
   dataUrl: string,
-  canvas?: any
+  canvas?: any,
 ): Promise<void> {
   if (!object || !dataUrl) return;
   const { width: prevW, height: prevH } = getScaledSize(object);
@@ -116,7 +116,7 @@ export function applyCornerRadiusToImage(
   object: any,
   fabricNS: any,
   canvas: any,
-  radius: number
+  radius: number,
 ): void {
   if (!object) return;
   try {
