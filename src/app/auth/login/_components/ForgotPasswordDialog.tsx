@@ -75,7 +75,7 @@ export default function ForgotPasswordDialog({
           <Button
             type="submit"
             disabled={isSubmitting || !email}
-            className="w-full py-5 bg-primary hover:opacity-80 text-primary-foreground font-medium"
+            className="w-full py-6! bg-primary hover:opacity-80 text-lg mt-4 text-primary-foreground font-medium"
           >
             {isSubmitting ? "Enviando..." : "Enviar link de recuperação"}
           </Button>

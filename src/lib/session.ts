@@ -34,6 +34,7 @@ export const getCurrentUser = cache(async () => {
         email: true,
         created_at: true,
         avatar: true,
+        require_two_factor: true,
         school_users: {
           where: {
             schools: {
@@ -51,7 +52,7 @@ export const getCurrentUser = cache(async () => {
       return null;
     }
     const user_schools = user.school_users.map(
-      (school_user) => school_user.schools
+      (school_user) => school_user.schools,
     );
 
     const { school_users, ...userWithoutSchoolUsers } = user;
@@ -82,7 +83,7 @@ export const getSelectedSchoolById = cache(
       console.error("Failed to fetch school from cookie:", error);
       return null;
     }
-  }
+  },
 );
 
 export const getAuthContext = cache(async () => {
@@ -110,7 +111,7 @@ export const getAuthContext = cache(async () => {
   ) {
     const foundSchool = await getSelectedSchoolById(
       Number(selectedSchool.data.id),
-      user.id
+      user.id,
     );
 
     if (foundSchool) {
